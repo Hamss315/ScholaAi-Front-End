@@ -1,0 +1,113 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Mail, Lock, User } from "lucide-react";
+import { Button } from "../../../components/ui/button";
+import { Input } from "../../../components/ui/input";
+import { Label } from "../../../components/ui/label";
+import RoleSelector from "./RoleSelector";
+
+type UserRole = "student" | "teacher" | "admin";
+
+export default function RegisterForm() {
+  const navigate = useNavigate();
+
+  const [role, setRole] = useState<UserRole>("student");
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Keep your original behavior: register → onboarding
+    if (role === "student") navigate("/student/onboarding", { state: { fullName, email } });
+    else if (role === "teacher") navigate("/teacher/onboarding", { state: { fullName, email } });
+    else navigate("/admin/panel"); // if you allow admin signup, otherwise remove admin from RoleSelector for register
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <Label htmlFor="reg-name">Full Name</Label>
+        <div className="relative mt-1">
+          <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+          <Input
+            id="reg-name"
+            type="text"
+            placeholder="John Doe"
+            className="pl-10"
+            required
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+          />
+        </div>
+      </div>
+
+      <div>
+        <Label htmlFor="reg-email">Email</Label>
+        <div className="relative mt-1">
+          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+          <Input
+            id="reg-email"
+            type="email"
+            placeholder="your@email.com"
+            className="pl-10"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
+      </div>
+
+      <div>
+        <Label htmlFor="reg-password">Password</Label>
+        <div className="relative mt-1">
+          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+          <Input
+            id="reg-password"
+            type="password"
+            placeholder="••••••••"
+            className="pl-10"
+            required
+          />
+        </div>
+      </div>
+
+      {/* Reuse your RoleSelector */}
+        <RoleSelector
+        role={role}
+        setRole={setRole}
+        label="Register as"
+        allowedRoles={["student", "teacher"]}
+        />
+
+      <div className="text-sm text-gray-600">
+        By registering, you agree to our{" "}
+        <a href="#" className="hover:underline" style={{ color: "#3B82F6" }}>
+          Terms of Service
+        </a>{" "}
+        and{" "}
+        <a href="#" className="hover:underline" style={{ color: "#3B82F6" }}>
+          Privacy Policy
+        </a>
+        .
+      </div>
+
+      <Button type="submit" className="w-full bg-[#1E3A8A] hover:bg-[#1e3a8a]/90">
+        Create Account
+      </Button>
+
+      {/* Optional: link back to login route */}
+      <div className="text-center text-sm text-gray-600">
+        Already have an account?{" "}
+        <button
+          type="button"
+          className="hover:underline"
+          style={{ color: "#3B82F6" }}
+          onClick={() => navigate("/login")}
+        >
+          Login
+        </button>
+      </div>
+    </form>
+  );
+}

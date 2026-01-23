@@ -1,0 +1,114 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ================================
+   DESIGN TOKENS (FROM FIGMA)
+================================ */
+
+:root {
+  --font-size: 16px;
+
+  --background: #ffffff;
+  --foreground: #111827;
+
+  --card: #ffffff;
+  --card-foreground: #111827;
+
+  --popover: #ffffff;
+  --popover-foreground: #111827;
+
+  --primary: #1E3A8A;
+  --primary-foreground: #ffffff;
+
+  --secondary: #3B82F6;
+  --secondary-foreground: #ffffff;
+  
+  --muted: #F3F4F6;
+  --muted-foreground: #6B7280;
+
+  --accent: #8B5CF6;
+  --accent-foreground: #ffffff;
+
+  --destructive: #EF4444;
+  --destructive-foreground: #ffffff;
+
+  --success: #22C55E;
+  --warning: #FACC15;
+
+  --border: #E5E7EB;
+
+  --input-background: #F3F4F6;
+  --switch-background: #D1D5DB;
+
+  --ring: #3B82F6;
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+
+  --radius-sm: 0.5rem;
+  --radius-md: 0.625rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+}
+
+/* ================================
+   DARK MODE TOKENS
+================================ */
+
+.dark {
+  --background: #0f172a;
+  --foreground: #f9fafb;
+
+  --card: #020617;
+  --card-foreground: #f9fafb;
+
+  --popover: #020617;
+  --popover-foreground: #f9fafb;
+
+  --primary: #f9fafb;
+  --primary-foreground: #020617;
+
+  --secondary: #1e293b;
+  --secondary-foreground: #f9fafb;
+
+  --muted: #1e293b;
+  --muted-foreground: #9ca3af;
+
+  --accent: #1e293b;
+  --accent-foreground: #f9fafb;
+
+  --border: #1e293b;
+
+  --ring: #334155;
+}
+
+/* ================================
+   BASE STYLES (TAILWIND v3 SAFE)
+================================ */
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-size: var(--font-size);
+  }
+
+  h1 {
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  h2,
+  h3,
+  h4,
+  p,
+  label,
+  button,
+  input {
+    line-height: 1.5;
+  }
+}
