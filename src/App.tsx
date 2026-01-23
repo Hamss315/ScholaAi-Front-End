@@ -9,19 +9,10 @@ import ResetPasswordNewPage from "./features/auth/pages/ResetPasswordNewPage";
 import ResetPasswordSuccessPage from "./features/auth/pages/ResetPasswordSuccessPage";
 import StudentProfilePage from "./features/student/pages/StudentProfilePage";
 
-import { Button } from "./components/ui/button";
-import { LogOut } from "lucide-react";
-
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={
-          <Button variant="ghost" size="icon" onClick={() => useNavigate()} className="absolute top-4 right-4">
-            <LogOut className="w-5 h-5" />
-          </Button>
-        } />
-
         {/* Auth */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
