@@ -16,7 +16,7 @@ import {
 import { Separator } from "../../../components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui/tabs";
 
-import { Edit, Save, X, Lock, Mail, Calendar, FileText, Globe, Settings, Clock } from "lucide-react";
+import { Edit, Save, X, Lock, Mail, Calendar, FileText, Globe, Settings, Clock, Phone, User } from "lucide-react";
 
 import type {
   ProfileData,
@@ -83,17 +83,26 @@ export default function StudentProfileTabs({
               </h3>
 
               {!isEditingProfile ? (
-                <Button onClick={() => setIsEditingProfile(true)} style={{ backgroundColor: "#3B82F6" }}>
+                <Button
+                  onClick={() => setIsEditingProfile(true)}
+                  style={{ backgroundColor: "#3B82F6" }}
+                >
                   <Edit className="w-4 h-4 mr-2" />
                   Edit Profile
                 </Button>
               ) : (
                 <div className="flex gap-2">
-                  <Button onClick={onSaveProfile} style={{ backgroundColor: "#22C55E" }}>
+                  <Button
+                    onClick={onSaveProfile}
+                    style={{ backgroundColor: "#22C55E" }}
+                  >
                     <Save className="w-4 h-4 mr-2" />
                     Save
                   </Button>
-                  <Button variant="outline" onClick={() => setIsEditingProfile(false)}>
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsEditingProfile(false)}
+                  >
                     <X className="w-4 h-4 mr-2" />
                     Cancel
                   </Button>
@@ -102,17 +111,23 @@ export default function StudentProfileTabs({
             </div>
 
             <div className="space-y-4">
+              {/* Full Name */}
               <div>
                 <Label htmlFor="name">Full Name</Label>
-                <Input
-                  id="name"
-                  value={profileData.name}
-                  onChange={(e) => setProfileData((p) => ({ ...p, name: e.target.value }))}
-                  disabled={!isEditingProfile}
-                  className="mt-1"
-                />
+                <div className="flex items-center gap-2 mt-1">
+                  <User className="w-4 h-4 text-gray-400" />
+                  <Input
+                    id="name"
+                    value={profileData.name}
+                    onChange={(e) =>
+                      setProfileData((p) => ({ ...p, name: e.target.value }))
+                    }
+                    disabled={!isEditingProfile}
+                  />
+                </div>
               </div>
 
+              {/* Email */}
               <div>
                 <Label htmlFor="email">Email Address</Label>
                 <div className="flex items-center gap-2 mt-1">
@@ -121,29 +136,53 @@ export default function StudentProfileTabs({
                     id="email"
                     type="email"
                     value={profileData.email}
-                    onChange={(e) => setProfileData((p) => ({ ...p, email: e.target.value }))}
+                    onChange={(e) =>
+                      setProfileData((p) => ({ ...p, email: e.target.value }))
+                    }
                     disabled={!isEditingProfile}
                   />
                 </div>
               </div>
 
+              {/* Phone */}
+              <div>
+                <Label htmlFor="phone">Phone Number</Label>
+                <div className="flex items-center gap-2 mt-1">
+                  <Phone className="w-4 h-4 text-gray-400" />
+                  <Input
+                    id="phone"
+                    value={profileData.phone}
+                    onChange={(e) =>
+                      setProfileData((p) => ({ ...p, phone: e.target.value }))
+                    }
+                    disabled={!isEditingProfile}
+                  />
+                </div>
+              </div>
+
+              {/* Grade */}
               <div>
                 <Label htmlFor="grade">Grade Level</Label>
                 <Input
                   id="grade"
                   value={profileData.grade}
-                  onChange={(e) => setProfileData((p) => ({ ...p, grade: e.target.value }))}
+                  onChange={(e) =>
+                    setProfileData((p) => ({ ...p, grade: e.target.value }))
+                  }
                   disabled={!isEditingProfile}
                   className="mt-1"
                 />
               </div>
 
+              {/* Bio */}
               <div>
                 <Label htmlFor="bio">Bio</Label>
                 <Input
                   id="bio"
                   value={profileData.bio}
-                  onChange={(e) => setProfileData((p) => ({ ...p, bio: e.target.value }))}
+                  onChange={(e) =>
+                    setProfileData((p) => ({ ...p, bio: e.target.value }))
+                  }
                   disabled={!isEditingProfile}
                   className="mt-1"
                 />
@@ -151,6 +190,7 @@ export default function StudentProfileTabs({
             </div>
           </Card>
         </TabsContent>
+
 
         {/* Settings Tab */}
         <TabsContent value="settings">

@@ -16,7 +16,6 @@ export default function StudentProfilePage() {
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
 
-  // ✅ STATIC profile data (no services/localStorage yet)
   const [profileData, setProfileData] = useState<ProfileData>({
     name: "John Smith",
     email: "john.smith@example.com",
