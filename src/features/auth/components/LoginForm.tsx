@@ -4,13 +4,12 @@ import { Mail, Lock } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
-import RoleSelector from "./RoleSelector";
 
 type UserRole = "student" | "teacher" | "admin";
 
 export default function LoginForm() {
   const navigate = useNavigate();
-  const [role, setRole] = useState<UserRole>("student");
+  const [role] = useState<UserRole>("student");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,13 +49,6 @@ export default function LoginForm() {
           />
         </div>
       </div>
-
-      <RoleSelector
-        role={role}
-        setRole={setRole}
-        label="Login as"
-        allowedRoles={["student", "teacher", "admin"]}
-      />
 
       <div className="flex items-center justify-between">
                   <label className="flex items-center gap-2">

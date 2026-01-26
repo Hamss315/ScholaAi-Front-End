@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route} from "react-router-dom";
 
 import LoginPage from "./features/auth/pages/LoginPage";
 import RegisterPage from "./features/auth/pages/RegisterPage";
@@ -7,7 +7,9 @@ import ResetPasswordRequestPage from "./features/auth/pages/ResetPasswordRequest
 import ResetPasswordEmailSentPage from "./features/auth/pages/ResetPasswordEmailSentPage";
 import ResetPasswordNewPage from "./features/auth/pages/ResetPasswordNewPage";
 import ResetPasswordSuccessPage from "./features/auth/pages/ResetPasswordSuccessPage";
+
 import StudentProfilePage from "./features/student/pages/StudentProfilePage";
+import TeacherProfilePage from "./features/teacher/pages/TeacherProfilePage";
 
 export default function App() {
   return (
@@ -24,6 +26,7 @@ export default function App() {
         <Route path="/reset-password/success" element={<ResetPasswordSuccessPage />} />
 
         <Route path="/student/profile" element={<StudentProfilePage />} />
+        <Route path="/teacher/profile" element={<TeacherProfilePage />} />
 
         {/* Dashboards (later) */}
         {/*

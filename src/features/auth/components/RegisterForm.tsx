@@ -18,10 +18,9 @@ export default function RegisterForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Keep your original behavior: register → onboarding
-    if (role === "student") navigate("/student/onboarding", { state: { fullName, email } });
-    else if (role === "teacher") navigate("/teacher/onboarding", { state: { fullName, email } });
-    else navigate("/admin/panel"); // if you allow admin signup, otherwise remove admin from RoleSelector for register
+    if (role === "student") navigate("/onboarding/student", { state: { fullName, email } });
+    else if (role === "teacher") navigate("/onboarding/teacher", { state: { fullName, email } });
+    else navigate("/admin/panel"); 
   };
 
   return (
