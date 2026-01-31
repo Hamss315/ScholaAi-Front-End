@@ -13,7 +13,6 @@ import {
   X,
   Upload,
   FileText,
-  Globe,
   Bell,
   Inbox,
   CalendarIcon,
@@ -28,7 +27,6 @@ import { Avatar, AvatarFallback } from "../../../components/ui/avatar";
 import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
 import { Switch } from "../../../components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
 import { Separator } from "../../../components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui/tabs";
 import { Textarea } from "../../../components/ui/textarea";
@@ -84,8 +82,6 @@ export default function TeacherProfileTabs({
   recentReviews,
   notifications,
   setNotifications,
-  language,
-  setLanguage,
   isEditingProfile,
   setIsEditingProfile,
   isEditingProfessional,
@@ -96,10 +92,13 @@ export default function TeacherProfileTabs({
   onSaveProfessional,
   onChangePassword,
 }: Props) {
-  const initials = useMemo(() => {
-    const parts = (profileData.name || "SR").trim().split(" ");
-    return parts.slice(0, 2).map((p) => p[0]?.toUpperCase()).join("") || "SR";
-  }, [profileData.name]);
+ const initials = useMemo(() => {
+  const firstInitial = profileData.firstName?.[0]?.toUpperCase() || "";
+  const lastInitial = profileData.lastName?.[0]?.toUpperCase() || "";
+
+  return (firstInitial + lastInitial) || "SR";
+}, [profileData.firstName, profileData.lastName]);
+
 
   return (
     <div className="md:col-span-2">
@@ -140,13 +139,26 @@ export default function TeacherProfileTabs({
 
             <div className="space-y-4">
               <div>
-                <Label htmlFor="name">Full Name</Label>
+                <Label htmlFor="firstName">First Name</Label>
                 <div className="flex items-center gap-2 mt-1">
                   <User className="w-4 h-4 text-gray-400 shrink-0" />
                   <Input
-                    id="name"
-                    value={profileData.name}
-                    onChange={(e) => setProfileData({ ...profileData, name: e.target.value })}
+                    id="firstName"
+                    value={profileData.firstName}
+                    onChange={(e) => setProfileData({ ...profileData, firstName: e.target.value })}
+                    disabled={!isEditingProfile}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="lastName">Last Name</Label>
+                <div className="flex items-center gap-2 mt-1">
+                  <User className="w-4 h-4 text-gray-400 shrink-0" />
+                  <Input
+                    id="lastName"
+                    value={profileData.lastName}
+                    onChange={(e) => setProfileData({ ...profileData, lastName: e.target.value })}
                     disabled={!isEditingProfile}
                   />
                 </div>

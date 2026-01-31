@@ -1,5 +1,6 @@
 export type ProfileData = {
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
   phone: string;
   grade: string;

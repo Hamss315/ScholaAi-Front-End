@@ -22,12 +22,17 @@ export default function StudentProfileHeader() {
           </div>
 
           <div className="flex items-center gap-4">
+            <Button variant="ghost" onClick={() => navigate("/student/find-teachers")}>
+              <Send className="w-4 h-4 mr-2" />
+              Find Teachers
+            </Button>
+
             <Button variant="ghost" onClick={() => navigate("/student/request-session")}>
               <Send className="w-4 h-4 mr-2" />
               Request Session
             </Button>
 
-            <Button variant="ghost" onClick={() => navigate("/chats")}>
+            <Button variant="ghost" onClick={() => navigate("/student/messages")}>
               <MessageSquare className="w-4 h-4 mr-2" />
               Messages
             </Button>

@@ -75,11 +75,23 @@ export default function StepPersonalInfo({ formData, setFormData }: Props) {
 
       <div className="grid md:grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="fullname">Full Name *</Label>
+          <Label htmlFor="firstname">First Name *</Label>
           <Input
-            id="fullname"
-            value={formData.fullName}
-            onChange={(e) => setFormData((prev) => ({ ...prev, fullName: e.target.value }))}
+            id="firstname"
+            value={formData.firstName}
+            onChange={(e) => setFormData((prev) => ({ ...prev, firstName: e.target.value }))}
+            placeholder="John Doe"
+            className="mt-[5px]"
+            required
+          />
+        </div>
+
+        <div>
+          <Label htmlFor="lastname">Last Name *</Label>
+          <Input
+            id="lastname"
+            value={formData.lastName}
+            onChange={(e) => setFormData((prev) => ({ ...prev, lastName: e.target.value }))}
             placeholder="John Doe"
             className="mt-[5px]"
             required

@@ -19,7 +19,8 @@ export default function TeacherProfilePage() {
   const [isChangingPassword, setIsChangingPassword] = useState(false);
 
   const [profileData, setProfileData] = useState<TeacherProfileData>({
-    name: "Dr. Sarah Roberts",
+    firstName: "Dr Sarah",
+    lastName: "Roberts",
     email: "sarah.roberts@example.com",
     phone: "+1 (555) 987-6543",
     bio: "Passionate educator with 10+ years of experience in mathematics and physics. Specialized in making complex concepts easy to understand.",

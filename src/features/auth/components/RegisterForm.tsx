@@ -20,12 +20,10 @@ export default function RegisterForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const fullName = `${firstName.trim()} ${lastName.trim()}`;
-
     if (role === "student") {
-      navigate("/onboarding/student", { state: { fullName, email } });
+      navigate("/onboarding/student", { state: { firstName, lastName, email } });
     } else if (role === "teacher") {
-      navigate("/onboarding/teacher", { state: { fullName, email } });
+      navigate("/onboarding/teacher", { state: { firstName, lastName, email } });
     } else {
       navigate("/admin/panel");
     }

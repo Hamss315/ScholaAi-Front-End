@@ -7,7 +7,8 @@ import { useNavigate } from "react-router-dom";
 
 type Props = {
   profileData: {
-    name: string;
+    firstName: string;
+    lastName: string;
     grade: string;
   };
   sessionStats: {
@@ -39,7 +40,7 @@ export default function StudentProfileSidebar({
           </Avatar>
 
           <h2 className="text-2xl mb-1" style={{ color: "#1E3A8A" }}>
-            {profileData.name}
+            {profileData.firstName} {profileData.lastName}
           </h2>
           <p className="text-gray-600 mb-1">{profileData.grade}</p>
 

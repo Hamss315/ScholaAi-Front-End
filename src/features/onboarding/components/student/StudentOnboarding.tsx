@@ -13,21 +13,23 @@ import StepConfirmation from "../student/StepConfirmation";
 import type { StudentOnboardingData } from "../../types/onboarding.types";
 
 interface Props {
-  fullName: string;
+  firstName: string;
+  lastName: string;
   email?: string;
   onComplete: () => void;
 }
 
 const TOTAL_STEPS = 4;
 
-export default function StudentOnboarding({ fullName, email, onComplete }: Props) {
+export default function StudentOnboarding({ firstName, lastName, email, onComplete }: Props) {
   const [currentStep, setCurrentStep] = useState(1);
 
   const [cameraPermission, setCameraPermission] = useState<boolean | null>(null);
   const [micPermission, setMicPermission] = useState<boolean | null>(null);
 
   const [formData, setFormData] = useState<StudentOnboardingData>({
-    fullName: fullName || "",
+    firstName: firstName || "",
+    lastName: lastName || "",
     email,
 
     profileImage: null,
@@ -50,7 +52,8 @@ export default function StudentOnboarding({ fullName, email, onComplete }: Props
     switch (currentStep) {
       case 1:
         return (
-          formData.fullName.trim().length > 0 &&
+          formData.firstName.trim().length > 0 &&
+          formData.lastName.trim().length > 0 &&
           formData.gender.trim().length > 0 &&
           formData.grade !== null
         );

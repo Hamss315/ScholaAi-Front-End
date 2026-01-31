@@ -1,7 +1,8 @@
 export type StudentAvailability = Record<string, string[]>;
 
 export type StudentOnboardingData = {
-  fullName: string;
+  firstName: string;
+  lastName: string;
   email?: string;
 
   profileImage: string | null;
@@ -24,7 +25,8 @@ export type AvailabilityMap = Record<WeekDay, string[]>;
 export type TeacherExperienceValue = "0-2" | "3-5" | "6-10" | "10+";
 
 export interface TeacherOnboardingData {
-  fullName: string;
+  firstName: string;
+  lastName: string;
   email?: string;
 
   profileImage: string | null;

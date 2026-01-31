@@ -15,21 +15,23 @@ import StepTeacherReview from "./StepTeacherReview";
 import type { TeacherOnboardingData } from "../../types/onboarding.types";
 
 interface Props {
-  fullName: string;
+  firstName: string;
+  lastName: string;
   email?: string;
   onComplete: () => void;
 }
 
 const TOTAL_STEPS = 6;
 
-export default function TeacherOnboarding({ fullName, email, onComplete }: Props) {
+export default function TeacherOnboarding({ firstName, lastName, email, onComplete }: Props) {
   const [currentStep, setCurrentStep] = useState(1);
 
   const [cameraPermission, setCameraPermission] = useState<boolean | null>(null);
   const [micPermission, setMicPermission] = useState<boolean | null>(null);
 
   const [formData, setFormData] = useState<TeacherOnboardingData>({
-    fullName: fullName || "",
+    firstName: firstName || "",
+    lastName: lastName || "",
     email,
 
     profileImage: null,
@@ -55,7 +57,8 @@ export default function TeacherOnboarding({ fullName, email, onComplete }: Props
     switch (currentStep) {
       case 1:
         return (
-          formData.fullName.trim().length > 0 &&
+          formData.firstName.trim().length > 0 && 
+          formData.lastName.trim().length > 0 &&
           formData.gender.trim().length > 0 &&
           formData.biography.trim().length >= 20
         );

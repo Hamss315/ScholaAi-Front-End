@@ -33,7 +33,7 @@ export default function StepTeacherReview({ formData }: Props) {
             </div>
 
             <div className="flex-1">
-              <h4 className="text-gray-900">{formData.fullName}</h4>
+              <h4 className="text-gray-900">{formData.firstName} {formData.lastName}</h4>
               <p className="text-sm text-gray-600">{formData.experience ? `${formData.experience} years experience` : ""}</p>
             </div>
           </div>

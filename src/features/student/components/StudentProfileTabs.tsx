@@ -6,17 +6,27 @@ import { Badge } from "../../../components/ui/badge";
 import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
 import { Switch } from "../../../components/ui/switch";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../../../components/ui/select";
 import { Separator } from "../../../components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui/tabs";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "../../../components/ui/tabs";
 
-import { Edit, Save, X, Lock, Mail, Calendar, FileText, Globe, Settings, Clock, Phone, User } from "lucide-react";
+import {
+  Edit,
+  Save,
+  X,
+  Lock,
+  Mail,
+  Calendar,
+  FileText,
+  Settings,
+  Clock,
+  Phone,
+  User,
+} from "lucide-react";
 
 import type {
   ProfileData,
@@ -57,8 +67,6 @@ export default function StudentProfileTabs({
   setIsChangingPassword,
   notifications,
   setNotifications,
-  language,
-  setLanguage,
   paymentHistory,
   sessionStats,
   onSaveProfile,
@@ -111,16 +119,38 @@ export default function StudentProfileTabs({
             </div>
 
             <div className="space-y-4">
-              {/* Full Name */}
+              {/* First Name */}
               <div>
-                <Label htmlFor="name">Full Name</Label>
+                <Label htmlFor="firstname">First Name</Label>
                 <div className="flex items-center gap-2 mt-1">
                   <User className="w-4 h-4 text-gray-400" />
                   <Input
-                    id="name"
-                    value={profileData.name}
+                    id="firstname"
+                    value={profileData.firstName}
                     onChange={(e) =>
-                      setProfileData((p) => ({ ...p, name: e.target.value }))
+                      setProfileData((p) => ({
+                        ...p,
+                        firstName: e.target.value,
+                      }))
+                    }
+                    disabled={!isEditingProfile}
+                  />
+                </div>
+              </div>
+
+              {/* Last Name */}
+              <div>
+                <Label htmlFor="lastname">Last Name</Label>
+                <div className="flex items-center gap-2 mt-1">
+                  <User className="w-4 h-4 text-gray-400" />
+                  <Input
+                    id="lastname"
+                    value={profileData.lastName}
+                    onChange={(e) =>
+                      setProfileData((p) => ({
+                        ...p,
+                        lastName: e.target.value,
+                      }))
                     }
                     disabled={!isEditingProfile}
                   />
@@ -191,18 +221,24 @@ export default function StudentProfileTabs({
           </Card>
         </TabsContent>
 
-
         {/* Settings Tab */}
         <TabsContent value="settings">
           <div className="space-y-6">
             <Card className="p-6">
               <div className="flex justify-between items-center mb-6">
                 <div>
-                  <h3 className="text-2xl" style={{ color: "#1E3A8A" }}>Security</h3>
-                  <p className="text-sm text-gray-600">Manage your password and security settings</p>
+                  <h3 className="text-2xl" style={{ color: "#1E3A8A" }}>
+                    Security
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    Manage your password and security settings
+                  </p>
                 </div>
                 {!isChangingPassword && (
-                  <Button onClick={() => setIsChangingPassword(true)} style={{ backgroundColor: "#3B82F6" }}>
+                  <Button
+                    onClick={() => setIsChangingPassword(true)}
+                    style={{ backgroundColor: "#3B82F6" }}
+                  >
                     <Lock className="w-4 h-4 mr-2" />
                     Change Password
                   </Button>
@@ -213,7 +249,11 @@ export default function StudentProfileTabs({
                 <div className="space-y-4 mb-2 p-4 bg-gray-50 rounded-lg">
                   <div>
                     <Label htmlFor="current-password">Current Password</Label>
-                    <Input id="current-password" type="password" className="mt-1" />
+                    <Input
+                      id="current-password"
+                      type="password"
+                      className="mt-1"
+                    />
                   </div>
                   <div>
                     <Label htmlFor="new-password">New Password</Label>
@@ -221,14 +261,24 @@ export default function StudentProfileTabs({
                   </div>
                   <div>
                     <Label htmlFor="confirm-password">Confirm New Password</Label>
-                    <Input id="confirm-password" type="password" className="mt-1" />
+                    <Input
+                      id="confirm-password"
+                      type="password"
+                      className="mt-1"
+                    />
                   </div>
 
                   <div className="flex gap-2">
-                    <Button onClick={onChangePassword} style={{ backgroundColor: "#22C55E" }}>
+                    <Button
+                      onClick={onChangePassword}
+                      style={{ backgroundColor: "#22C55E" }}
+                    >
                       Update Password
                     </Button>
-                    <Button variant="outline" onClick={() => setIsChangingPassword(false)}>
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsChangingPassword(false)}
+                    >
                       Cancel
                     </Button>
                   </div>
@@ -238,8 +288,12 @@ export default function StudentProfileTabs({
 
             <Card className="p-6">
               <div className="mb-6">
-                <h3 className="text-2xl mb-2" style={{ color: "#1E3A8A" }}>Notifications</h3>
-                <p className="text-sm text-gray-600">Choose what updates you'd like to receive</p>
+                <h3 className="text-2xl mb-2" style={{ color: "#1E3A8A" }}>
+                  Notifications
+                </h3>
+                <p className="text-sm text-gray-600">
+                  Choose what updates you'd like to receive
+                </p>
               </div>
 
               <div className="space-y-4">
@@ -248,13 +302,18 @@ export default function StudentProfileTabs({
                     <Mail className="w-5 h-5 text-gray-400" />
                     <div>
                       <p>Email Notifications</p>
-                      <p className="text-sm text-gray-600">Receive email updates about your account</p>
+                      <p className="text-sm text-gray-600">
+                        Receive email updates about your account
+                      </p>
                     </div>
                   </div>
                   <Switch
                     checked={notifications.emailNotifications}
                     onCheckedChange={(checked) =>
-                      setNotifications((n) => ({ ...n, emailNotifications: checked }))
+                      setNotifications((n) => ({
+                        ...n,
+                        emailNotifications: checked,
+                      }))
                     }
                   />
                 </div>
@@ -266,13 +325,18 @@ export default function StudentProfileTabs({
                     <Calendar className="w-5 h-5 text-gray-400" />
                     <div>
                       <p>Session Reminders</p>
-                      <p className="text-sm text-gray-600">Get reminded before your sessions start</p>
+                      <p className="text-sm text-gray-600">
+                        Get reminded before your sessions start
+                      </p>
                     </div>
                   </div>
                   <Switch
                     checked={notifications.sessionReminders}
                     onCheckedChange={(checked) =>
-                      setNotifications((n) => ({ ...n, sessionReminders: checked }))
+                      setNotifications((n) => ({
+                        ...n,
+                        sessionReminders: checked,
+                      }))
                     }
                   />
                 </div>
@@ -284,38 +348,21 @@ export default function StudentProfileTabs({
                     <FileText className="w-5 h-5 text-gray-400" />
                     <div>
                       <p>Weekly Reports</p>
-                      <p className="text-sm text-gray-600">Get weekly learning progress reports</p>
+                      <p className="text-sm text-gray-600">
+                        Get weekly learning progress reports
+                      </p>
                     </div>
                   </div>
                   <Switch
                     checked={notifications.weeklyReports}
                     onCheckedChange={(checked) =>
-                      setNotifications((n) => ({ ...n, weeklyReports: checked }))
+                      setNotifications((n) => ({
+                        ...n,
+                        weeklyReports: checked,
+                      }))
                     }
                   />
                 </div>
-              </div>
-            </Card>
-
-            <Card className="p-6">
-              <div className="mb-6">
-                <h3 className="text-2xl mb-2" style={{ color: "#1E3A8A" }}>Language</h3>
-                <p className="text-sm text-gray-600">Select your preferred language</p>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <Globe className="w-5 h-5 text-gray-400" />
-                <Select value={language} onValueChange={setLanguage}>
-                  <SelectTrigger className="w-64">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="en">English</SelectItem>
-                    <SelectItem value="ar">Arabic</SelectItem>
-                    <SelectItem value="fr">Français</SelectItem>
-                    <SelectItem value="de">Deutsch</SelectItem>
-                  </SelectContent>
-                </Select>
               </div>
             </Card>
           </div>
@@ -324,7 +371,9 @@ export default function StudentProfileTabs({
         {/* Sessions Tab */}
         <TabsContent value="sessions">
           <Card className="p-6">
-            <h3 className="text-2xl mb-6" style={{ color: "#1E3A8A" }}>Session Statistics</h3>
+            <h3 className="text-2xl mb-6" style={{ color: "#1E3A8A" }}>
+              Session Statistics
+            </h3>
 
             <div className="grid md:grid-cols-2 gap-4 mb-6">
               <div className="p-4 bg-gray-50 rounded-lg">
@@ -332,7 +381,9 @@ export default function StudentProfileTabs({
                   <Clock className="w-5 h-5 text-gray-400" />
                   <span className="text-gray-600">Total Sessions</span>
                 </div>
-                <p className="text-3xl" style={{ color: "#1E3A8A" }}>{sessionStats.totalSessions}</p>
+                <p className="text-3xl" style={{ color: "#1E3A8A" }}>
+                  {sessionStats.totalSessions}
+                </p>
               </div>
 
               <div className="p-4 bg-gray-50 rounded-lg">
@@ -340,7 +391,9 @@ export default function StudentProfileTabs({
                   <Clock className="w-5 h-5 text-gray-400" />
                   <span className="text-gray-600">Total Hours</span>
                 </div>
-                <p className="text-3xl" style={{ color: "#8B5CF6" }}>{sessionStats.totalHours}</p>
+                <p className="text-3xl" style={{ color: "#8B5CF6" }}>
+                  {sessionStats.totalHours}
+                </p>
               </div>
 
               <div className="p-4 bg-gray-50 rounded-lg">
@@ -348,7 +401,9 @@ export default function StudentProfileTabs({
                   <Settings className="w-5 h-5 text-gray-400" />
                   <span className="text-gray-600">Average Focus Score</span>
                 </div>
-                <p className="text-3xl" style={{ color: "#22C55E" }}>{sessionStats.averageFocus}%</p>
+                <p className="text-3xl" style={{ color: "#22C55E" }}>
+                  {sessionStats.averageFocus}%
+                </p>
               </div>
 
               <div className="p-4 bg-gray-50 rounded-lg">
@@ -356,7 +411,9 @@ export default function StudentProfileTabs({
                   <Calendar className="w-5 h-5 text-gray-400" />
                   <span className="text-gray-600">This Month</span>
                 </div>
-                <p className="text-3xl" style={{ color: "#3B82F6" }}>{sessionStats.completedThisMonth}</p>
+                <p className="text-3xl" style={{ color: "#3B82F6" }}>
+                  {sessionStats.completedThisMonth}
+                </p>
               </div>
             </div>
 
@@ -369,19 +426,30 @@ export default function StudentProfileTabs({
         {/* Billing Tab */}
         <TabsContent value="billing">
           <Card className="p-6">
-            <h3 className="text-2xl mb-6" style={{ color: "#1E3A8A" }}>Payment History</h3>
+            <h3 className="text-2xl mb-6" style={{ color: "#1E3A8A" }}>
+              Payment History
+            </h3>
 
             <div className="space-y-3">
               {paymentHistory.map((payment) => (
-                <div key={payment.id} className="p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+                <div
+                  key={payment.id}
+                  className="p-4 border rounded-lg hover:bg-gray-50 transition-colors"
+                >
                   <div className="flex justify-between items-start">
                     <div>
-                      <p className="font-semibold" style={{ color: "#1E3A8A" }}>{payment.plan}</p>
+                      <p className="font-semibold" style={{ color: "#1E3A8A" }}>
+                        {payment.plan}
+                      </p>
                       <p className="text-sm text-gray-600">{payment.date}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-lg" style={{ color: "#22C55E" }}>{payment.amount}</p>
-                      <Badge className="bg-green-100 text-green-700 hover:bg-green-100">{payment.status}</Badge>
+                      <p className="text-lg" style={{ color: "#22C55E" }}>
+                        {payment.amount}
+                      </p>
+                      <Badge className="bg-green-100 text-green-700 hover:bg-green-100">
+                        {payment.status}
+                      </Badge>
                     </div>
                   </div>
                 </div>

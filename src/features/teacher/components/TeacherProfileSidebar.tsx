@@ -22,7 +22,7 @@ export default function TeacherProfileSidebar({ profileData, professionalData, w
           </Avatar>
 
           <h2 className="text-2xl mb-1" style={{ color: "#1E3A8A" }}>
-            {profileData.name}
+            {profileData.firstName} {profileData.lastName}
           </h2>
 
           <p className="text-gray-600 mb-1">{professionalData.education.split(",")[0]}</p>

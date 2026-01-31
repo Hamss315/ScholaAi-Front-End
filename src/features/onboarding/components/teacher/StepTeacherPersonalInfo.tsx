@@ -60,14 +60,28 @@ export default function StepTeacherPersonalInfo({ formData, setFormData }: Props
 
       <div className="grid md:grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="fullname" className="mb-1 block">
-            Full Name *
+          <Label htmlFor="firstname" className="mb-1 block">
+            First Name *
           </Label>
           <Input
-            id="fullname"
-            value={formData.fullName}
-            onChange={(e) => setFormData((prev) => ({ ...prev, fullName: e.target.value }))}
-            placeholder="Dr. Jane Smith"
+            id="firstname"
+            value={formData.firstName}
+            onChange={(e) => setFormData((prev) => ({ ...prev, firstName: e.target.value }))}
+            placeholder="Dr. Jane"
+            className="mt-1"
+            required
+          />
+        </div>
+
+        <div>
+          <Label htmlFor="lastname" className="mb-1 block">
+            Last Name *
+          </Label>
+          <Input
+            id="lastname"
+            value={formData.lastName}
+            onChange={(e) => setFormData((prev) => ({ ...prev, lastName: e.target.value }))}
+            placeholder="Smith"
             className="mt-1"
             required
           />

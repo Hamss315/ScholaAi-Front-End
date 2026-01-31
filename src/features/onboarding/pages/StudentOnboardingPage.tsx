@@ -2,7 +2,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import StudentOnboarding from "../components/student/StudentOnboarding";
 
 type LocationState = {
-  fullName?: string;
+  firstName?: string;
+  lastName?: string;
   email?: string;
 };
 
@@ -11,12 +12,14 @@ export default function StudentOnboardingPage() {
   const location = useLocation();
   const state = (location.state || {}) as LocationState;
 
-  const fullName = state.fullName || "John Doe";
+  const firstName = state.firstName || "John";
+  const lastName = state.lastName || "Doe";
   const email = state.email;
 
   return (
     <StudentOnboarding
-      fullName={fullName}
+      firstName={firstName}
+      lastName={lastName}
       email={email}
       onComplete={() => {
         // Change later to /student/dashboard

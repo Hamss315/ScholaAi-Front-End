@@ -3,7 +3,8 @@ export type TeacherProfilePageProps = {
 };
 
 export type TeacherProfileData = {
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
   phone: string;
   bio: string;
