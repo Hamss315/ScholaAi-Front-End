@@ -17,9 +17,6 @@ import TeacherOnboardingPage from "./features/onboarding/pages/TeacherOnboarding
 import RequestSessionPage from "./features/sessions/pages/RequestSessionPage";
 import TeacherSessionRequestsPage from "./features/sessions/pages/TeacherSessionRequestsPage";
 
-import ChatPage from "./features/messages/pages/ChatPage";
-import ChatsListPage from "./features/messages/pages/ChatsListPage"
-
 export default function App() {
   return (
     <BrowserRouter>
@@ -46,22 +43,7 @@ export default function App() {
         <Route path="/student/request-session" element={<RequestSessionPage />} />
         <Route path="/teacher/session-requests" element={<TeacherSessionRequestsPage />} />
 
-        {/* Chats */}
-        <Route
-          path="/messages"
-          element={<ChatsListPage userRole="student" />}
-        />
-
-        {/* <Route
-          path="/chat/:chatId"
-          element={<ChatPage userRole="student" />}
-        /> */}
-
-        {/* example for teacher */}
-        <Route
-          path="/teacher/messages"
-          element={<ChatsListPage userRole="teacher" />}
-        />
+    
         {/* Dashboards (later) */}
         {/*
         <Route path="/student/dashboard" element={<div>Student</div>} />
