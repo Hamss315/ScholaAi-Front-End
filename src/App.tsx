@@ -1,4 +1,6 @@
-import { BrowserRouter, Routes, Route} from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+
+import LandingPage from "./features/landing/pages/LandingPage";
 
 import LoginPage from "./features/auth/pages/LoginPage";
 import RegisterPage from "./features/auth/pages/RegisterPage";
@@ -21,6 +23,9 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Landing */}
+        <Route path="/" element={<LandingPage />} />
+
         {/* Auth */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
@@ -43,13 +48,8 @@ export default function App() {
         <Route path="/student/request-session" element={<RequestSessionPage />} />
         <Route path="/teacher/session-requests" element={<TeacherSessionRequestsPage />} />
 
-    
-        {/* Dashboards (later) */}
-        {/*
-        <Route path="/student/dashboard" element={<div>Student</div>} />
-        <Route path="/teacher/dashboard" element={<div>Teacher</div>} />
-        <Route path="/admin/panel" element={<div>Admin</div>} />
-        */}
+        {/* Optional: default fallback */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );
