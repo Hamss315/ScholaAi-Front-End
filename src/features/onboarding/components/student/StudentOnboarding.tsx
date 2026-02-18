@@ -15,13 +15,20 @@ import type { StudentOnboardingData } from "../../types/onboarding.types";
 interface Props {
   firstName: string;
   lastName: string;
+  userName: string;
   email?: string;
-  onComplete: () => void;
+  onComplete: (data: StudentOnboardingData) => void; // ✅ change: return data
 }
 
 const TOTAL_STEPS = 4;
 
-export default function StudentOnboarding({ firstName, lastName, email, onComplete }: Props) {
+export default function StudentOnboarding({
+  firstName,
+  lastName,
+  userName,
+  email,
+  onComplete,
+}: Props) {
   const [currentStep, setCurrentStep] = useState(1);
 
   const [cameraPermission, setCameraPermission] = useState<boolean | null>(null);
@@ -30,13 +37,14 @@ export default function StudentOnboarding({ firstName, lastName, email, onComple
   const [formData, setFormData] = useState<StudentOnboardingData>({
     firstName: firstName || "",
     lastName: lastName || "",
+    userName: userName || "",
     email,
 
     profileImage: null,
 
     gender: "",
     birthdate: "",
-    grade: null, // ✅ numeric
+    grade: null,
 
     selectedSubjects: [],
     sessionDuration: "45",
@@ -44,27 +52,27 @@ export default function StudentOnboarding({ firstName, lastName, email, onComple
     availability: {},
   });
 
-  const progressPercentage = useMemo(() => (currentStep / TOTAL_STEPS) * 100, [currentStep]);
+  const progressPercentage = useMemo(
+    () => (currentStep / TOTAL_STEPS) * 100,
+    [currentStep]
+  );
 
-  // ✅ This is why your Continue/Finish was disabled before:
-  // you were checking fields you removed or were using string methods on grade.
   const canProceed = useMemo(() => {
     switch (currentStep) {
       case 1:
         return (
           formData.firstName.trim().length > 0 &&
           formData.lastName.trim().length > 0 &&
+          formData.userName.trim().length > 0 &&
           formData.gender.trim().length > 0 &&
           formData.grade !== null
         );
 
       case 2:
-        return true; // ✅ device step never blocks (prototype)
+        return true;
 
       case 3:
-        return (
-          formData.sessionDuration.length > 0
-        );
+        return formData.sessionDuration.length > 0;
 
       case 4:
         return true;
@@ -84,10 +92,8 @@ export default function StudentOnboarding({ firstName, lastName, email, onComple
       return;
     }
 
-    // Finish: no saving for now
-    // console.log("Student onboarding:", formData);
-
-    onComplete();
+    // ✅ Finish: submit collected data to parent
+    onComplete(formData);
   };
 
   return (
@@ -111,16 +117,26 @@ export default function StudentOnboarding({ firstName, lastName, email, onComple
         <div className="mb-6">
           <Progress value={progressPercentage} className="h-2" />
           <div className="flex justify-between mt-2 text-xs text-gray-500">
-            <span className={currentStep >= 1 ? "text-[#3B82F6]" : ""}>Personal Info</span>
-            <span className={currentStep >= 2 ? "text-[#3B82F6]" : ""}>Device Check</span>
-            <span className={currentStep >= 3 ? "text-[#3B82F6]" : ""}>Preferences</span>
-            <span className={currentStep >= 4 ? "text-[#3B82F6]" : ""}>Confirmation</span>
+            <span className={currentStep >= 1 ? "text-[#3B82F6]" : ""}>
+              Personal Info
+            </span>
+            <span className={currentStep >= 2 ? "text-[#3B82F6]" : ""}>
+              Device Check
+            </span>
+            <span className={currentStep >= 3 ? "text-[#3B82F6]" : ""}>
+              Preferences
+            </span>
+            <span className={currentStep >= 4 ? "text-[#3B82F6]" : ""}>
+              Confirmation
+            </span>
           </div>
         </div>
 
         {/* Card */}
         <Card className="p-8 shadow-xl">
-          {currentStep === 1 && <StepPersonalInfo formData={formData} setFormData={setFormData} />}
+          {currentStep === 1 && (
+            <StepPersonalInfo formData={formData} setFormData={setFormData} />
+          )}
 
           {currentStep === 2 && (
             <StepDeviceCheck
@@ -131,7 +147,9 @@ export default function StudentOnboarding({ firstName, lastName, email, onComple
             />
           )}
 
-          {currentStep === 3 && <StepPreferences formData={formData} setFormData={setFormData} />}
+          {currentStep === 3 && (
+            <StepPreferences formData={formData} setFormData={setFormData} />
+          )}
 
           {currentStep === 4 && <StepConfirmation formData={formData} />}
 

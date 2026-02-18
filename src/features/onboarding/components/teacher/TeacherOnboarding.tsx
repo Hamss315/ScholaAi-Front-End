@@ -17,13 +17,14 @@ import type { TeacherOnboardingData } from "../../types/onboarding.types";
 interface Props {
   firstName: string;
   lastName: string;
+  userName: string;
   email?: string;
   onComplete: () => void;
 }
 
 const TOTAL_STEPS = 6;
 
-export default function TeacherOnboarding({ firstName, lastName, email, onComplete }: Props) {
+export default function TeacherOnboarding({ firstName, lastName, userName, email, onComplete }: Props) {
   const [currentStep, setCurrentStep] = useState(1);
 
   const [cameraPermission, setCameraPermission] = useState<boolean | null>(null);
@@ -32,6 +33,7 @@ export default function TeacherOnboarding({ firstName, lastName, email, onComple
   const [formData, setFormData] = useState<TeacherOnboardingData>({
     firstName: firstName || "",
     lastName: lastName || "",
+    userName: userName || "",
     email,
 
     profileImage: null,
@@ -59,6 +61,7 @@ export default function TeacherOnboarding({ firstName, lastName, email, onComple
         return (
           formData.firstName.trim().length > 0 && 
           formData.lastName.trim().length > 0 &&
+          formData.userName.trim().length > 0 &&
           formData.gender.trim().length > 0 &&
           formData.biography.trim().length >= 20
         );
