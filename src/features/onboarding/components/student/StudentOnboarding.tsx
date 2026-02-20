@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Brain, Check, ChevronLeft, ChevronRight } from "lucide-react";
 
 import { Button } from "../../../../components/ui/button";
@@ -12,33 +12,27 @@ import StepConfirmation from "../student/StepConfirmation";
 
 import type { StudentOnboardingData } from "../../types/onboarding.types";
 
+import { useRegister } from "../../../../context/register-context";
+
 interface Props {
-  firstName: string;
-  lastName: string;
-  userName: string;
-  email?: string;
-  onComplete: (data: StudentOnboardingData) => void; // ✅ change: return data
+  onComplete: (data: StudentOnboardingData) => void;
 }
 
 const TOTAL_STEPS = 4;
 
-export default function StudentOnboarding({
-  firstName,
-  lastName,
-  userName,
-  email,
-  onComplete,
-}: Props) {
+export default function StudentOnboarding({ onComplete }: Props) {
+  const { payload } = useRegister();
+
   const [currentStep, setCurrentStep] = useState(1);
 
   const [cameraPermission, setCameraPermission] = useState<boolean | null>(null);
   const [micPermission, setMicPermission] = useState<boolean | null>(null);
 
   const [formData, setFormData] = useState<StudentOnboardingData>({
-    firstName: firstName || "",
-    lastName: lastName || "",
-    userName: userName || "",
-    email,
+    firstName: "",
+    lastName: "",
+    userName: "",
+    email: undefined,
 
     profileImage: null,
 
@@ -51,6 +45,19 @@ export default function StudentOnboarding({
 
     availability: {},
   });
+
+  // ✅ Fill basic data from Register context
+  useEffect(() => {
+    if (!payload) return;
+
+    setFormData((prev) => ({
+      ...prev,
+      firstName: payload.firstName ?? "",
+      lastName: payload.lastName ?? "",
+      userName: payload.userName ?? "",
+      email: payload.email ?? undefined,
+    }));
+  }, [payload]);
 
   const progressPercentage = useMemo(
     () => (currentStep / TOTAL_STEPS) * 100,
@@ -92,7 +99,6 @@ export default function StudentOnboarding({
       return;
     }
 
-    // ✅ Finish: submit collected data to parent
     onComplete(formData);
   };
 
@@ -155,7 +161,11 @@ export default function StudentOnboarding({
 
           {/* Navigation */}
           <div className="flex justify-between mt-8 pt-6 border-t">
-            <Button variant="outline" onClick={handleBack} disabled={currentStep === 1}>
+            <Button
+              variant="outline"
+              onClick={handleBack}
+              disabled={currentStep === 1}
+            >
               <ChevronLeft className="w-4 h-4 mr-2" />
               Back
             </Button>

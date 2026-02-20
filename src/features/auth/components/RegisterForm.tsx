@@ -9,7 +9,7 @@ import RoleSelector from "./RoleSelector";
 
 import { useRegister } from "../../../context/register-context";
 
-type UserRole = "student" | "teacher" | "admin";
+type UserRole = "student" | "teacher";
 
 export default function RegisterForm() {
   const navigate = useNavigate();
@@ -21,7 +21,6 @@ export default function RegisterForm() {
   const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
 
-  // ✅ Backend requires phone, so we add it here
   const [phone, setPhone] = useState("");
 
   const [password, setPassword] = useState("");
@@ -54,7 +53,7 @@ export default function RegisterForm() {
     // ✅ Save the common registration fields into context
     // Remaining fields will be completed in onboarding (grade, availability, gender, profilePhotoURL...)
     setPayload({
-      role: role === "admin" ? "student" : role, // your context is for student/teacher; keep admin flow separate
+      role: role, // your context is for student/teacher; keep admin flow separate
       userName,
       profilePhotoURL: "",
       firstName,
@@ -147,7 +146,6 @@ export default function RegisterForm() {
         </div>
       </div>
 
-      {/* ✅ Phone (required by backend) */}
       <div>
         <Label htmlFor="phone">Phone</Label>
         <Input
