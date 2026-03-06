@@ -69,7 +69,7 @@ export default function StepPreferences({ formData, setFormData }: Props) {
       </div>
 
       <div>
-        <Label className="mb-3 block">Weekly Availability (Optional)</Label>
+        <Label className="mb-3 block">Weekly Availability (Select at least 1 time slot)</Label>
         <div className="border rounded-lg p-4">
           <div className="space-y-3">
             {STUDENT_WEEK_DAYS.map((day) => (

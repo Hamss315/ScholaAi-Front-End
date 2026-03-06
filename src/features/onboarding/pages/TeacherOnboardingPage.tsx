@@ -1,33 +1,94 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 import TeacherOnboarding from "../components/teacher/TeacherOnboarding";
 
-type LocationState = {
-  firstName?: string;
-  lastName?: string;
-  userName?: string;
-  email?: string;
-};
+import api from "../../../services/api";
+import { useRegister } from "../../../context/register-context";
+import type { TeacherOnboardingData } from "../types/onboarding.types";
+
+function mapAvailabilityToApi(av: Record<string, string[]>) {
+  const dayMap: Record<string, number> = {
+    Sun: 0,
+    Mon: 1,
+    Tue: 2,
+    Wed: 3,
+    Thu: 4,
+    Fri: 5,
+    Sat: 6,
+  };
+
+  const slotMap: Record<string, number> = {
+    Morning: 0,
+    Afternoon: 1,
+    Evening: 2,
+    "Morning (6-12)": 0,
+    "Afternoon (12-17)": 1,
+    "Evening (17-22)": 2,
+  };
+
+  return Object.entries(av).flatMap(([day, slots]) =>
+    slots.map((slot) => ({
+      day: dayMap[day] ?? 0,
+      timeSlot: slotMap[slot] ?? 0,
+    }))
+  );
+}
 
 export default function TeacherOnboardingPage() {
   const navigate = useNavigate();
-  const location = useLocation();
-  const state = (location.state || {}) as LocationState;
+  const { payload, reset } = useRegister();
 
-  const firstName = state.firstName || "Dr. Jane";
-  const lastName = state.lastName || "Smith";
-  const userName = state.userName || "DrSmith_123";
-  const email = state.email;
+  // ✅ Redirect safely (after render)
+  useEffect(() => {
+    if (!payload || payload.role !== "teacher") {
+      navigate("/register", { replace: true });
+    }
+  }, [payload, navigate]);
+
+  // ✅ Don’t render the onboarding while redirecting / missing payload
+  if (!payload || payload.role !== "teacher") return null;
+
+  const handleComplete = async (data: TeacherOnboardingData) => {
+    try {
+      // ✅ Build backend DTO (PascalCase is safest for .NET)
+      const requestBody = {
+        UserName: data.userName || payload.userName,
+        ProfilePhotoURL: data.profileImage ?? payload.profilePhotoURL ?? "",
+        FirstName: data.firstName || payload.firstName,
+        LastName: data.lastName || payload.lastName,
+        Email: data.email ?? payload.email,
+        Phone: payload.phone,
+
+        Description: payload.description ?? "",
+        Gender: data.gender === "male" ? 0 : 1,// ✅ adjust to backend enum
+
+        Biography: data.biography,
+
+        // Backend likely expects IDs not names — keep as-is now for prototype
+        Subject: data.subject,
+        Experience: data.experience,
+
+        Availability: mapAvailabilityToApi(data.availability),
+        OpenForImmediate: data.openForImmediate,
+
+        Password: payload.password,
+        ConfirmPassword: payload.confirmPassword,
+      };
+
+      await api.post("/account/register/teacher", requestBody);
+
+      // ✅ clear context to remove password from memory
+      reset();
+
+      // Change later to /teacher/dashboard
+      navigate("/teacher/profile");
+    } catch (err: any) {
+      console.error("API ERROR:", err?.response?.data || err?.message);
+      alert(err?.response?.data?.message || "Registration failed");
+    }
+  };
 
   return (
-    <TeacherOnboarding
-      firstName={firstName}
-      lastName={lastName}
-      userName={userName}
-      email={email}
-      onComplete={() => {
-        // Change later to /teacher/dashboard
-        navigate("/login");
-      }}
-    />
+    <TeacherOnboarding onComplete={handleComplete} />
   );
 }

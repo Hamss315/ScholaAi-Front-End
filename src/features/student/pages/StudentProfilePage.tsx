@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import StudentProfileHeader from "../components/StudentProfileHeader";
 import StudentProfileSidebar from "../components/StudentProfileSidebar";
@@ -12,23 +12,29 @@ import type {
   SessionStats,
 } from "../types/profile";
 
+import { getStudentProfile } from "../services/studentProfile.service";
+import { mapStudentProfileDto } from "../services/studentProfile.mapper";
+
 export default function StudentProfilePage() {
+  
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
 
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string>("");
+
   const [profileData, setProfileData] = useState<ProfileData>({
-    firstName: "John",
-    lastName: "Smith",
-    email: "john.smith@example.com",
-    phone: "+1 (555) 123-4567",
-    grade: "Grade 10",
-    bio: "Passionate about learning mathematics and science. Looking to improve my grades and understanding.",
-    gender: "Male",
-    country: "Egypt",
-    city: "Cairo",
-    subjects: ["Math", "Physics"],
-    learningStyle: "Visual",
-    sessionDuration: "45",
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    grade: "",
+    bio: "",
+    gender: "",
+    country: "",
+    city: "",
+    subjects: [],
+    sessionDuration: "",
   });
 
   const [notifications, setNotifications] = useState<NotificationsSettings>({
@@ -38,46 +44,48 @@ export default function StudentProfilePage() {
     weeklyReports: true,
   });
 
-  const [language, setLanguage] = useState("en");
-
   const subscriptionData: SubscriptionData = {
-    plan: "Premium Plan",
-    hoursRemaining: 12.5,
-    renewalDate: "December 15, 2025",
+    balance: 0,
+    lastTopUp: new Date(),
     status: "Active",
-    monthlyHours: 20,
+    currency: "USD",
   };
 
-  const paymentHistory: PaymentItem[] = [
-    {
-      id: 1,
-      date: "Nov 15, 2025",
-      amount: "$79.99",
-      plan: "Premium - 20 Hours",
-      status: "Completed",
-    },
-    {
-      id: 2,
-      date: "Oct 15, 2025",
-      amount: "$79.99",
-      plan: "Premium - 20 Hours",
-      status: "Completed",
-    },
-    {
-      id: 3,
-      date: "Sep 15, 2025",
-      amount: "$49.99",
-      plan: "Basic - 10 Hours",
-      status: "Completed",
-    },
-  ];
+  const [paymentHistory, setPaymentHistory] = useState<PaymentItem[]>([]);
+  const [sessionStats, setSessionStats] = useState<SessionStats>({
+    totalSessions: 0,
+    totalHours: 0,
+    averageFocus: 0,
+    completedThisMonth: 0,
+  });
 
-  const sessionStats: SessionStats = {
-    totalSessions: 48,
-    totalHours: 72.5,
-    averageFocus: 91,
-    completedThisMonth: 12,
-  };
+  useEffect(() => {
+    const run = async () => {
+      try {
+        setLoading(true);
+        setError("");
+        const userId = localStorage.getItem("userId");
+     if (!userId) {
+          setError("Missing userId. Please login again.");
+          return;
+        }
+
+        const dto = await getStudentProfile(userId);
+        const mapped = mapStudentProfileDto(dto);
+
+        setProfileData(mapped.profileData);
+        setSessionStats(mapped.sessionStats);
+        setPaymentHistory(mapped.paymentHistory);
+      } catch (e: any) {
+        console.error(e?.response?.data || e?.message);
+        setError("Failed to load profile from server.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    run();
+  }, []);
 
   const handleSaveProfile = () => {
     setIsEditingProfile(false);
@@ -106,6 +114,10 @@ export default function StudentProfilePage() {
           </p>
         </div>
 
+        {loading && <p className="text-gray-600">Loading profile...</p>}
+        {!loading && error && <p className="text-red-600">{error}</p>}
+
+        {!loading && !error && (
         <div className="grid md:grid-cols-3 gap-6">
           <StudentProfileSidebar
             profileData={profileData}
@@ -122,14 +134,13 @@ export default function StudentProfilePage() {
             setIsChangingPassword={setIsChangingPassword}
             notifications={notifications}
             setNotifications={setNotifications}
-            language={language}
-            setLanguage={setLanguage}
             paymentHistory={paymentHistory}
             sessionStats={sessionStats}
             onSaveProfile={handleSaveProfile}
             onChangePassword={handleChangePassword}
           />
         </div>
+        )}
       </main>
     </div>
   );

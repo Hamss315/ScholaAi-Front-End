@@ -9,7 +9,6 @@ export type ProfileData = {
   country: string;
   city: string;
   subjects: string[];
-  learningStyle: string;
   sessionDuration: string;
 };
 
@@ -21,11 +20,10 @@ export type NotificationsSettings = {
 };
 
 export type SubscriptionData = {
-  plan: string;
-  hoursRemaining: number;
-  renewalDate: string;
+  lastTopUp: Date;
+  balance: number;
   status: string;
-  monthlyHours: number;
+  currency: string;
 };
 
 export type PaymentItem = {

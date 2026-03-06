@@ -1,5 +1,3 @@
-import { LogOut } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import LoginCard from "../components/LoginCard";
 
 function LoginPage() {

@@ -37,14 +37,18 @@ export interface TeacherOnboardingData {
 
   biography: string;
 
-  selectedSubjects: string[];
+  subject: string;
   experience: "" | TeacherExperienceValue;
 
+  // college: string;
+  // teachingExperience: string;
+  
   certificateFiles: File[];
   idFile: File | null;
   documentsConfirmed: boolean;
 
-  hourlyRate: string;
   availability: AvailabilityMap;
   openForImmediate: boolean;
+
+
 }

@@ -2,9 +2,18 @@ import { Award } from "lucide-react";
 
 import { Label } from "../../../../components/ui/label";
 import { Badge } from "../../../../components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../../components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../../components/ui/select";
 
-import { TEACHER_SUBJECTS, TEACHER_EXPERIENCE_LEVELS } from "../../constants/onboarding.constants";
+import {
+  TEACHER_SUBJECTS,
+  TEACHER_EXPERIENCE_LEVELS,
+} from "../../constants/onboarding.constants";
 import type { TeacherOnboardingData } from "../../types/onboarding.types";
 
 interface Props {
@@ -12,16 +21,10 @@ interface Props {
   setFormData: React.Dispatch<React.SetStateAction<TeacherOnboardingData>>;
 }
 
-export default function StepTeacherProfessionalInfo({ formData, setFormData }: Props) {
-  const toggleSubject = (subject: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      selectedSubjects: prev.selectedSubjects.includes(subject)
-        ? prev.selectedSubjects.filter((s) => s !== subject)
-        : [...prev.selectedSubjects, subject],
-    }));
-  };
-
+export default function StepTeacherProfessionalInfo({
+  formData,
+  setFormData,
+}: Props) {
   return (
     <div className="space-y-6">
       <div className="text-center">
@@ -30,36 +33,55 @@ export default function StepTeacherProfessionalInfo({ formData, setFormData }: P
         <p className="text-sm text-gray-600">Share your expertise</p>
       </div>
 
+      {/* ✅ SINGLE SUBJECT SELECTION */}
       <div>
-        <Label className="mb-2 block">Subjects You Teach * (Select at least one)</Label>
+        <Label className="mb-2 block">
+          Subject You Teach * (Select one)
+        </Label>
+
         <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
           {TEACHER_SUBJECTS.map((subject) => (
             <Badge
               key={subject}
-              variant={formData.selectedSubjects.includes(subject) ? "default" : "outline"}
+              variant={formData.subject === subject ? "default" : "outline"}
               className={`cursor-pointer text-center justify-center py-2 ${
-                formData.selectedSubjects.includes(subject)
+                formData.subject === subject
                   ? "bg-[#3B82F6] hover:bg-[#3B82F6]/90"
                   : "hover:bg-gray-100"
               }`}
-              onClick={() => toggleSubject(subject)}
+              onClick={() =>
+                setFormData((prev) => ({
+                  ...prev,
+                  subject,
+                }))
+              }
             >
               {subject}
             </Badge>
           ))}
         </div>
 
-        <p className="text-xs text-gray-500 mt-2">
-          Selected: {formData.selectedSubjects.length} subject{formData.selectedSubjects.length !== 1 ? "s" : ""}
-        </p>
+        {formData.subject && (
+          <p className="text-xs text-gray-500 mt-2">
+            Selected: {formData.subject}
+          </p>
+        )}
       </div>
 
+      {/* EXPERIENCE */}
       <div>
-        <Label className="mb-1 block">Years of Teaching Experience *</Label>
+        <Label className="mb-1 block">
+          Years of Teaching Experience *
+        </Label>
 
         <Select
           value={formData.experience}
-          onValueChange={(value) => setFormData((prev) => ({ ...prev, experience: value as any }))}
+          onValueChange={(value) =>
+            setFormData((prev) => ({
+              ...prev,
+              experience: value as any,
+            }))
+          }
         >
           <SelectTrigger className="mt-1">
             <SelectValue placeholder="Select experience level" />

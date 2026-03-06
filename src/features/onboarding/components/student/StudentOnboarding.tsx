@@ -41,7 +41,7 @@ export default function StudentOnboarding({ onComplete }: Props) {
     grade: null,
 
     selectedSubjects: [],
-    sessionDuration: "45",
+    sessionDuration: "",
 
     availability: {},
   });
@@ -79,7 +79,7 @@ export default function StudentOnboarding({ onComplete }: Props) {
         return true;
 
       case 3:
-        return formData.sessionDuration.length > 0;
+        return formData.sessionDuration.length > 0  && Object.values(formData.availability).some((slots) => slots.length > 0);
 
       case 4:
         return true;
