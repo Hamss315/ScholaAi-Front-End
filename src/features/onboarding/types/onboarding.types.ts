@@ -3,6 +3,7 @@ export type StudentAvailability = Record<string, string[]>;
 export type StudentOnboardingData = {
   firstName: string;
   lastName: string;
+  userName: string;
   email?: string;
 
   profileImage: string | null;
@@ -27,6 +28,7 @@ export type TeacherExperienceValue = "0-2" | "3-5" | "6-10" | "10+";
 export interface TeacherOnboardingData {
   firstName: string;
   lastName: string;
+  userName: string;
   email?: string;
 
   profileImage: string | null;
@@ -35,14 +37,18 @@ export interface TeacherOnboardingData {
 
   biography: string;
 
-  selectedSubjects: string[];
+  subject: string;
   experience: "" | TeacherExperienceValue;
 
+  // college: string;
+  // teachingExperience: string;
+  
   certificateFiles: File[];
   idFile: File | null;
   documentsConfirmed: boolean;
 
-  hourlyRate: string;
   availability: AvailabilityMap;
   openForImmediate: boolean;
+
+
 }

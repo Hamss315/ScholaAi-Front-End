@@ -17,10 +17,10 @@ type Props = {
     averageFocus: number;
   };
   subscriptionData: {
-    plan: string;
-    hoursRemaining: number;
-    renewalDate: string;
+    lastTopUp: Date;
+    balance: number;
     status: string;
+    currency: string;
   };
 };
 
@@ -75,25 +75,25 @@ export default function StudentProfileSidebar({
 
       <Card className="p-6 mt-6">
         <h3 className="text-xl mb-4" style={{ color: "#1E3A8A" }}>
-          Subscription
+          My Wallet
         </h3>
 
         <div className="space-y-3">
           <div>
-            <p className="text-sm text-gray-600">Current Plan</p>
-            <p className="font-semibold" style={{ color: "#8B5CF6" }}>
-              {subscriptionData.plan}
+            <p className="text-sm text-gray-600">Current Balance</p>
+            <p className="text-3xl" style={{ color: "#22C55E" }}>
+              {subscriptionData.balance.toFixed(2)}
             </p>
           </div>
           <div>
-            <p className="text-sm text-gray-600">Hours Remaining</p>
-            <p className="text-2xl" style={{ color: "#1E3A8A" }}>
-              {subscriptionData.hoursRemaining}
+            <p className="text-sm text-gray-600">Last Top-up</p>
+            <p  style={{ color: "#1E3A8A" }}>
+              {subscriptionData.lastTopUp.toLocaleDateString()}
             </p>
           </div>
           <div>
-            <p className="text-sm text-gray-600">Renewal Date</p>
-            <p>{subscriptionData.renewalDate}</p>
+            <p className="text-sm text-gray-600">Currency</p>
+            <p>{subscriptionData.currency}</p>
           </div>
         </div>
 
@@ -102,7 +102,7 @@ export default function StudentProfileSidebar({
           style={{ backgroundColor: "#3B82F6" }}
           onClick={() => navigate("/payment")}
         >
-          Upgrade Plan
+          Add Funds
         </Button>
       </Card>
     </aside>

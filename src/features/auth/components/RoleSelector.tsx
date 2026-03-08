@@ -1,20 +1,19 @@
+import type { Dispatch, SetStateAction } from "react";
 import { Button } from "../../../components/ui/button";
 
-export type UserRole = "student" | "teacher" | "admin";
-
-interface RoleSelectorProps {
-  role: UserRole;
-  setRole: React.Dispatch<React.SetStateAction<UserRole>>;
+interface RoleSelectorProps<T extends string> {
+  role: T;
+  setRole: Dispatch<SetStateAction<T>>;
   label: string;
-  allowedRoles: UserRole[];
+  allowedRoles: T[];
 }
 
-export default function RoleSelector({
+export default function RoleSelector<T extends string>({
   role,
   setRole,
   label,
   allowedRoles,
-}: RoleSelectorProps) {
+}: RoleSelectorProps<T>) {
   return (
     <div>
       <p className="text-sm font-medium mb-1">{label}</p>

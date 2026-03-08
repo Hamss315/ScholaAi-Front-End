@@ -48,9 +48,6 @@ interface StudentProfileTabsProps {
   notifications: NotificationsSettings;
   setNotifications: Dispatch<SetStateAction<NotificationsSettings>>;
 
-  language: string;
-  setLanguage: Dispatch<SetStateAction<string>>;
-
   paymentHistory: PaymentItem[];
   sessionStats: SessionStats;
 

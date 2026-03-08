@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Brain, Check, ChevronLeft, ChevronRight } from "lucide-react";
 
 import { Button } from "../../../../components/ui/button";
@@ -14,66 +14,107 @@ import StepTeacherReview from "./StepTeacherReview";
 
 import type { TeacherOnboardingData } from "../../types/onboarding.types";
 
+import { useRegister } from "../../../../context/register-context";
+
 interface Props {
-  firstName: string;
-  lastName: string;
-  email?: string;
-  onComplete: () => void;
+  onComplete: (data: TeacherOnboardingData) => void;
 }
 
 const TOTAL_STEPS = 6;
 
-export default function TeacherOnboarding({ firstName, lastName, email, onComplete }: Props) {
+export default function TeacherOnboarding({ onComplete }: Props) {
+  const { payload } = useRegister();
+
   const [currentStep, setCurrentStep] = useState(1);
 
   const [cameraPermission, setCameraPermission] = useState<boolean | null>(null);
   const [micPermission, setMicPermission] = useState<boolean | null>(null);
 
   const [formData, setFormData] = useState<TeacherOnboardingData>({
-    firstName: firstName || "",
-    lastName: lastName || "",
-    email,
+    firstName: "",
+    lastName: "",
+    userName: "",
+    email: undefined,
 
     profileImage: null,
 
     gender: "",
     biography: "",
 
-    selectedSubjects: [],
+    subject: "",
     experience: "",
 
     certificateFiles: [],
     idFile: null,
     documentsConfirmed: false,
 
-    hourlyRate: "",
     availability: { Mon: [], Tue: [], Wed: [], Thu: [], Fri: [], Sat: [], Sun: [] },
     openForImmediate: false,
   });
 
-  const progressPercentage = useMemo(() => (currentStep / TOTAL_STEPS) * 100, [currentStep]);
+  // ✅ Fill basic data from Register context (same as StudentOnboarding)
+  useEffect(() => {
+    if (!payload) return;
+
+    setFormData((prev) => ({
+      ...prev,
+      firstName: payload.firstName ?? "",
+      lastName: payload.lastName ?? "",
+      userName: payload.userName ?? "",
+      email: payload.email ?? undefined,
+    }));
+  }, [payload]);
+
+  // ✅ Optional: reset device permissions when leaving the device step
+  useEffect(() => {
+    if (currentStep !== 5) {
+      setCameraPermission(null);
+      setMicPermission(null);
+    }
+  }, [currentStep]);
+
+  const progressPercentage = useMemo(
+    () => (currentStep / TOTAL_STEPS) * 100,
+    [currentStep]
+  );
 
   const canProceed = useMemo(() => {
     switch (currentStep) {
+      // Step 1: Personal
       case 1:
         return (
-          formData.firstName.trim().length > 0 && 
+          formData.firstName.trim().length > 0 &&
           formData.lastName.trim().length > 0 &&
+          formData.userName.trim().length > 0 &&
           formData.gender.trim().length > 0 &&
           formData.biography.trim().length >= 20
         );
+
+      // Step 2: Professional
       case 2:
-        return formData.selectedSubjects.length > 0 && formData.experience.length > 0;
+        return formData.subject.trim().length > 0 && formData.experience.length > 0;
+      // Step 3: Verification
       case 3:
-        return formData.certificateFiles.length > 0 && formData.idFile !== null && formData.documentsConfirmed;
+        return (
+          formData.certificateFiles.length > 0 &&
+          formData.idFile !== null &&
+          formData.documentsConfirmed
+        );
+
+      // Step 4: Pricing + Schedule
       case 4: {
         const selectedSlotsCount = Object.values(formData.availability).flat().length;
         return selectedSlotsCount >= 3;
       }
+
+      // Step 5: Device check (prototype)
       case 5:
-        return true; // prototype mode device check
+        return true;
+
+      // Step 6: Review
       case 6:
         return true;
+
       default:
         return false;
     }
@@ -89,10 +130,8 @@ export default function TeacherOnboarding({ firstName, lastName, email, onComple
       return;
     }
 
-    // Finish (no saving for now)
-    // console.log("Teacher onboarding data:", formData);
-
-    onComplete();
+    // ✅ Finish: submit collected data to parent
+    onComplete(formData);
   };
 
   return (
@@ -127,13 +166,17 @@ export default function TeacherOnboarding({ firstName, lastName, email, onComple
 
         {/* Card */}
         <Card className="p-8 shadow-xl">
-          {currentStep === 1 && <StepTeacherPersonalInfo formData={formData} setFormData={setFormData} />}
+          {currentStep === 1 && (
+            <StepTeacherPersonalInfo formData={formData} setFormData={setFormData} />
+          )}
 
           {currentStep === 2 && (
             <StepTeacherProfessionalInfo formData={formData} setFormData={setFormData} />
           )}
 
-          {currentStep === 3 && <StepTeacherVerification formData={formData} setFormData={setFormData} />}
+          {currentStep === 3 && (
+            <StepTeacherVerification formData={formData} setFormData={setFormData} />
+          )}
 
           {currentStep === 4 && (
             <StepTeacherPricingSchedule formData={formData} setFormData={setFormData} />

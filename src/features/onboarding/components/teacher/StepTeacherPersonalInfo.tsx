@@ -88,6 +88,20 @@ export default function StepTeacherPersonalInfo({ formData, setFormData }: Props
         </div>
 
         <div>
+          <Label htmlFor="username" className="mb-1 block">
+            Username *
+          </Label>
+          <Input
+            id="username"
+            value={formData.userName}
+            onChange={(e) => setFormData((prev) => ({ ...prev, userName: e.target.value }))}
+            placeholder="JSmith_9"
+            className="mt-1"
+            required
+          />
+        </div>
+
+        <div>
           <Label htmlFor="gender" className="mb-1 block">
             Gender *
           </Label>

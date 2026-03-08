@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Brain, Check, ChevronLeft, ChevronRight } from "lucide-react";
 
 import { Button } from "../../../../components/ui/button";
@@ -12,59 +12,74 @@ import StepConfirmation from "../student/StepConfirmation";
 
 import type { StudentOnboardingData } from "../../types/onboarding.types";
 
+import { useRegister } from "../../../../context/register-context";
+
 interface Props {
-  firstName: string;
-  lastName: string;
-  email?: string;
-  onComplete: () => void;
+  onComplete: (data: StudentOnboardingData) => void;
 }
 
 const TOTAL_STEPS = 4;
 
-export default function StudentOnboarding({ firstName, lastName, email, onComplete }: Props) {
+export default function StudentOnboarding({ onComplete }: Props) {
+  const { payload } = useRegister();
+
   const [currentStep, setCurrentStep] = useState(1);
 
   const [cameraPermission, setCameraPermission] = useState<boolean | null>(null);
   const [micPermission, setMicPermission] = useState<boolean | null>(null);
 
   const [formData, setFormData] = useState<StudentOnboardingData>({
-    firstName: firstName || "",
-    lastName: lastName || "",
-    email,
+    firstName: "",
+    lastName: "",
+    userName: "",
+    email: undefined,
 
     profileImage: null,
 
     gender: "",
     birthdate: "",
-    grade: null, // ✅ numeric
+    grade: null,
 
     selectedSubjects: [],
-    sessionDuration: "45",
+    sessionDuration: "",
 
     availability: {},
   });
 
-  const progressPercentage = useMemo(() => (currentStep / TOTAL_STEPS) * 100, [currentStep]);
+  // ✅ Fill basic data from Register context
+  useEffect(() => {
+    if (!payload) return;
 
-  // ✅ This is why your Continue/Finish was disabled before:
-  // you were checking fields you removed or were using string methods on grade.
+    setFormData((prev) => ({
+      ...prev,
+      firstName: payload.firstName ?? "",
+      lastName: payload.lastName ?? "",
+      userName: payload.userName ?? "",
+      email: payload.email ?? undefined,
+    }));
+  }, [payload]);
+
+  const progressPercentage = useMemo(
+    () => (currentStep / TOTAL_STEPS) * 100,
+    [currentStep]
+  );
+
   const canProceed = useMemo(() => {
     switch (currentStep) {
       case 1:
         return (
           formData.firstName.trim().length > 0 &&
           formData.lastName.trim().length > 0 &&
+          formData.userName.trim().length > 0 &&
           formData.gender.trim().length > 0 &&
           formData.grade !== null
         );
 
       case 2:
-        return true; // ✅ device step never blocks (prototype)
+        return true;
 
       case 3:
-        return (
-          formData.sessionDuration.length > 0
-        );
+        return formData.sessionDuration.length > 0  && Object.values(formData.availability).some((slots) => slots.length > 0);
 
       case 4:
         return true;
@@ -84,10 +99,7 @@ export default function StudentOnboarding({ firstName, lastName, email, onComple
       return;
     }
 
-    // Finish: no saving for now
-    // console.log("Student onboarding:", formData);
-
-    onComplete();
+    onComplete(formData);
   };
 
   return (
@@ -111,16 +123,26 @@ export default function StudentOnboarding({ firstName, lastName, email, onComple
         <div className="mb-6">
           <Progress value={progressPercentage} className="h-2" />
           <div className="flex justify-between mt-2 text-xs text-gray-500">
-            <span className={currentStep >= 1 ? "text-[#3B82F6]" : ""}>Personal Info</span>
-            <span className={currentStep >= 2 ? "text-[#3B82F6]" : ""}>Device Check</span>
-            <span className={currentStep >= 3 ? "text-[#3B82F6]" : ""}>Preferences</span>
-            <span className={currentStep >= 4 ? "text-[#3B82F6]" : ""}>Confirmation</span>
+            <span className={currentStep >= 1 ? "text-[#3B82F6]" : ""}>
+              Personal Info
+            </span>
+            <span className={currentStep >= 2 ? "text-[#3B82F6]" : ""}>
+              Device Check
+            </span>
+            <span className={currentStep >= 3 ? "text-[#3B82F6]" : ""}>
+              Preferences
+            </span>
+            <span className={currentStep >= 4 ? "text-[#3B82F6]" : ""}>
+              Confirmation
+            </span>
           </div>
         </div>
 
         {/* Card */}
         <Card className="p-8 shadow-xl">
-          {currentStep === 1 && <StepPersonalInfo formData={formData} setFormData={setFormData} />}
+          {currentStep === 1 && (
+            <StepPersonalInfo formData={formData} setFormData={setFormData} />
+          )}
 
           {currentStep === 2 && (
             <StepDeviceCheck
@@ -131,13 +153,19 @@ export default function StudentOnboarding({ firstName, lastName, email, onComple
             />
           )}
 
-          {currentStep === 3 && <StepPreferences formData={formData} setFormData={setFormData} />}
+          {currentStep === 3 && (
+            <StepPreferences formData={formData} setFormData={setFormData} />
+          )}
 
           {currentStep === 4 && <StepConfirmation formData={formData} />}
 
           {/* Navigation */}
           <div className="flex justify-between mt-8 pt-6 border-t">
-            <Button variant="outline" onClick={handleBack} disabled={currentStep === 1}>
+            <Button
+              variant="outline"
+              onClick={handleBack}
+              disabled={currentStep === 1}
+            >
               <ChevronLeft className="w-4 h-4 mr-2" />
               Back
             </Button>

@@ -99,6 +99,18 @@ export default function StepPersonalInfo({ formData, setFormData }: Props) {
         </div>
 
         <div>
+          <Label htmlFor="username">User Name *</Label>
+          <Input
+            id="username"
+            value={formData.userName}
+            onChange={(e) => setFormData((prev) => ({ ...prev, userName: e.target.value }))}
+            placeholder="JDoe_2"
+            className="mt-[5px]"
+            required
+          />
+        </div>
+
+        <div>
           <Label htmlFor="gender" className="mb-[5px] block">
             Gender *
           </Label>

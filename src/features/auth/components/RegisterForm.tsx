@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Mail, Lock, User } from "lucide-react";
 
@@ -7,23 +7,70 @@ import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
 import RoleSelector from "./RoleSelector";
 
-type UserRole = "student" | "teacher" | "admin";
+import { useRegister } from "../../../context/register-context";
+
+type UserRole = "student" | "teacher";
 
 export default function RegisterForm() {
   const navigate = useNavigate();
+  const { setPayload } = useRegister();
 
   const [role, setRole] = useState<UserRole>("student");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
+
+  const [phone, setPhone] = useState("");
+
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+
+  const canSubmit = useMemo(() => {
+    if (
+      !firstName ||
+      !lastName ||
+      !userName ||
+      !email ||
+      !phone ||
+      !password ||
+      !confirmPassword
+    )
+      return false;
+
+    return password === confirmPassword;
+  }, [firstName, lastName, userName, email, phone, password, confirmPassword]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (password !== confirmPassword) {
+      setPasswordError("Passwords do not match");
+      return;
+    }
+
+    // ✅ Save the common registration fields into context
+    // Remaining fields will be completed in onboarding (grade, availability, gender, profilePhotoURL...)
+    setPayload({
+      role: role, // your context is for student/teacher; keep admin flow separate
+      userName,
+      profilePhotoURL: "",
+      firstName,
+      lastName,
+      email,
+      phone,
+      description: "",
+      gender: 0,
+      availability: [],
+      password,
+      confirmPassword,
+    } as any);
+
     if (role === "student") {
-      navigate("/onboarding/student", { state: { firstName, lastName, email } });
+      navigate("/onboarding/student");
     } else if (role === "teacher") {
-      navigate("/onboarding/teacher", { state: { firstName, lastName, email } });
+      navigate("/onboarding/teacher");
     } else {
       navigate("/admin/panel");
     }
@@ -65,6 +112,23 @@ export default function RegisterForm() {
         </div>
       </div>
 
+      {/* User Name */}
+      <div>
+        <Label htmlFor="user-name">User Name</Label>
+        <div className="relative mt-1">
+          <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+          <Input
+            id="user-name"
+            type="text"
+            placeholder="JDoe_2"
+            className="pl-10"
+            required
+            value={userName}
+            onChange={(e) => setUserName(e.target.value)}
+          />
+        </div>
+      </div>
+
       {/* Email */}
       <div>
         <Label htmlFor="reg-email">Email</Label>
@@ -82,6 +146,18 @@ export default function RegisterForm() {
         </div>
       </div>
 
+      <div>
+        <Label htmlFor="phone">Phone</Label>
+        <Input
+          id="phone"
+          type="tel"
+          placeholder="01012345678"
+          required
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+        />
+      </div>
+
       {/* Password */}
       <div>
         <Label htmlFor="reg-password">Password</Label>
@@ -93,8 +169,39 @@ export default function RegisterForm() {
             placeholder="••••••••"
             className="pl-10"
             required
+            value={password}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              setPasswordError("");
+            }}
           />
         </div>
+      </div>
+
+      {/* Confirm Password */}
+      <div>
+        <Label htmlFor="reg-confirm-password">Confirm Password</Label>
+        <div className="relative mt-1">
+          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+          <Input
+            id="reg-confirm-password"
+            type="password"
+            placeholder="••••••••"
+            className="pl-10"
+            required
+            value={confirmPassword}
+            onChange={(e) => {
+              setConfirmPassword(e.target.value);
+              setPasswordError("");
+            }}
+          />
+        </div>
+
+        {passwordError && <p className="text-sm text-red-500 mt-1">{passwordError}</p>}
+
+        {!passwordError && password && confirmPassword && password !== confirmPassword && (
+          <p className="text-sm text-red-500 mt-1">Passwords do not match</p>
+        )}
       </div>
 
       {/* Role Selector */}
@@ -118,8 +225,12 @@ export default function RegisterForm() {
         .
       </div>
 
-      <Button type="submit" className="w-full bg-[#1E3A8A] hover:bg-[#1e3a8a]/90">
-        Create Account
+      <Button
+        type="submit"
+        className="w-full bg-[#1E3A8A] hover:bg-[#1e3a8a]/90"
+        disabled={!canSubmit}
+      >
+        Continue
       </Button>
 
       {/* Login */}

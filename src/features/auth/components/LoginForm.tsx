@@ -5,19 +5,61 @@ import { Button } from "../../../components/ui/button";
 import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
 
+import { useAuth } from "../../../context/auth-context"; 
+import { loginApi } from "../services/auth.service"
+import { getRoleFromToken, getUserIdFromToken } from "../../../utils/jwt";
+
 type UserRole = "student" | "teacher" | "admin";
 
 export default function LoginForm() {
   const navigate = useNavigate();
-  const [role] = useState<UserRole>("student");
+  const { login } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+
+  const handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMsg("");
+    setLoading(true);
+
+     try {
+      const res = await loginApi({ email, password });
+
+      // Adjust these based on your backend response fields:
+      const token = res.token;
+      const userId = res.userId || getUserIdFromToken(token);
+      const role =(res.role || getRoleFromToken(token) || "student") as UserRole;
+
+      if (!token) throw new Error("No token returned from API");
+      if (!userId) {
+        // If backend doesn't return userId, we can decode from JWT — tell me and I’ll add it.
+        throw new Error("No userId returned from API");
+      }
+
+      localStorage.setItem("token", token);
+      localStorage.setItem("userId", userId);
+
+      login(token, {
+        userId,
+        role,
+        email: res.email ?? email,
+        userName: res.userName,
+      });
 
     // Match your previous behavior (but with routes)
-    if (role === "student") navigate("/student/profile");
-    else if (role === "teacher") navigate("/teacher/dashboard");
-    else navigate("/admin/panel");
+    if (role === "student") navigate("/student/profile", { replace: true });
+    else if (role === "teacher") navigate("/teacher/profile", { replace: true });
+    else navigate("/admin/panel", { replace: true });
+
+    } catch (err: any) {
+      console.error(err?.response?.data || err?.message);
+      setErrorMsg(err?.response?.data?.message || "Login failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -32,6 +74,8 @@ export default function LoginForm() {
             placeholder="your@email.com"
             className="pl-10"
             required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
         </div>
       </div>
@@ -46,6 +90,8 @@ export default function LoginForm() {
             placeholder="••••••••"
             className="pl-10"
             required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
           />
         </div>
       </div>
@@ -65,8 +111,10 @@ export default function LoginForm() {
                   </button>
                 </div>
 
-      <Button type="submit" className="w-full bg-[#1E3A8A] hover:bg-[#1e3a8a]/90">
-        Login
+    {errorMsg && <p className="text-sm text-red-500">{errorMsg}</p>}
+
+      <Button type="submit" className="w-full bg-[#1E3A8A] hover:bg-[#1e3a8a]/90" disabled={loading}>
+        {loading ? "Signing in..." : "Login"}
       </Button>
     </form>
   );
