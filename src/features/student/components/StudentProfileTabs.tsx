@@ -51,6 +51,11 @@ interface StudentProfileTabsProps {
   paymentHistory: PaymentItem[];
   sessionStats: SessionStats;
 
+  passwordData: { currentPassword: string; newPassword: string; confirmPassword: string };
+  setPasswordData: Dispatch<SetStateAction<{ currentPassword: string; newPassword: string; confirmPassword: string }>>;
+  passwordError: string;
+  passwordSuccess: string;
+
   onSaveProfile: () => void;
   onChangePassword: () => void;
 }
@@ -68,6 +73,10 @@ export default function StudentProfileTabs({
   sessionStats,
   onSaveProfile,
   onChangePassword,
+  passwordData,
+  setPasswordData,
+  passwordError,
+  passwordSuccess,
 }: StudentProfileTabsProps) {
   return (
     <div className="md:col-span-2">
@@ -244,17 +253,38 @@ export default function StudentProfileTabs({
 
               {isChangingPassword && (
                 <div className="space-y-4 mb-2 p-4 bg-gray-50 rounded-lg">
+
+                  {/* error/success messages */}
+                  {passwordError && (
+                    <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded p-2">
+                      {passwordError}
+                    </p>
+                  )}
+                  {passwordSuccess && (
+                    <p className="text-sm text-green-600 bg-green-50 border border-green-200 rounded p-2">
+                      {passwordSuccess}
+                    </p>
+                  )}
+
                   <div>
                     <Label htmlFor="current-password">Current Password</Label>
                     <Input
                       id="current-password"
                       type="password"
                       className="mt-1"
+                      value={passwordData.currentPassword}                         // ✅ controlled
+                      onChange={(e) => setPasswordData(p => ({ ...p, currentPassword: e.target.value }))}
                     />
                   </div>
                   <div>
                     <Label htmlFor="new-password">New Password</Label>
-                    <Input id="new-password" type="password" className="mt-1" />
+                    <Input
+                      id="new-password"
+                      type="password"
+                      className="mt-1"
+                      value={passwordData.newPassword}                             // ✅ controlled
+                      onChange={(e) => setPasswordData(p => ({ ...p, newPassword: e.target.value }))}
+                    />
                   </div>
                   <div>
                     <Label htmlFor="confirm-password">Confirm New Password</Label>
@@ -262,20 +292,16 @@ export default function StudentProfileTabs({
                       id="confirm-password"
                       type="password"
                       className="mt-1"
+                      value={passwordData.confirmPassword}                         // ✅ controlled
+                      onChange={(e) => setPasswordData(p => ({ ...p, confirmPassword: e.target.value }))}
                     />
                   </div>
 
                   <div className="flex gap-2">
-                    <Button
-                      onClick={onChangePassword}
-                      style={{ backgroundColor: "#22C55E" }}
-                    >
+                    <Button onClick={onChangePassword} style={{ backgroundColor: "#22C55E" }}>
                       Update Password
                     </Button>
-                    <Button
-                      variant="outline"
-                      onClick={() => setIsChangingPassword(false)}
-                    >
+                    <Button variant="outline" onClick={() => setIsChangingPassword(false)}>
                       Cancel
                     </Button>
                   </div>
