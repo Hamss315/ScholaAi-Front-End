@@ -25,6 +25,7 @@ export default function StudentProfilePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
 
+
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
     newPassword: "",
@@ -32,6 +33,9 @@ export default function StudentProfilePage() {
   });
   const [passwordError, setPasswordError] = useState<string>("");
   const [passwordSuccess, setPasswordSuccess] = useState<string>("");
+
+  const [profileError, setProfileError] = useState<string>("");
+  const [profileSuccess, setProfileSuccess] = useState<string>("");
 
   const [profileData, setProfileData] = useState<ProfileData>({
     firstName: "",
@@ -99,10 +103,11 @@ export default function StudentProfilePage() {
 
   const handleSaveProfile = async () => {
     try {
+      setProfileError("");       // ✅
+      setProfileSuccess("");     // ✅
       const userId = localStorage.getItem("userId");
       if (!userId) return;
 
-      // parse grade safely
       const gradeNumber = profileData.grade
         ? parseInt(profileData.grade.replace("Grade ", ""), 10)
         : undefined;
@@ -112,28 +117,53 @@ export default function StudentProfilePage() {
         lastName: profileData.lastName || undefined,
         phone: profileData.phone || undefined,
         description: profileData.bio || undefined,
-        grade: !isNaN(gradeNumber!) ? gradeNumber : undefined, // ✅ guard against NaN
+        grade: gradeNumber && !isNaN(gradeNumber) ? gradeNumber : undefined,
       };
 
       await updateStudentProfile(userId, dto);
+      setProfileSuccess("Profile updated successfully!");  // ✅
       setIsEditingProfile(false);
     } catch (e: any) {
-      console.error("400 details:", e?.response?.data);
-      setError(
-        e?.response?.data?.errors
-          ? JSON.stringify(e.response.data.errors)
-          : e?.response?.data?.message
-          ?? e.message
-          ?? "Failed to save profile."
+      const data = e?.response?.data;
+      setProfileError(                                     // ✅
+        data?.errors ? JSON.stringify(data) : data?.message ?? e.message ?? "Failed to save."
       );
     }
   };
 
   const handleChangePassword = async () => {
     try {
-      console.log("passwordData:", passwordData); 
       setPasswordError("");
       setPasswordSuccess("");
+
+      // ✅ frontend validation
+      const { newPassword, confirmPassword, currentPassword } = passwordData;
+
+      if (!currentPassword) {
+        setPasswordError("Current password is required.");
+        return;
+      }
+      if (newPassword.length < 6) {
+        setPasswordError("New password must be at least 6 characters.");
+        return;
+      }
+      if (!/[A-Z]/.test(newPassword)) {
+        setPasswordError("New password must contain at least one uppercase letter.");
+        return;
+      }
+      if (!/[a-z]/.test(newPassword)) {
+        setPasswordError("New password must contain at least one lowercase letter.");
+        return;
+      }
+      if (!/[^a-zA-Z0-9]/.test(newPassword)) {
+        setPasswordError("New password must contain at least one special character (e.g. @, #, !).");
+        return;
+      }
+      if (newPassword !== confirmPassword) {
+        setPasswordError("Passwords do not match.");
+        return;
+      }
+
       const userId = localStorage.getItem("userId");
       if (!userId) return;
 
@@ -142,15 +172,19 @@ export default function StudentProfilePage() {
       setIsChangingPassword(false);
       setPasswordData({ currentPassword: "", newPassword: "", confirmPassword: "" });
     } catch (e: any) {
-      console.error("400 details:", e?.response?.data);
       const data = e?.response?.data;
-      setPasswordError(
-        typeof data === "string"
-          ? data
-          : data?.errors
-            ? JSON.stringify(data.errors)
-            : "Failed to change password."
-      );
+
+      if (typeof data === "string") {
+        setPasswordError(data);
+      } else if (data?.errors) {
+        // extract first error message from each field and join them
+        const messages = Object.values(data.errors as Record<string, string[]>)
+          .flat()
+          .join(" • ");
+        setPasswordError(messages);
+      } else {
+        setPasswordError(data?.message ?? e.message ?? "Failed to change password.");
+      }
     }
   };
 
@@ -199,6 +233,8 @@ export default function StudentProfilePage() {
               setPasswordData={setPasswordData}
               passwordError={passwordError}
               passwordSuccess={passwordSuccess}
+              profileError={profileError}
+              profileSuccess={profileSuccess}
             />
           </div>
         )}
