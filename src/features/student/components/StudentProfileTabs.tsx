@@ -35,6 +35,23 @@ import type {
   SessionStats,
 } from "../types/profile";
 
+// parses ASP.NET ModelState errors: {"errors":{"phone":["msg"]}}
+function getFieldError(errorJson: string, field: string): string {
+  try {
+    const parsed = JSON.parse(errorJson);
+    const errors = parsed?.errors ?? parsed;
+    // ASP.NET field names are camelCase, try both cases
+    return errors?.[field]?.[0] ?? errors?.[field.toLowerCase()]?.[0] ?? "";
+  } catch {
+    return "";
+  }
+}
+
+function FieldError({ error }: { error: string }) {
+  if (!error) return null;
+  return <p className="text-xs text-red-500 mt-1 ml-6">{error}</p>;
+}
+
 interface StudentProfileTabsProps {
   profileData: ProfileData;
   setProfileData: Dispatch<SetStateAction<ProfileData>>;
@@ -50,6 +67,14 @@ interface StudentProfileTabsProps {
 
   paymentHistory: PaymentItem[];
   sessionStats: SessionStats;
+
+  passwordData: { currentPassword: string; newPassword: string; confirmPassword: string };
+  setPasswordData: Dispatch<SetStateAction<{ currentPassword: string; newPassword: string; confirmPassword: string }>>;
+  passwordError: string;
+  passwordSuccess: string;
+
+  profileError: string;
+  profileSuccess: string;
 
   onSaveProfile: () => void;
   onChangePassword: () => void;
@@ -68,6 +93,12 @@ export default function StudentProfileTabs({
   sessionStats,
   onSaveProfile,
   onChangePassword,
+  passwordData,
+  setPasswordData,
+  passwordError,
+  passwordSuccess,
+  profileError,
+  profileSuccess,
 }: StudentProfileTabsProps) {
   return (
     <div className="md:col-span-2">
@@ -86,34 +117,33 @@ export default function StudentProfileTabs({
               <h3 className="text-2xl" style={{ color: "#1E3A8A" }}>
                 Profile Information
               </h3>
-
               {!isEditingProfile ? (
-                <Button
-                  onClick={() => setIsEditingProfile(true)}
-                  style={{ backgroundColor: "#3B82F6" }}
-                >
-                  <Edit className="w-4 h-4 mr-2" />
-                  Edit Profile
+                <Button onClick={() => setIsEditingProfile(true)} style={{ backgroundColor: "#3B82F6" }}>
+                  <Edit className="w-4 h-4 mr-2" /> Edit Profile
                 </Button>
               ) : (
                 <div className="flex gap-2">
-                  <Button
-                    onClick={onSaveProfile}
-                    style={{ backgroundColor: "#22C55E" }}
-                  >
-                    <Save className="w-4 h-4 mr-2" />
-                    Save
+                  <Button onClick={onSaveProfile} style={{ backgroundColor: "#22C55E" }}>
+                    <Save className="w-4 h-4 mr-2" /> Save
                   </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => setIsEditingProfile(false)}
-                  >
-                    <X className="w-4 h-4 mr-2" />
-                    Cancel
+                  <Button variant="outline" onClick={() => setIsEditingProfile(false)}>
+                    <X className="w-4 h-4 mr-2" /> Cancel
                   </Button>
                 </div>
               )}
             </div>
+
+            {/* ✅ top-level success/error banners */}
+            {profileSuccess && (
+              <div className="flex items-center gap-2 text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg px-4 py-3 mb-4">
+                <span>✓</span> {profileSuccess}
+              </div>
+            )}
+            {profileError && !profileError.startsWith("{") && (
+              <div className="flex items-center gap-2 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-4 py-3 mb-4">
+                <span>✕</span> {profileError}
+              </div>
+            )}
 
             <div className="space-y-4">
               {/* First Name */}
@@ -124,15 +154,12 @@ export default function StudentProfileTabs({
                   <Input
                     id="firstname"
                     value={profileData.firstName}
-                    onChange={(e) =>
-                      setProfileData((p) => ({
-                        ...p,
-                        firstName: e.target.value,
-                      }))
-                    }
+                    onChange={(e) => setProfileData((p) => ({ ...p, firstName: e.target.value }))}
                     disabled={!isEditingProfile}
+                    className={getFieldError(profileError, "firstName") ? "border-red-400" : ""}
                   />
                 </div>
+                <FieldError error={getFieldError(profileError, "firstName")} />
               </div>
 
               {/* Last Name */}
@@ -143,15 +170,12 @@ export default function StudentProfileTabs({
                   <Input
                     id="lastname"
                     value={profileData.lastName}
-                    onChange={(e) =>
-                      setProfileData((p) => ({
-                        ...p,
-                        lastName: e.target.value,
-                      }))
-                    }
+                    onChange={(e) => setProfileData((p) => ({ ...p, lastName: e.target.value }))}
                     disabled={!isEditingProfile}
+                    className={getFieldError(profileError, "lastName") ? "border-red-400" : ""}
                   />
                 </div>
+                <FieldError error={getFieldError(profileError, "lastName")} />
               </div>
 
               {/* Email */}
@@ -163,9 +187,7 @@ export default function StudentProfileTabs({
                     id="email"
                     type="email"
                     value={profileData.email}
-                    onChange={(e) =>
-                      setProfileData((p) => ({ ...p, email: e.target.value }))
-                    }
+                    onChange={(e) => setProfileData((p) => ({ ...p, email: e.target.value }))}
                     disabled={!isEditingProfile}
                   />
                 </div>
@@ -179,12 +201,12 @@ export default function StudentProfileTabs({
                   <Input
                     id="phone"
                     value={profileData.phone}
-                    onChange={(e) =>
-                      setProfileData((p) => ({ ...p, phone: e.target.value }))
-                    }
+                    onChange={(e) => setProfileData((p) => ({ ...p, phone: e.target.value }))}
                     disabled={!isEditingProfile}
+                    className={getFieldError(profileError, "phone") ? "border-red-400" : ""}
                   />
                 </div>
+                <FieldError error={getFieldError(profileError, "phone")} />
               </div>
 
               {/* Grade */}
@@ -193,12 +215,11 @@ export default function StudentProfileTabs({
                 <Input
                   id="grade"
                   value={profileData.grade}
-                  onChange={(e) =>
-                    setProfileData((p) => ({ ...p, grade: e.target.value }))
-                  }
+                  onChange={(e) => setProfileData((p) => ({ ...p, grade: e.target.value }))}
                   disabled={!isEditingProfile}
-                  className="mt-1"
+                  className={`mt-1 ${getFieldError(profileError, "grade") ? "border-red-400" : ""}`}
                 />
+                <FieldError error={getFieldError(profileError, "grade")} />
               </div>
 
               {/* Bio */}
@@ -207,9 +228,7 @@ export default function StudentProfileTabs({
                 <Input
                   id="bio"
                   value={profileData.bio}
-                  onChange={(e) =>
-                    setProfileData((p) => ({ ...p, bio: e.target.value }))
-                  }
+                  onChange={(e) => setProfileData((p) => ({ ...p, bio: e.target.value }))}
                   disabled={!isEditingProfile}
                   className="mt-1"
                 />
@@ -244,17 +263,38 @@ export default function StudentProfileTabs({
 
               {isChangingPassword && (
                 <div className="space-y-4 mb-2 p-4 bg-gray-50 rounded-lg">
+
+                  {/* error/success messages */}
+                  {passwordError && (
+                    <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded p-2">
+                      {passwordError}
+                    </p>
+                  )}
+                  {passwordSuccess && (
+                    <p className="text-sm text-green-600 bg-green-50 border border-green-200 rounded p-2">
+                      {passwordSuccess}
+                    </p>
+                  )}
+
                   <div>
                     <Label htmlFor="current-password">Current Password</Label>
                     <Input
                       id="current-password"
                       type="password"
                       className="mt-1"
+                      value={passwordData.currentPassword}                         // ✅ controlled
+                      onChange={(e) => setPasswordData(p => ({ ...p, currentPassword: e.target.value }))}
                     />
                   </div>
                   <div>
                     <Label htmlFor="new-password">New Password</Label>
-                    <Input id="new-password" type="password" className="mt-1" />
+                    <Input
+                      id="new-password"
+                      type="password"
+                      className="mt-1"
+                      value={passwordData.newPassword}                             // ✅ controlled
+                      onChange={(e) => setPasswordData(p => ({ ...p, newPassword: e.target.value }))}
+                    />
                   </div>
                   <div>
                     <Label htmlFor="confirm-password">Confirm New Password</Label>
@@ -262,20 +302,16 @@ export default function StudentProfileTabs({
                       id="confirm-password"
                       type="password"
                       className="mt-1"
+                      value={passwordData.confirmPassword}                         // ✅ controlled
+                      onChange={(e) => setPasswordData(p => ({ ...p, confirmPassword: e.target.value }))}
                     />
                   </div>
 
                   <div className="flex gap-2">
-                    <Button
-                      onClick={onChangePassword}
-                      style={{ backgroundColor: "#22C55E" }}
-                    >
+                    <Button onClick={onChangePassword} style={{ backgroundColor: "#22C55E" }}>
                       Update Password
                     </Button>
-                    <Button
-                      variant="outline"
-                      onClick={() => setIsChangingPassword(false)}
-                    >
+                    <Button variant="outline" onClick={() => setIsChangingPassword(false)}>
                       Cancel
                     </Button>
                   </div>
