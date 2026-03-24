@@ -19,6 +19,8 @@ import TeacherOnboardingPage from "./features/onboarding/pages/TeacherOnboarding
 import RequestSessionPage from "./features/sessions/pages/RequestSessionPage";
 import TeacherSessionRequestsPage from "./features/sessions/pages/TeacherSessionRequestsPage";
 
+import SessionStreamPage from "./features/sessions/pages/StreamPage";
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -47,6 +49,9 @@ export default function App() {
         {/* Request Sessions */}
         <Route path="/student/request-session" element={<RequestSessionPage />} />
         <Route path="/teacher/session-requests" element={<TeacherSessionRequestsPage />} />
+
+        {/* Session Stream */}
+        <Route path="/session/:sessionId/stream" element={<SessionStreamPage />} />
 
         {/* Optional: default fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />
