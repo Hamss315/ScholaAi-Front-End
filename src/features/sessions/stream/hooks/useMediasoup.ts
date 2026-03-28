@@ -7,8 +7,9 @@ export interface RemoteStream {
     producerId: string;
     stream: MediaStream;
     kind: string;
-    source: string;
+    source: string;   // 'camera' | 'screen' | 'mic'
     peerId: string;
+    role: string;     // 'host' | 'viewer'
 }
 
 export function useMediasoup() {
@@ -67,15 +68,22 @@ export function useMediasoup() {
 
         recvTransportRef.current = transport;
 
-        // Listen for producerClosed from server — remove the stream immediately
         socket.on('producerClosed', ({ producerId }: { producerId: string }) => {
             setRemoteStreams(prev => prev.filter(s => s.producerId !== producerId));
         });
 
-        // Listen for consumerClosed from server
         socket.on('consumerClosed', ({ consumerId }: { consumerId: string }) => {
             setRemoteStreams(prev => prev.filter(s => s.consumerId !== consumerId));
         });
+        // // Listen for producerClosed — remove stream by producerId
+        // socketRef.current?.on('producerClosed', ({ producerId }: { producerId: string }) => {
+        //     setRemoteStreams(prev => prev.filter(s => s.producerId !== producerId));
+        // });
+
+        // // Listen for consumerClosed
+        // socketRef.current?.on('consumerClosed', ({ consumerId }: { consumerId: string }) => {
+        //     setRemoteStreams(prev => prev.filter(s => s.consumerId !== consumerId));
+        // });
     }
 
     async function produceMedia(): Promise<void> {
@@ -88,6 +96,13 @@ export function useMediasoup() {
         if (audioTrack) await transport.produce({ track: audioTrack, appData: { source: 'mic' } });
     }
 
+    async function produceMediaAudioOnly(): Promise<void> {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true });
+        const transport = sendTransportRef.current!;
+        const audioTrack = stream.getAudioTracks()[0];
+        if (audioTrack) await transport.produce({ track: audioTrack, appData: { source: 'mic' } });
+    }
+
     async function produceScreen(onStopped?: () => void): Promise<void> {
         const stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
         const transport = sendTransportRef.current!;
@@ -95,7 +110,6 @@ export function useMediasoup() {
         const producer = await transport.produce({ track: videoTrack, appData: { source: 'screen' } });
         screenProducerRef.current = producer;
 
-        // Browser "Stop sharing" button clicked
         videoTrack.onended = () => {
             stopScreen();
             onStopped?.();
@@ -108,8 +122,7 @@ export function useMediasoup() {
             screenProducerRef.current.track?.stop();
             screenProducerRef.current.close();
             screenProducerRef.current = null;
-            // Tell server explicitly to close this producer
-            socketRef.current?.emit('closeProducer', { producerId }, () => {});
+            socketRef.current?.emit('closeProducer', { producerId }, () => { });
         }
     }
 
@@ -118,15 +131,23 @@ export function useMediasoup() {
         producerId: string,
         appData?: any
     ): Promise<void> {
+        console.log('🎯 consumeProducer START', producerId, appData);
         const device = deviceRef.current!;
         const transport = recvTransportRef.current!;
+
+        console.log('device:', !!device, 'transport:', !!transport);
 
         const consumerOptions = await new Promise<any>((resolve) => {
             socket.emit('consume', { producerId, rtpCapabilities: device.rtpCapabilities }, resolve);
         });
-        if (consumerOptions.error) throw new Error(consumerOptions.error);
+        console.log('📦 consumerOptions:', consumerOptions);
+        if (consumerOptions.error) {
+            console.error('consume error:', consumerOptions.error);
+            return;
+        }
 
         const consumer = await transport.consume(consumerOptions);
+        console.log('✅ consumer created:', consumer.id, 'kind:', consumer.kind);
 
         await new Promise<void>((resolve) => {
             socket.emit('resumeConsumer', { consumerId: consumer.id }, () => resolve());
@@ -134,16 +155,24 @@ export function useMediasoup() {
 
         const stream = new MediaStream([consumer.track]);
         const source = appData?.source ?? (consumer.kind === 'video' ? 'camera' : 'mic');
+        const role = appData?.role ?? 'unknown';
+
+        console.log('📡 Adding to remoteStreams:', { source, role, kind: consumer.kind });
 
         if (consumer.kind === 'video') {
-            setRemoteStreams(prev => [...prev, {
-                consumerId: consumer.id,
-                producerId: producerId,
-                stream,
-                kind: consumer.kind,
-                source,
-                peerId: appData?.peerId ?? '',
-            }]);
+            setRemoteStreams(prev => {
+                const next = [...prev, {
+                    consumerId: consumer.id,
+                    producerId,
+                    stream,
+                    kind: consumer.kind,
+                    source,
+                    peerId: appData?.peerId ?? '',
+                    role,
+                }];
+                console.log('🔄 setRemoteStreams called, new length:', next.length);
+                return next;
+            });
         }
 
         consumer.on('transportclose', () => {
@@ -154,6 +183,8 @@ export function useMediasoup() {
             setRemoteStreams(prev => prev.filter(s => s.consumerId !== consumer.id));
         });
     }
+
+
 
     function cleanup() {
         localStream?.getTracks().forEach(t => t.stop());
@@ -169,6 +200,7 @@ export function useMediasoup() {
         createSendTransport,
         createRecvTransport,
         produceMedia,
+        produceMediaAudioOnly,
         produceScreen,
         stopScreen,
         consumeProducer,
