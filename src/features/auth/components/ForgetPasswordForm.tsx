@@ -1,5 +1,3 @@
-import React from "react";
-
 const ForgetPasswordForm = () => {
   return (
     <div className="bg-white rounded-2xl shadow-lg w-full max-w-md p-8">

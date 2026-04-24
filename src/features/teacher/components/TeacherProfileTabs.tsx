@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import {
   User,
   Mail,
@@ -67,6 +66,14 @@ type Props = {
   isChangingPassword: boolean;
   setIsChangingPassword: React.Dispatch<React.SetStateAction<boolean>>;
 
+  passwordData: { currentPassword: string; newPassword: string; confirmPassword: string };
+  setPasswordData: React.Dispatch<React.SetStateAction<{ currentPassword: string; newPassword: string; confirmPassword: string }>>;
+  passwordError: string;
+  passwordSuccess: string;
+
+  profileError: string;
+  profileSuccess: string;
+
   onSaveProfile: () => void;
   onSaveProfessional: () => void;
   onChangePassword: () => void;
@@ -88,18 +95,16 @@ export default function TeacherProfileTabs({
   setIsEditingProfessional,
   isChangingPassword,
   setIsChangingPassword,
+  passwordData,
+  setPasswordData,
+  passwordError,
+  passwordSuccess,
+  profileError,
+  profileSuccess,
   onSaveProfile,
   onSaveProfessional,
   onChangePassword,
 }: Props) {
- const initials = useMemo(() => {
-  const firstInitial = profileData.firstName?.[0]?.toUpperCase() || "";
-  const lastInitial = profileData.lastName?.[0]?.toUpperCase() || "";
-
-  return (firstInitial + lastInitial) || "SR";
-}, [profileData.firstName, profileData.lastName]);
-
-
   return (
     <div className="md:col-span-2">
       <Tabs defaultValue="profile" className="w-full">
@@ -136,6 +141,17 @@ export default function TeacherProfileTabs({
                 </div>
               )}
             </div>
+
+            {profileSuccess && (
+              <div className="flex items-center gap-2 text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg px-4 py-3 mb-4">
+                <span>✓</span> {profileSuccess}
+              </div>
+            )}
+            {profileError && !profileError.startsWith("{") && (
+              <div className="flex items-center gap-2 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-4 py-3 mb-4">
+                <span>✕</span> {profileError}
+              </div>
+            )}
 
             <div className="space-y-4">
               <div>
@@ -472,17 +488,37 @@ export default function TeacherProfileTabs({
 
               {isChangingPassword && (
                 <div className="space-y-4 mb-6 p-4 bg-gray-50 rounded-lg">
+                  {passwordError && (
+                    <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded p-2">
+                      {passwordError}
+                    </p>
+                  )}
+                  {passwordSuccess && (
+                    <p className="text-sm text-green-600 bg-green-50 border border-green-200 rounded p-2">
+                      {passwordSuccess}
+                    </p>
+                  )}
+
                   <div>
                     <Label htmlFor="current-password">Current Password</Label>
-                    <Input id="current-password" type="password" className="mt-1" />
+                    <Input id="current-password" type="password" className="mt-1" 
+                      value={passwordData.currentPassword}
+                      onChange={(e) => setPasswordData({...passwordData, currentPassword: e.target.value})}
+                    />
                   </div>
                   <div>
                     <Label htmlFor="new-password">New Password</Label>
-                    <Input id="new-password" type="password" className="mt-1" />
+                    <Input id="new-password" type="password" className="mt-1" 
+                      value={passwordData.newPassword}
+                      onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
+                    />
                   </div>
                   <div>
                     <Label htmlFor="confirm-password">Confirm New Password</Label>
-                    <Input id="confirm-password" type="password" className="mt-1" />
+                    <Input id="confirm-password" type="password" className="mt-1" 
+                      value={passwordData.confirmPassword}
+                      onChange={(e) => setPasswordData({...passwordData, confirmPassword: e.target.value})}
+                    />
                   </div>
 
                   <div className="flex gap-2">
