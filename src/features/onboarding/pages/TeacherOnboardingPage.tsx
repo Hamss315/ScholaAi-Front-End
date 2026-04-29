@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import TeacherOnboarding from "../components/teacher/TeacherOnboarding";
 
 import api from "../../../services/api";
@@ -47,16 +47,17 @@ const SUBJECT_MAP: Record<string, number> = {
 export default function TeacherOnboardingPage() {
   const navigate = useNavigate();
   const { payload, reset } = useRegister();
+  const [isSuccess, setIsSuccess] = useState(false);
 
   // ✅ Redirect safely (after render)
   useEffect(() => {
-    if (!payload || payload.role !== "teacher") {
+    if (!isSuccess && (!payload || payload.role !== "teacher")) {
       navigate("/register", { replace: true });
     }
-  }, [payload, navigate]);
+  }, [payload, navigate, isSuccess]);
 
   // ✅ Don’t render the onboarding while redirecting / missing payload
-  if (!payload || payload.role !== "teacher") return null;
+  if (!isSuccess && (!payload || payload.role !== "teacher")) return null;
 
   const handleComplete = async (data: TeacherOnboardingData) => {
     try {
@@ -88,11 +89,12 @@ export default function TeacherOnboardingPage() {
 
       await api.post("/account/register/teacher", requestBody);
 
+      setIsSuccess(true);
       // ✅ clear context to remove password from memory
       reset();
 
-      // Change later to /teacher/dashboard
-      navigate("/teacher/profile");
+      // Redirect to login after successful registration
+      navigate("/login");
     } catch (err: any) {
       console.error("API ERROR:", err?.response?.data || err?.message);
       alert(err?.response?.data?.message || "Registration failed");

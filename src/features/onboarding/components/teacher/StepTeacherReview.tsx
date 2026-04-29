@@ -75,10 +75,12 @@ export default function StepTeacherReview({ formData }: Props) {
           </div>
 
           <div className="space-y-2 md:col-span-2">
-            <Label className="text-gray-600">Documents</Label>
+            <Label className="text-gray-600">Documents & ID</Label>
             <p className="text-sm text-gray-700">
-              {formData.certificateFiles.length} certificate(s) +{" "}
-              {formData.idFile ? "ID uploaded" : "No ID"}
+              {formData.certificateFiles.length} certificate(s)
+            </p>
+            <p className="text-sm text-gray-700">
+              National ID / Passport: {formData.nationalId || "Not provided"}
             </p>
           </div>
         </div>

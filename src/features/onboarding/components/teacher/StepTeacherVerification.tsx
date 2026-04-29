@@ -2,6 +2,7 @@ import { FileText, Upload, AlertCircle, CheckCircle2, Clock } from "lucide-react
 
 import { Button } from "../../../../components/ui/button";
 import { Checkbox } from "../../../../components/ui/checkbox";
+import { Input } from "../../../../components/ui/input";
 import { Label } from "../../../../components/ui/label";
 
 import type { TeacherOnboardingData } from "../../types/onboarding.types";
@@ -84,37 +85,17 @@ export default function StepTeacherVerification({ formData, setFormData }: Props
       </div>
 
       <div>
-        <Label className="mb-2 block">Upload ID/Passport for Verification *</Label>
+        <Label htmlFor="teacher-national-id" className="mb-2 block">National ID / Passport Number *</Label>
 
-        <Button
-          type="button"
-          variant="outline"
-          className="w-full mt-1"
-          onClick={() => {
-            const input = document.getElementById("teacher-id") as HTMLInputElement | null;
-            input?.click();
-          }}
-        >
-          <Upload className="w-4 h-4 mr-2" />
-          {formData.idFile ? formData.idFile.name : "Choose ID Document"}
-        </Button>
-
-        <input
-          id="teacher-id"
-          type="file"
-          accept=".pdf,.jpg,.jpeg,.png"
-          className="hidden"
-          onChange={(e) => setFormData((prev) => ({ ...prev, idFile: e.target.files?.[0] || null }))}
+        <Input
+          id="teacher-national-id"
+          type="text"
+          placeholder="Enter your ID or Passport Number"
+          value={formData.nationalId}
+          onChange={(e) => setFormData((prev) => ({ ...prev, nationalId: e.target.value }))}
+          className="mt-1"
+          required
         />
-
-        {formData.idFile && (
-          <div className="mt-2 p-3 bg-green-50 rounded-lg border border-green-200">
-            <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-green-600" />
-              <span className="text-sm text-green-700">ID document uploaded</span>
-            </div>
-          </div>
-        )}
       </div>
 
       <div className="flex items-start gap-3 p-4 border rounded-lg">

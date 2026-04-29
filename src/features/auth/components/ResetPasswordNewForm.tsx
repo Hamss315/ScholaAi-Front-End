@@ -1,20 +1,31 @@
 import { useState } from "react";
 import { Lock, AlertCircle } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "../../../components/ui/button";
 import { Card } from "../../../components/ui/card";
 import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
+import api from "../../../services/api";
 
 export default function ResetPasswordNewForm() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const email = searchParams.get("email");
+  const token = searchParams.get("token");
+
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    if (!email || !token) {
+      setError("Invalid reset link. Missing email or token.");
+      return;
+    }
 
     if (newPassword.length < 8) {
       setError("Password must be at least 8 characters long");
@@ -26,7 +37,20 @@ export default function ResetPasswordNewForm() {
       return;
     }
 
-    navigate("/reset-password/success");
+    setIsLoading(true);
+    try {
+      await api.post("/account/reset-password", {
+        email,
+        token,
+        newPassword,
+        confirmNewPassword: confirmPassword
+      });
+      navigate("/reset-password/success");
+    } catch (err: any) {
+      setError(err?.response?.data || err?.message || "Failed to reset password.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -35,7 +59,7 @@ export default function ResetPasswordNewForm() {
         {error && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-center gap-2">
             <AlertCircle className="w-5 h-5 text-red-600 shrink-0" />
-            <p className="text-sm text-red-700">{error}</p>
+            <p className="text-sm text-red-700">{typeof error === 'string' ? error : "An error occurred"}</p>
           </div>
         )}
 
@@ -52,6 +76,7 @@ export default function ResetPasswordNewForm() {
               minLength={8}
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
+              disabled={isLoading}
             />
           </div>
         </div>
@@ -69,6 +94,7 @@ export default function ResetPasswordNewForm() {
               minLength={8}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
+              disabled={isLoading}
             />
           </div>
         </div>
@@ -77,8 +103,8 @@ export default function ResetPasswordNewForm() {
           <p className="text-xs text-gray-700">Password must be at least 8 characters long</p>
         </div>
 
-        <Button type="submit" className="w-full bg-[#1E3A8A] hover:bg-[#1e3a8a]/90">
-          Reset Password
+        <Button type="submit" className="w-full bg-[#1E3A8A] hover:bg-[#1e3a8a]/90" disabled={isLoading}>
+          {isLoading ? "Resetting..." : "Reset Password"}
         </Button>
       </form>
     </Card>

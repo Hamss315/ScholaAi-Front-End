@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import StudentOnboarding from "../components/student/StudentOnboarding";
 
@@ -38,15 +38,16 @@ function mapAvailabilityToApi(av: Record<string, string[]>) {
 export default function StudentOnboardingPage() {
   const navigate = useNavigate();
   const { payload, reset } = useRegister();
+  const [isSuccess, setIsSuccess] = useState(false);
 
   // ✅ Redirect safely (don’t navigate during render)
   useEffect(() => {
-    if (!payload || payload.role !== "student") {
+    if (!isSuccess && (!payload || payload.role !== "student")) {
       navigate("/register", { replace: true });
     }
-  }, [payload, navigate]);
+  }, [payload, navigate, isSuccess]);
 
-  if (!payload || payload.role !== "student") return null;
+  if (!isSuccess && (!payload || payload.role !== "student")) return null;
 
   const handleComplete = async (data: StudentOnboardingData) => {
     try {
@@ -72,8 +73,9 @@ export default function StudentOnboardingPage() {
 
       await api.post("/account/register/student", requestBody);
 
+      setIsSuccess(true);
       reset();
-      navigate("/student/profile");
+      navigate("/login");
     } catch (err: any) {
       console.error(err?.response?.data || err?.message);
       alert(err?.response?.data?.message || "Registration failed");
