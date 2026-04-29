@@ -35,6 +35,8 @@ import type {
   SessionStats,
 } from "../types/profile";
 
+import StudentRequestsList from "./StudentRequestsList";
+
 // parses ASP.NET ModelState errors: {"errors":{"phone":["msg"]}}
 function getFieldError(errorJson: string, field: string): string {
   try {
@@ -453,6 +455,8 @@ export default function StudentProfileTabs({
             <Button className="w-full" style={{ backgroundColor: "#8B5CF6" }}>
               View All Sessions
             </Button>
+
+            <StudentRequestsList />
           </Card>
         </TabsContent>
 

@@ -1,23 +1,68 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { Card } from "../../../components/ui/card";
 import TeacherRequestsHeader from "../components/TeacherRequestsHeader";
 import TeacherRequestsTabs from "../components/TeacherRequestsTabs";
 
 import type { SessionRequest } from "../types/session.types";
-import { TEACHER_DEMO_REQUESTS } from "../constants/teacherRequests.constants";
+import { getTeacherRequests, acceptSessionRequest, rejectSessionRequest } from "../services/session.service";
 
 export default function TeacherSessionRequestsPage() {
-  const [requests, setRequests] = useState<SessionRequest[]>(TEACHER_DEMO_REQUESTS);
+  const [requests, setRequests] = useState<SessionRequest[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const handleAccept = (id: number) => {
-    setRequests((prev) => prev.map((r) => (r.id === id ? { ...r, status: "accepted" } : r)));
-    alert("Session request accepted! The student will be notified and the session will be added to your calendar.");
+  const fetchRequests = async () => {
+    try {
+      setIsLoading(true);
+      const data = await getTeacherRequests();
+      
+      const mapped: SessionRequest[] = data.map((d) => {
+        const dDate = new Date(d.preferredDate);
+        return {
+          id: d.sessionId,
+          studentName: d.studentName || `Student`,
+          studentInitials: (d.studentName || "ST").substring(0, 2).toUpperCase(),
+          subject: d.subject || `Subject`,
+          preferredDate: dDate.toLocaleDateString(),
+          preferredTime: dDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          duration: "1 hour", // Defaulting as DTO might not have it
+          notes: d.description,
+          requestedDate: "Recently",
+          status: "pending",
+        };
+      });
+      setRequests(mapped);
+    } catch (err: any) {
+      console.error(err);
+      setError("Failed to load requests.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleDecline = (id: number) => {
-    setRequests((prev) => prev.map((r) => (r.id === id ? { ...r, status: "declined" } : r)));
-    alert("Session request declined. The student will be notified.");
+  useEffect(() => {
+    fetchRequests();
+  }, []);
+
+  const handleAccept = async (id: number) => {
+    try {
+      await acceptSessionRequest(id);
+      setRequests((prev) => prev.map((r) => (r.id === id ? { ...r, status: "accepted" } : r)));
+      alert("Session request accepted!");
+    } catch (err: any) {
+      alert("Failed to accept request: " + (err?.response?.data?.message || err?.message));
+    }
+  };
+
+  const handleDecline = async (id: number) => {
+    try {
+      await rejectSessionRequest(id);
+      setRequests((prev) => prev.map((r) => (r.id === id ? { ...r, status: "declined" } : r)));
+      alert("Session request declined.");
+    } catch (err: any) {
+      alert("Failed to decline request: " + (err?.response?.data?.message || err?.message));
+    }
   };
 
   const handleMessageStudent = (id: number) => {
@@ -37,14 +82,20 @@ export default function TeacherSessionRequestsPage() {
           <p className="text-gray-600">Review and manage session requests from students</p>
         </div>
 
-        <Card className="p-0 border-0 bg-transparent shadow-none">
-          <TeacherRequestsTabs
-            requests={requests}
-            onAccept={handleAccept}
-            onDecline={handleDecline}
-            onMessageStudent={handleMessageStudent}
-          />
-        </Card>
+        {isLoading ? (
+          <p>Loading requests...</p>
+        ) : error ? (
+          <p className="text-red-600">{error}</p>
+        ) : (
+          <Card className="p-0 border-0 bg-transparent shadow-none">
+            <TeacherRequestsTabs
+              requests={requests}
+              onAccept={handleAccept}
+              onDecline={handleDecline}
+              onMessageStudent={handleMessageStudent}
+            />
+          </Card>
+        )}
       </div>
     </div>
   );

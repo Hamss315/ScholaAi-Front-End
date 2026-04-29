@@ -8,6 +8,8 @@ import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
 import { Textarea } from "../../../components/ui/textarea";
 
+import { createSessionRequest } from "../services/session.service";
+
 const SUBJECTS = [
   "Mathematics",
   "Physics",
@@ -19,6 +21,17 @@ const SUBJECTS = [
   "Economics",
 ];
 
+const SUBJECT_MAP: Record<string, number> = {
+  "Mathematics": 1,
+  "Physics": 2,
+  "Chemistry": 3,
+  "Biology": 4,
+  "English": 5,
+  "History": 6,
+  "Computer Science": 7,
+  "Economics": 8,
+};
+
 export default function RequestSessionForm() {
   const navigate = useNavigate();
 
@@ -28,18 +41,65 @@ export default function RequestSessionForm() {
   const [duration, setDuration] = useState("1");
   const [notes, setNotes] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
+    setSuccess("");
 
-    alert(
-      `Session request sent!\n\nSubject: ${subject}\nDate: ${date}\nTime: ${time}`
-    );
+    if (!subject || !date || !time) {
+      setError("Please fill all required fields.");
+      return;
+    }
 
-    navigate("/student/profile");
+    try {
+      setIsLoading(true);
+
+      const subjectId = SUBJECT_MAP[subject];
+      if (!subjectId) {
+        throw new Error("Invalid subject selected.");
+      }
+
+      // Combine date and time to ISO string
+      const preferredDate = new Date(`${date}T${time}`).toISOString();
+
+      await createSessionRequest({
+        subjectId,
+        preferredDate,
+        description: notes,
+      });
+
+      setSuccess("Session request sent successfully!");
+      
+      // Wait briefly before redirecting
+      setTimeout(() => {
+        navigate("/student/profile");
+      }, 1500);
+
+    } catch (err: any) {
+      console.error("API Error:", err?.response?.data || err?.message);
+      setError(err?.response?.data?.message || err?.message || "Failed to create session request.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <Card className="p-8">
+      {error && (
+        <div className="mb-4 p-3 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2">
+          <span>✕</span> {error}
+        </div>
+      )}
+      {success && (
+        <div className="mb-4 p-3 text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg flex items-center gap-2">
+          <span>✓</span> {success}
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Subject */}
         <div>
@@ -120,12 +180,12 @@ export default function RequestSessionForm() {
 
         {/* Actions */}
         <div className="flex gap-3">
-          <Button type="button" variant="outline" onClick={() => navigate("/student/profile")}>
+          <Button type="button" variant="outline" onClick={() => navigate("/student/profile")} disabled={isLoading}>
             Cancel
           </Button>
-          <Button type="submit" className="bg-[#1E3A8A]">
+          <Button type="submit" className="bg-[#1E3A8A]" disabled={isLoading}>
             <Send className="w-4 h-4 mr-2" />
-            Send Request
+            {isLoading ? "Sending..." : "Send Request"}
           </Button>
         </div>
       </form>

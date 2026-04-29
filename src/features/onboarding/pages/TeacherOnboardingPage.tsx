@@ -34,6 +34,16 @@ function mapAvailabilityToApi(av: Record<string, string[]>) {
   );
 }
 
+const SUBJECT_MAP: Record<string, number> = {
+  "Mathematics": 1,
+  "Physics": 2,
+  "Computer Science": 3,
+  "English Literature": 4,
+  "Chemistry": 5,
+  "Biology": 6,
+  "History": 7
+};
+
 export default function TeacherOnboardingPage() {
   const navigate = useNavigate();
   const { payload, reset } = useRegister();
@@ -60,13 +70,14 @@ export default function TeacherOnboardingPage() {
         Phone: payload.phone,
 
         Description: payload.description ?? "",
-        Gender: data.gender === "male" ? 0 : 1,// ✅ adjust to backend enum
+        Gender: data.gender === "male" ? 0 : 1, // adjust to backend enum
 
-        Biography: data.biography,
+        College: "N/A", // Prototype placeholder
+        Certificate: "N/A", // Prototype placeholder
+        IdNumber: "000000000", // Prototype placeholder
 
-        // Backend likely expects IDs not names — keep as-is now for prototype
-        Subject: data.subject,
-        Experience: data.experience,
+        SubjectId: SUBJECT_MAP[data.subject] || 1,
+        TeachingExperience: data.experience || "0-2",
 
         Availability: mapAvailabilityToApi(data.availability),
         OpenForImmediate: data.openForImmediate,

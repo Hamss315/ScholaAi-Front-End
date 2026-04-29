@@ -30,9 +30,10 @@ export function getUserIdFromToken(token: string): string {
 export function getRoleFromToken(token: string): "student" | "teacher" | "admin" | "" {
   const payload = parseJwt(token);
 
-  return (
+  const role = (
     payload?.role ||
     payload?.["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] ||
     ""
   );
+  return role.toLowerCase() as "student" | "teacher" | "admin" | "";
 }

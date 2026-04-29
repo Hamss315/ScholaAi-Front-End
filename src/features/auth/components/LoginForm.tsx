@@ -31,7 +31,7 @@ export default function LoginForm() {
       // Adjust these based on your backend response fields:
       const token = res.token;
       const userId = res.userId || getUserIdFromToken(token);
-      const role =(res.role || getRoleFromToken(token) || "student") as UserRole;
+      const role = ((res.role || getRoleFromToken(token) || "student") as string).toLowerCase() as UserRole;
 
       if (!token) throw new Error("No token returned from API");
       if (!userId) {
