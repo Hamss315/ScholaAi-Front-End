@@ -45,7 +45,7 @@ export default function TeacherOnboarding({ onComplete }: Props) {
     experience: "",
 
     certificateFiles: [],
-    idFile: null,
+    nationalId: "",
     documentsConfirmed: false,
 
     availability: { Mon: [], Tue: [], Wed: [], Thu: [], Fri: [], Sat: [], Sun: [] },
@@ -97,7 +97,7 @@ export default function TeacherOnboarding({ onComplete }: Props) {
       case 3:
         return (
           formData.certificateFiles.length > 0 &&
-          formData.idFile !== null &&
+          formData.nationalId.trim().length > 0 &&
           formData.documentsConfirmed
         );
 

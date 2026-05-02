@@ -44,7 +44,7 @@ export interface TeacherOnboardingData {
   // teachingExperience: string;
   
   certificateFiles: File[];
-  idFile: File | null;
+  nationalId: string;
   documentsConfirmed: boolean;
 
   availability: AvailabilityMap;
