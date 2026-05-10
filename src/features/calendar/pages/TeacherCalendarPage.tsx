@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Brain, ArrowLeft, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -9,21 +9,18 @@ import TeacherCalendarGrid from "../components/TeacherCalendarGrid";
 import TeacherSidebar from "../components/TeacherSidebar";
 
 import type { TeacherSession } from "../types/calendar.types";
+import { getTeacherSessions } from "../../../services/api/teacherCalendar";
 
 export default function TeacherCalendarPage() {
   const navigate = useNavigate();
 
-  const [currentMonth, setCurrentMonth] = useState(new Date(2025, 9));
+  const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [sessions, setSessions] = useState<TeacherSession[]>([]);
 
-  const sessions: TeacherSession[] = [
-    { id: 1, date: "2025-10-28", student: "Emily Parker", subject: "Mathematics", time: "2:00 PM", duration: "1 hour", status: "completed", focusScore: 92 },
-    { id: 2, date: "2025-10-29", student: "James Wilson", subject: "Physics", time: "10:00 AM", duration: "1.5 hours", status: "upcoming" },
-    { id: 3, date: "2025-10-30", student: "Sarah Martinez", subject: "Chemistry", time: "3:00 PM", duration: "1 hour", status: "pending" },
-    { id: 4, date: "2025-11-01", student: "David Lee", subject: "Mathematics", time: "2:00 PM", duration: "1 hour", status: "upcoming" },
-    { id: 5, date: "2025-11-03", student: "Lisa Anderson", subject: "Biology", time: "11:00 AM", duration: "1 hour", status: "upcoming" },
-    { id: 6, date: "2025-11-05", student: "Michael Brown", subject: "Physics", time: "4:00 PM", duration: "1 hour", status: "upcoming" },
-  ];
+  useEffect(() => {
+    getTeacherSessions().then(setSessions);
+  }, []);
 
   const previousMonth = () => {
     setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1));
@@ -33,8 +30,15 @@ export default function TeacherCalendarPage() {
     setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1));
   };
 
+  const formatDateKey = (date: Date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
   const getSessionsForDate = (date: Date) => {
-    const dateString = date.toISOString().split("T")[0];
+    const dateString = formatDateKey(date);
     return sessions.filter((s) => s.date === dateString);
   };
 

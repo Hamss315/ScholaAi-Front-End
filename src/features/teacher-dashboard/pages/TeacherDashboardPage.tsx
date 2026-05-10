@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "../../../components/ui/alert";
-import { getCurrentUserProfile, type TeacherProfile } from "../../../utils/userDataService";
+// import { getCurrentUserProfile, type TeacherProfile } from "../../../utils/userDataService"; // removing unneeded imports that cause error
 
 import DashboardHeader from "../components/DashboardHeader";
 import DashboardStats from "../components/DashboardStats";
@@ -12,52 +12,53 @@ import CalendarCard from "../components/CalendarCard";
 import EarningsCard from "../components/EarningsCard";
 import TodayOverview from "../components/TodayOverview";
 
+import { getTeacherDashboardOverview, type TeacherDashboardOverview } from "../../../services/api/teacherDashboard";
+
 export default function TeacherDashboardPage() {
-  const [teacherProfile, setTeacherProfile] = useState<TeacherProfile | null>(null);
+  const [activeSessions, setActiveSessions] = useState<any[]>([]);
+  const [upcomingClasses, setUpcomingClasses] = useState<any[]>([]);
+  const [teacherName, setTeacherName] = useState("Teacher");
+  const [todayEarnings, setTodayEarnings] = useState(0);
+  const [thisMonthEarnings, setThisMonthEarnings] = useState(0);
+  const [avgRating, setAvgRating] = useState(0);
+  const [thisWeekEarnings, setThisWeekEarnings] = useState(0);
+  const [lastMonthEarnings, setLastMonthEarnings] = useState(0);
+  const [avgFocusScore, setAvgFocusScore] = useState(0);
 
   useEffect(() => {
-    const profile = getCurrentUserProfile();
-    if (profile && profile.role === "teacher") {
-      setTeacherProfile(profile as TeacherProfile);
-    }
+    getTeacherDashboardOverview().then((overview: TeacherDashboardOverview) => {
+      setActiveSessions(overview.activeSessions);
+      setUpcomingClasses(overview.upcomingClasses);
+      setTeacherName(overview.teacherName || "Teacher");
+      setTodayEarnings(overview.todayEarnings || 0);
+      setThisMonthEarnings(overview.thisMonthEarnings || 0);
+      setAvgRating(overview.avgRating || 0);
+      setThisWeekEarnings(overview.earningsSummary.thisWeek || 0);
+      setLastMonthEarnings(overview.earningsSummary.lastMonth || 0);
+
+      const focusValues = overview.recentSessions
+        .map((s) => s.focusScore)
+        .filter((v) => typeof v === "number" && v > 0);
+      const avgFocus = focusValues.length > 0
+        ? focusValues.reduce((sum, v) => sum + v, 0) / focusValues.length
+        : 0;
+      setAvgFocusScore(avgFocus);
+    });
   }, []);
 
   // Get available days based on teacher's availability
   const getAvailableDays = () => {
-    if (!teacherProfile?.availability) return [];
-    
-    const dayMap: Record<string, number> = {
-      "Mon": 1,
-      "Tue": 2,
-      "Wed": 3,
-      "Thu": 4,
-      "Fri": 5,
-      "Sat": 6,
-      "Sun": 0
-    };
-
-    const availableDayNumbers: number[] = [];
-    Object.entries(teacherProfile.availability).forEach(([day, slots]) => {
-      if (slots && slots.length > 0) {
-        availableDayNumbers.push(dayMap[day]);
-      }
-    });
-
-    return availableDayNumbers;
+    // TODO: wire teacher availability from profile service.
+    return [] as number[];
   };
 
   const availableDays = getAvailableDays();
-
-  const activeSessions = [
-    { id: 1, student: "Emily Parker", subject: "Mathematics", startTime: "1:30 PM", focusScore: 85, status: "warning", isCurrent: true },
-    { id: 2, student: "James Wilson", subject: "Physics", startTime: "3:00 PM", focusScore: 95, status: "good", isCurrent: false },
-  ];
-
-  const upcomingClasses = [
-    { id: 1, student: "Sarah Martinez", subject: "Chemistry", time: "4:00 PM", duration: "1 hour" },
-    { id: 2, student: "David Lee", subject: "Mathematics", time: "Tomorrow, 10:00 AM", duration: "1.5 hours" },
-    { id: 3, student: "Lisa Anderson", subject: "Biology", time: "Tomorrow, 2:00 PM", duration: "1 hour" },
-  ];
+  const activeStudents = new Set(upcomingClasses.map((s) => s.student)).size;
+  const todayKey = new Date().toISOString().split("T")[0];
+  const sessionsToday = upcomingClasses.filter(
+    (s) => s.scheduledAt && s.scheduledAt.startsWith(todayKey)
+  ).length;
+  const hoursTaughtToday = sessionsToday;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -66,11 +67,16 @@ export default function TeacherDashboardPage() {
       <div className="container mx-auto px-4 py-8">
         {/* Welcome Section */}
         <div className="mb-8">
-          <h1 className="text-4xl mb-2" style={{ color: '#1E3A8A' }}>Welcome, Dr. Roberts!</h1>
+          <h1 className="text-4xl mb-2" style={{ color: '#1E3A8A' }}>Welcome, {teacherName}!</h1>
           <p className="text-gray-600">Your teaching dashboard for today</p>
         </div>
 
-        <DashboardStats />
+        <DashboardStats
+          todayEarnings={todayEarnings}
+          thisMonthEarnings={thisMonthEarnings}
+          activeStudents={activeStudents}
+          avgRating={avgRating}
+        />
 
         {/* Engagement Alerts */}
         {activeSessions.some(s => s.status === "warning") && (
@@ -91,14 +97,26 @@ export default function TeacherDashboardPage() {
 
             <UpcomingClasses upcoming={upcomingClasses} />
 
-            <PerformanceAnalytics />
+            <PerformanceAnalytics
+              totalUpcoming={upcomingClasses.length}
+              avgRating={avgRating}
+              avgFocus={avgFocusScore}
+            />
           </div>
 
           {/* Right Column */}
           <div className="space-y-6">
             <CalendarCard availableDays={availableDays} />
-            <EarningsCard />
-            <TodayOverview />
+            <EarningsCard
+              thisWeek={thisWeekEarnings}
+              lastMonth={lastMonthEarnings}
+              thisMonth={thisMonthEarnings}
+            />
+            <TodayOverview
+              sessionsToday={sessionsToday}
+              hoursTaught={hoursTaughtToday}
+              avgFocus={avgFocusScore}
+            />
           </div>
         </div>
       </div>

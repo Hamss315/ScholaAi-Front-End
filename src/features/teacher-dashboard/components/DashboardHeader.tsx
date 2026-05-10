@@ -22,7 +22,7 @@ export default function DashboardHeader() {
               </Link>
             </Button>
             <Button variant="ghost" asChild>
-              <Link to="/session-requests" className="flex items-center">
+              <Link to="/teacher/session-requests" className="flex items-center">
                 <Inbox className="w-4 h-4 mr-2" />
                 Requests
                 <Badge className="ml-2 bg-yellow-100 text-yellow-700 hover:bg-yellow-100">2</Badge>
@@ -35,18 +35,18 @@ export default function DashboardHeader() {
               </Link>
             </Button>
             <Button variant="ghost" asChild>
-              <Link to="/teacher-schedule" className="flex items-center">
+              <Link to="/teacher/calendar" className="flex items-center">
                 <Calendar className="w-4 h-4 mr-2" />
                 My Schedule
               </Link>
             </Button>
-            <Link to="/teacher-profile">
+            <Link to="/teacher/profile">
               <Avatar className="cursor-pointer">
                 <AvatarFallback className="bg-[#8B5CF6] text-white">DR</AvatarFallback>
               </Avatar>
             </Link>
             <Button variant="ghost" size="icon" asChild>
-              <Link to="/landing">
+              <Link to="/">
                 <LogOut className="w-5 h-5" />
               </Link>
             </Button>

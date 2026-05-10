@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 
 import CalendarHeader from "../components/CalendarHeader";
 import CalendarLegend from "../components/CalendarLegend";
@@ -7,17 +6,16 @@ import CalendarGrid from "../components/CalendarGrid";
 import SessionSidebar from "../components/SessionSidebar";
 
 import type { StudentSession } from "../types/calendar.types";
+import { getStudentSessions } from "../../../services/api/studentCalendar";
 
 export default function StudentCalendarPage() {
-  const navigate = useNavigate();
-
-  const [currentMonth, setCurrentMonth] = useState(new Date(2025, 9));
+  const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [sessions, setSessions] = useState<StudentSession[]>([]);
 
-  const sessions: StudentSession[] = [
-    { id: 1, date: "2025-10-28", teacher: "Dr. Sarah Johnson", subject: "Mathematics", time: "2:00 PM", duration: "1 hour", status: "completed", focusScore: 92 },
-    { id: 2, date: "2025-10-29", teacher: "Prof. Michael Chen", subject: "Physics", time: "10:00 AM", duration: "1.5 hours", status: "upcoming" },
-  ];
+  useEffect(() => {
+    getStudentSessions().then(setSessions);
+  }, []);
 
   const previousMonth = () => {
     setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1));
@@ -27,10 +25,17 @@ export default function StudentCalendarPage() {
     setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1));
   };
 
+  const formatDateKey = (date: Date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
   const selectedSessions =
     selectedDate
       ? sessions.filter(
-          (s) => s.date === selectedDate.toISOString().split("T")[0]
+          (s) => s.date === formatDateKey(selectedDate)
         )
       : [];
 

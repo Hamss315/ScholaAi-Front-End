@@ -21,6 +21,14 @@ import TeacherSessionRequestsPage from "./features/sessions/pages/TeacherSession
 
 import SessionStreamPage from "./features/sessions/pages/StreamPage";
 
+import StudentDashboardPage from "./features/student-dashboard/pages/StudentDashboardPage";
+import TeacherDashboardPage from "./features/teacher-dashboard/pages/TeacherDashboardPage";
+
+import SearchTeachersPage from "./features/search-teacher/pages/SearchTeachersPage";
+
+import StudentCalendarPage from "./features/calendar/pages/StudentCalendarPage";
+import TeacherCalendarPage from "./features/calendar/pages/TeacherCalendarPage";
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -46,9 +54,21 @@ export default function App() {
         <Route path="/onboarding/student" element={<StudentOnboardingPage />} />
         <Route path="/onboarding/teacher" element={<TeacherOnboardingPage />} />
 
+        {/* Dashboards */}
+        <Route path="/student/dashboard" element={<StudentDashboardPage />} />
+        <Route path="/teacher/dashboard" element={<TeacherDashboardPage />} />
+
+        {/* Search Teachers */}
+        <Route path="/search-teachers" element={<SearchTeachersPage />} />
+
         {/* Request Sessions */}
+        <Route path="/request-session" element={<RequestSessionPage />} />
         <Route path="/student/request-session" element={<RequestSessionPage />} />
         <Route path="/teacher/session-requests" element={<TeacherSessionRequestsPage />} />
+
+        {/* Calendars */}
+        <Route path="/student/calendar" element={<StudentCalendarPage />} />
+        <Route path="/teacher/calendar" element={<TeacherCalendarPage />} />
 
         {/* Session Stream */}
         <Route path="/session/:sessionId/stream" element={<SessionStreamPage />} />

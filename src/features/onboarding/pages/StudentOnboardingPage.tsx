@@ -12,25 +12,28 @@ import type { StudentOnboardingData } from "../types/onboarding.types";
  */
 function mapAvailabilityToApi(av: Record<string, string[]>) {
   const dayMap: Record<string, number> = {
-    Mon: 0,
-    Tue: 1,
-    Wed: 2,
-    Thu: 3,
-    Fri: 4,
-    Sat: 5,
-    Sun: 6,
+    Sun: 0,
+    Mon: 1,
+    Tue: 2,
+    Wed: 3,
+    Thu: 4,
+    Fri: 5,
+    Sat: 6,
   };
 
   const slotMap: Record<string, number> = {
     Morning: 0,
     Afternoon: 1,
     Evening: 2,
+    "Morning (6-12)": 0,
+    "Afternoon (12-17)": 1,
+    "Evening (17-22)": 2,
   };
 
   return Object.entries(av).flatMap(([day, slots]) =>
     slots.map((slot) => ({
-      day: dayMap[day] ?? 0,
-      timeSlot: slotMap[slot] ?? 0,
+      Day: dayMap[day] ?? 0,
+      TimeSlot: slotMap[slot] ?? 0,
     }))
   );
 }
@@ -52,23 +55,23 @@ export default function StudentOnboardingPage() {
   const handleComplete = async (data: StudentOnboardingData) => {
     try {
       const requestBody = {
-        userName: data.userName || payload.userName,
-        profilePhotoURL: data.profileImage ?? payload.profilePhotoURL ?? "",
-        firstName: data.firstName || payload.firstName,
-        lastName: data.lastName || payload.lastName,
-        email: data.email ?? payload.email,
-        phone: payload.phone,
+        UserName: data.userName || payload.userName,
+        ProfilePhotoURL: data.profileImage ?? payload.profilePhotoURL ?? "",
+        FirstName: data.firstName || payload.firstName,
+        LastName: data.lastName || payload.lastName,
+        Email: data.email ?? payload.email,
+        Phone: payload.phone,
 
-        grade: data.grade ?? 0,
-        description: payload.description ?? "",
+        Grade: data.grade ?? 0,
+        Description: payload.description ?? "",
 
         // ⚠️ adjust to your backend enum
-        gender: data.gender === "male" ? 0 : 1,
+        Gender: data.gender === "male" ? 0 : 1,
 
-        availability: mapAvailabilityToApi(data.availability),
+        Availability: mapAvailabilityToApi(data.availability),
 
-        password: payload.password,
-        confirmPassword: payload.confirmPassword,
+        Password: payload.password,
+        ConfirmPassword: payload.confirmPassword,
       };
 
       await api.post("/account/register/student", requestBody);
@@ -78,7 +81,13 @@ export default function StudentOnboardingPage() {
       navigate("/login");
     } catch (err: any) {
       console.error(err?.response?.data || err?.message);
-      alert(err?.response?.data?.message || "Registration failed");
+      const resData = err?.response?.data;
+      if (resData?.errors) {
+        const messages = Object.values(resData.errors).flat().join("\\n");
+        alert(messages);
+      } else {
+        alert(resData?.message || (typeof resData === 'string' ? resData : "Registration failed"));
+      }
     }
   };
 

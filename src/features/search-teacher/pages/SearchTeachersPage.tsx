@@ -3,10 +3,9 @@ import { useState, useMemo, useEffect } from "react";
 import SearchHeader from "../components/SearchHeader";
 import SearchPageHeader from "../components/SearchPageHeader";
 import SearchBar from "../components/SearchBar";
-import FiltersPanel from "../components/FiltersPanel";
 import TeachersGrid from "../components/TeachersGrid";
 
-import { getTeachers } from "../services/teacher.service";
+import { searchTeachers } from "../../../services/api/searchTeachers";
 import type { Teacher } from "../types/teacher.types";
 
 export default function SearchTeachersPage() {
@@ -14,74 +13,33 @@ export default function SearchTeachersPage() {
   const [loading, setLoading] = useState(true);
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedSubject, setSelectedSubject] = useState("all");
-  const [priceRange, setPriceRange] = useState("all");
-  const [minRating, setMinRating] = useState("all");
   const [showFilters, setShowFilters] = useState(false);
 
-  const [availabilityFilters, setAvailabilityFilters] = useState({
-    morning: false,
-    afternoon: false,
-    evening: false,
-    night: false,
-  });
-
+  // Fetch from backend whenever search query changes
   useEffect(() => {
     (async () => {
-      const data = await getTeachers();
-      setTeachers(data);
+      setLoading(true);
+      const data = await searchTeachers(searchQuery || undefined, undefined, undefined);
+      setTeachers(Array.isArray(data) ? data : []);
       setLoading(false);
     })();
-  }, []);
+  }, [searchQuery]);
 
-  const allSubjects = useMemo(() => {
-    return Array.from(new Set(teachers.flatMap(t => t.subjects))).sort();
-  }, [teachers]);
-
+  // Client-side filter on top of what the server returned
   const filteredTeachers = useMemo(() => {
-    return teachers.filter((t) => {
-      const matchesSearch =
-        t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        t.subjects.some(s => s.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        t.bio.toLowerCase().includes(searchQuery.toLowerCase());
-
-      if (!matchesSearch) return false;
-
-      if (selectedSubject !== "all" && !t.subjects.includes(selectedSubject)) return false;
-
-      if (priceRange === "low" && t.hourlyRate > 40) return false;
-      if (priceRange === "medium" && (t.hourlyRate < 41 || t.hourlyRate > 50)) return false;
-      if (priceRange === "high" && t.hourlyRate < 51) return false;
-
-      if (minRating === "4.5" && t.rating < 4.5) return false;
-      if (minRating === "4.7" && t.rating < 4.7) return false;
-      if (minRating === "4.9" && t.rating < 4.9) return false;
-
-      const hasFilter = Object.values(availabilityFilters).some(Boolean);
-
-      if (hasFilter) {
-        return (
-          (availabilityFilters.morning && t.availability.includes("Morning")) ||
-          (availabilityFilters.afternoon && t.availability.includes("Afternoon")) ||
-          (availabilityFilters.evening && t.availability.includes("Evening")) ||
-          (availabilityFilters.night && t.availability.includes("Night"))
-        );
-      }
-
-      return true;
-    });
-  }, [teachers, searchQuery, selectedSubject, priceRange, minRating, availabilityFilters]);
+    if (!searchQuery) return teachers;
+    const q = searchQuery.toLowerCase();
+    return teachers.filter(
+      (t) =>
+        t.userName?.toLowerCase().includes(q) ||
+        t.subject?.toLowerCase().includes(q) ||
+        t.college?.toLowerCase().includes(q) ||
+        t.teachingExperience?.toLowerCase().includes(q)
+    );
+  }, [teachers, searchQuery]);
 
   const clearFilters = () => {
-    setSelectedSubject("all");
-    setPriceRange("all");
-    setMinRating("all");
-    setAvailabilityFilters({
-      morning: false,
-      afternoon: false,
-      evening: false,
-      night: false,
-    });
+    setSearchQuery("");
   };
 
   return (
@@ -100,26 +58,15 @@ export default function SearchTeachersPage() {
           setShowFilters={setShowFilters}
         />
 
-        {showFilters && (
-          <FiltersPanel
-            selectedSubject={selectedSubject}
-            setSelectedSubject={setSelectedSubject}
-            priceRange={priceRange}
-            setPriceRange={setPriceRange}
-            minRating={minRating}
-            setMinRating={setMinRating}
-            availabilityFilters={availabilityFilters}
-            setAvailabilityFilters={setAvailabilityFilters}
-            allSubjects={allSubjects}
+        {loading ? (
+          <div className="text-center py-12 text-gray-500">Searching teachers...</div>
+        ) : (
+          <TeachersGrid
+            teachers={filteredTeachers}
+            searchQuery={searchQuery}
             clearFilters={clearFilters}
           />
         )}
-
-        <TeachersGrid
-          teachers={filteredTeachers}
-          searchQuery={searchQuery}
-          clearFilters={clearFilters}
-        />
       </div>
     </div>
   );
