@@ -14,7 +14,6 @@ export type TeacherProfileData = {
 export type TeacherProfessionalData = {
   subjects: string[];
   experience: string;
-  hourlyRate: string;
   education: string;
   specializations: string;
 };

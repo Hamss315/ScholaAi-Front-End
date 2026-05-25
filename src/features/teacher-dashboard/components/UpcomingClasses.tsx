@@ -5,6 +5,27 @@ import { Avatar, AvatarFallback } from "../../../components/ui/avatar";
 import { Clock } from "lucide-react";
 
 export default function UpcomingClasses({ upcoming }: { upcoming: any[] }) {
+  const isStartable = (timeStr: string) => {
+    if (timeStr.includes("Tomorrow")) return false;
+    
+    try {
+      const now = new Date();
+      const [time, modifier] = timeStr.split(' ');
+      const [hours, minutes] = time.split(':').map(Number);
+      
+      let sessionHours = hours;
+      if (modifier === 'PM' && hours < 12) sessionHours += 12;
+      if (modifier === 'AM' && hours === 12) sessionHours = 0;
+      
+      const sessionDate = new Date(now);
+      sessionDate.setHours(sessionHours, minutes || 0, 0, 0);
+      
+      return now >= sessionDate;
+    } catch (e) {
+      return false;
+    }
+  };
+
   return (
     <Card className="p-6">
       <div className="flex items-center justify-between mb-6">
@@ -30,9 +51,24 @@ export default function UpcomingClasses({ upcoming }: { upcoming: any[] }) {
                 <div className="text-sm text-gray-600">{session.subject}</div>
               </div>
             </div>
-            <div className="text-right">
-              <div className="text-sm" style={{ color: '#3B82F6' }}>{session.time}</div>
-              <div className="text-sm text-gray-500">{session.duration}</div>
+            
+            <div className="flex items-center gap-4">
+              <Button 
+                size="sm"
+                className="bg-[#22C55E] hover:bg-[#22C55E]/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                asChild={isStartable(session.time)}
+                disabled={!isStartable(session.time)}
+              >
+                {isStartable(session.time) ? (
+                  <Link to="/live-session">Start</Link>
+                ) : (
+                  <span>Start</span>
+                )}
+              </Button>
+              <div className="text-right min-w-[100px]">
+                <div className="text-sm" style={{ color: '#3B82F6' }}>{session.time}</div>
+                <div className="text-sm text-gray-500">{session.duration}</div>
+              </div>
             </div>
           </div>
         ))}
