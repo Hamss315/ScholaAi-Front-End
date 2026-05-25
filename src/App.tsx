@@ -53,6 +53,9 @@ import SessionAnalysisPage from "./features/sessions/pages/SessionAnalysisPage";
 import StudentDashboardPage from "./features/student-dashboard/pages/StudentDashboardPage";
 import TeacherDashboardPage from "./features/teacher-dashboard/pages/TeacherDashboardPage";
 
+/* Session */ 
+import SessionStreamPage from "./features/sessions/pages/StreamPage";
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -110,6 +113,9 @@ export default function App() {
 
         {/* My Students */}
         <Route path="/my-students" element={<MyStudentsPage />} />
+
+        {/* Session Stream */}
+        <Route path="/session/:sessionId/stream" element={<SessionStreamPage />} />
 
         {/* FALLBACK */}
         <Route path="*" element={<Navigate to="/" replace />} />
