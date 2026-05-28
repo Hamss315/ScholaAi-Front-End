@@ -26,10 +26,10 @@ export default function TeacherSessionRequestsPage() {
           subject: d.subject || `Subject`,
           preferredDate: dDate.toLocaleDateString(),
           preferredTime: dDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          duration: "1 hour", // Defaulting as DTO might not have it
+          duration: "1 hour",
           notes: d.description,
           requestedDate: "Recently",
-          status: "pending",
+          status: d.isAccepted ? "accepted" : "pending",
         };
       });
       setRequests(mapped);

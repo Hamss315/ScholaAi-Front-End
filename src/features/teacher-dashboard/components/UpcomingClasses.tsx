@@ -31,7 +31,7 @@ export default function UpcomingClasses({ upcoming }: { upcoming: any[] }) {
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl" style={{ color: '#1E3A8A' }}>Upcoming Classes</h2>
         <Button variant="outline" asChild>
-          <Link to="/teacher-schedule">
+          <Link to="/teacher/calendar">
             <Clock className="w-4 h-4 mr-2" />
             Set Availability
           </Link>

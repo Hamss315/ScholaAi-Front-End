@@ -12,6 +12,7 @@ export interface TeacherRequestDto {
   subject: string;
   preferredDate: string;
   description?: string;
+  isAccepted: boolean;
 }
 
 export interface StudentSessionDto {

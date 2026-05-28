@@ -98,7 +98,7 @@ export default function SessionSidebar({
                   <Button
                     className="w-full mt-3 bg-[#1E3A8A] hover:bg-[#1e3a8a]/90"
                     size="sm"
-                    onClick={() => navigate("/live-session")}
+                    onClick={() => navigate(`/session/${session.id}/stream`)}
                   >
                     <Video className="w-4 h-4 mr-2" />
                     Join Session

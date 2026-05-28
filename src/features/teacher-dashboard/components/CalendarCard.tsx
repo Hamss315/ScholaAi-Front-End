@@ -43,7 +43,7 @@ export default function CalendarCard({ availableDays = [] }: Props) {
           className="w-full border-[#1E3A8A] text-[#1E3A8A]"
           asChild
         >
-          <Link to="/teacher-calendar">
+          <Link to="/teacher/calendar">
             <CalendarIcon className="w-4 h-4 mr-2" />
             View Full Calendar
           </Link>
