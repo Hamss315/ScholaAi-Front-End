@@ -1,19 +1,12 @@
 import { useEffect, useState } from "react";
+import type { UpcomingSession, RecentNote } from "../types/dashboard.types";
 import DashboardHeader from "../components/DashboardHeader";
 import StatsGrid from "../components/StatsGrid";
 import UpcomingSessions from "../components/UpcomingSessions";
 import RecentNotes from "../components/RecentNotes";
 import RightSidebar from "../components/RightSidebar";
 
-import {
-  getUpcomingSessions,
-  getRecentNotes,
-} from "../services/dashboard.service";
-
-import type {
-  UpcomingSession,
-  RecentNote,
-} from "../types/dashboard.types";
+import { getUpcomingSessions, getRecentNotes } from "../../../services/api/studentDashboard";
 
 export default function StudentDashboardPage() {
   const [sessions, setSessions] = useState<UpcomingSession[]>([]);

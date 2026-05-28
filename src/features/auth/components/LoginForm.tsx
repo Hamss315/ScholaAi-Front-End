@@ -56,7 +56,8 @@ export default function LoginForm() {
 
     } catch (err: any) {
       console.error(err?.response?.data || err?.message);
-      setErrorMsg(err?.response?.data?.message || "Login failed");
+      const data = err?.response?.data;
+      setErrorMsg(data?.message || (typeof data === 'string' ? data : "Login failed"));
     } finally {
       setLoading(false);
     }
