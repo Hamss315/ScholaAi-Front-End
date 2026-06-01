@@ -133,7 +133,7 @@ export default function TeacherSidebar({
                   <Button
                     className="w-full mt-3 bg-blue-500"
                     size="sm"
-                    onClick={() => navigate("/live-session")}
+                    onClick={() => navigate("/teacher/live-session")}
                   >
                     <Video className="w-4 h-4 mr-2" />
                     Join Session
@@ -145,7 +145,7 @@ export default function TeacherSidebar({
                     variant="outline"
                     className="w-full mt-3"
                     size="sm"
-                    onClick={() => navigate("/session-analysis")}
+                    onClick={() => navigate("/teacher/session-analysis")}
                   >
                     View Analysis
                   </Button>

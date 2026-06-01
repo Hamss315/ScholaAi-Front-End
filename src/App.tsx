@@ -45,7 +45,7 @@ import MyStudentsPage from "./features/my-students/pages/MyStudentsPage";
 import TeacherSchedulePage from "./features/teacher-schedule/pages/TeacherSchedulePage";
 
 /* Teacher Extras */
-import TeacherPayoutPage from "./features/teacher/pages/TeacherPayoutPage";
+import TeacherPayoutPage from "./features/payment/pages/TeacherPayoutPage";
 import LiveSessionPage from "./features/sessions/pages/LiveSessionPage";
 import SessionAnalysisPage from "./features/sessions/pages/SessionAnalysisPage";
 
@@ -99,8 +99,8 @@ export default function App() {
         <Route path="/teacher/payout" element={<TeacherPayoutPage />} />
 
         {/* LIVE SESSIONS */}
-        <Route path="/teacher/live-session" element={<LiveSessionPage />} />
-        <Route path="/teacher/session-analysis" element={<SessionAnalysisPage />} />
+        <Route path="/live-session" element={<LiveSessionPage />} />
+        <Route path="/session-analysis" element={<SessionAnalysisPage />} />
 
         {/* PAYMENT */}
         <Route path="/payment" element={<PaymentPage />} />

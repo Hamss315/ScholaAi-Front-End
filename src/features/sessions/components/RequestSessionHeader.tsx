@@ -12,14 +12,12 @@ export default function RequestSessionHeader() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
+              <Button variant="ghost" onClick={() => navigate("/student/dashboard")}>
+              <ArrowLeft />
+              </Button>
               <Brain className="w-8 h-8 text-purple-500" />
               <span className="text-2xl text-blue-900">ScholaAi</span>
             </div>
-
-            <Button variant="ghost" onClick={() => navigate("/student/profile")}>
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Profile
-            </Button>
           </div>
 
           <div className="flex items-center gap-4">

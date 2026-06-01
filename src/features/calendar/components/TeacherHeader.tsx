@@ -16,7 +16,7 @@ export default function TeacherHeader() {
             <span className="text-2xl text-blue-900">ScholaAi</span>
           </div>
 
-          <Button variant="ghost" onClick={() => navigate("/teacher/profile")}>
+          <Button variant="ghost" onClick={() => navigate("/teacher/dashboard")}>
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Dashboard
           </Button>

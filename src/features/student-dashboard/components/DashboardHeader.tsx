@@ -48,7 +48,7 @@ export default function DashboardHeader() {
 
           <Avatar
             className="cursor-pointer"
-            onClick={() => navigate("/student-profile")}
+            onClick={() => navigate("/student/profile")}
           >
             <AvatarFallback className="bg-[#8B5CF6] text-white">
               JS

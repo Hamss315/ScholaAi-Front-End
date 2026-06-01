@@ -71,7 +71,9 @@ export default function ChatsListPage({ userRole }: ChatsListPageProps) {
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => navigate("/dashboard")}
+                onClick={() => navigate(userRole === "teacher"
+                ? "/teacher/dashboard"
+                : "/student/dashboard")}
               >
                 <ArrowLeft className="w-5 h-5" />
               </Button>
