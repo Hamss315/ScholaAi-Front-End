@@ -86,10 +86,6 @@ export default function App() {
         <Route path="/student/dashboard" element={<StudentDashboardPage />} />
         <Route path="/teacher/dashboard" element={<TeacherDashboardPage />} />
 
-        {/* SESSIONS */}
-        <Route path="/request-session" element={<RequestSessionPage />} />
-        <Route path="/teacher/session-requests" element={<TeacherSessionRequestsPage />} />
-
         {/* SCHEDULE */}
         <Route path="/teacher/schedule" element={<TeacherSchedulePage />} />
 
@@ -111,10 +107,15 @@ export default function App() {
         {/* SEARCH */}
         <Route path="/search-teachers" element={<SearchTeachersPage />} />
 
-        {/* My Students */}
+        {/* MY STUDENTS */}
         <Route path="/my-students" element={<MyStudentsPage />} />
 
-        {/* Session Stream */}
+        {/* REQUEST SESSIONS */}
+        <Route path="/request-session" element={<RequestSessionPage />} />
+        <Route path="/student/request-session" element={<RequestSessionPage />} />
+        <Route path="/teacher/session-requests" element={<TeacherSessionRequestsPage />} />
+
+        {/* SESSION STREAM */}
         <Route path="/session/:sessionId/stream" element={<SessionStreamPage />} />
 
         {/* FALLBACK */}

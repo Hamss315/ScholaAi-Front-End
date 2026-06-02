@@ -34,7 +34,7 @@ export default function TeacherProfileHeader() {
               Messages
             </Button>
 
-            <Button variant="ghost">
+            <Button variant="ghost" onClick={() => navigate("/teacher/calendar")}>
               <CalendarIcon className="w-4 h-4 mr-2 shrink-0" />
               My Schedule
             </Button>

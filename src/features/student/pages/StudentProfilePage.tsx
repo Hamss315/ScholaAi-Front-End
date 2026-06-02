@@ -16,8 +16,23 @@ import { getStudentProfile, type UpdateStudentProfileDto } from "../services/stu
 import { updateStudentProfile } from "../services/studentProfile.service";
 import { changeStudentPassword } from "../services/studentProfile.service";
 import { mapStudentProfileDto } from "../services/studentProfile.mapper";
+import { getUserIdFromToken } from "../../../utils/jwt";
 
 export default function StudentProfilePage() {
+  const resolveUserId = () => {
+    const storedUserId = localStorage.getItem("userId");
+    if (storedUserId) return storedUserId;
+
+    const token = localStorage.getItem("token") || localStorage.getItem("scholaai_token");
+    if (!token) return "";
+
+    const idFromToken = getUserIdFromToken(token);
+    if (idFromToken) {
+      localStorage.setItem("userId", idFromToken);
+    }
+
+    return idFromToken;
+  };
 
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
@@ -78,7 +93,7 @@ export default function StudentProfilePage() {
       try {
         setLoading(true);
         setError("");
-        const userId = localStorage.getItem("userId");
+        const userId = resolveUserId();
         if (!userId) {
           setError("Missing userId. Please login again.");
           return;
@@ -105,7 +120,7 @@ export default function StudentProfilePage() {
     try {
       setProfileError("");       // ✅
       setProfileSuccess("");     // ✅
-      const userId = localStorage.getItem("userId");
+      const userId = resolveUserId();
       if (!userId) return;
 
       const gradeNumber = profileData.grade
@@ -164,7 +179,7 @@ export default function StudentProfilePage() {
         return;
       }
 
-      const userId = localStorage.getItem("userId");
+      const userId = resolveUserId();
       if (!userId) return;
 
       const message = await changeStudentPassword(userId, passwordData);

@@ -50,7 +50,7 @@ export default function TeachersGrid({
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {teachers.map((teacher) => (
             <TeacherCard
-              key={teacher.id}
+              key={teacher.userName}
               teacher={teacher}
             />
           ))}
