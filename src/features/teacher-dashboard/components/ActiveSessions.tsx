@@ -65,7 +65,7 @@ export default function ActiveSessions({ sessions }: { sessions: any[] }) {
                   className="bg-[#22C55E] hover:bg-[#22C55E]/90"
                   asChild
                 >
-                  <Link to="/live-session">Join Now</Link>
+                  <Link to="/teacher/live-session">Join Now</Link>
                 </Button>
               ) : (
                 <Button 
@@ -73,7 +73,7 @@ export default function ActiveSessions({ sessions }: { sessions: any[] }) {
                   variant="outline"
                   asChild
                 >
-                  <Link to="/session-analysis">View Analysis</Link>
+                  <Link to="/teacher/session-analysis">View Analysis</Link>
                 </Button>
               )}
             </div>

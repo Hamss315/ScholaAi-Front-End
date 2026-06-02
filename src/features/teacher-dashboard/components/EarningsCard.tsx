@@ -33,7 +33,7 @@ export default function EarningsCard({ thisWeek, lastMonth, thisMonth }: Earning
           </div>
         </div>
         <Button className="w-full bg-[#1E3A8A] hover:bg-[#1e3a8a]/90" asChild>
-          <Link to="/teacher-payout">
+          <Link to="/teacher/payout">
             <DollarSign className="w-4 h-4 mr-2" />
             Request Payout
           </Link>

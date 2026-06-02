@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "../../../components/ui/button";
 import { Avatar, AvatarFallback } from "../../../components/ui/avatar";
 
-export default function RequestSessionHeader() {
+export default function PerformanceHeader() {
   const navigate = useNavigate();
 
   return (
@@ -12,19 +12,18 @@ export default function RequestSessionHeader() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <Button variant="ghost" onClick={() => navigate("/student/dashboard")}>
-              <ArrowLeft />
-              </Button>
-              <Brain className="w-8 h-8 text-purple-500" />
-              <span className="text-2xl text-blue-900">ScholaAi</span>
+              <Brain className="w-8 h-8" style={{ color: '#8B5CF6' }} />
+              <span className="text-2xl" style={{ color: '#1E3A8A' }}>ScholaAi</span>
             </div>
+            <Button variant="ghost" onClick={() => navigate("/student/dashboard")}>
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Dashboard
+            </Button>
           </div>
-
-          <div className="flex items-center gap-4">
-            <Avatar>
-              <AvatarFallback className="bg-purple-500 text-white">ST</AvatarFallback>
+          <div className="flex items-center gap-3">
+            <Avatar className="cursor-pointer" onClick={() => navigate("/student/profile")}>
+              <AvatarFallback className="bg-[#8B5CF6] text-white">JS</AvatarFallback>
             </Avatar>
-
             <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
               <LogOut className="w-5 h-5" />
             </Button>

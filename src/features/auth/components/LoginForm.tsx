@@ -50,8 +50,8 @@ export default function LoginForm() {
       });
 
     // Match your previous behavior (but with routes)
-    if (role === "student") navigate("/student/profile", { replace: true });
-    else if (role === "teacher") navigate("/teacher/profile", { replace: true });
+    if (role === "student") navigate("/student/dashboard", { replace: true });
+    else if (role === "teacher") navigate("/teacher/dashboard", { replace: true });
     else navigate("/admin/panel", { replace: true });
 
     } catch (err: any) {

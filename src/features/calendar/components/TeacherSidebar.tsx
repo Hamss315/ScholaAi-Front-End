@@ -145,7 +145,7 @@ export default function TeacherSidebar({
                     variant="outline"
                     className="w-full mt-3"
                     size="sm"
-                    onClick={() => navigate("/session-analysis")}
+                    onClick={() => navigate("/teacher/session-analysis")}
                   >
                     View Analysis
                   </Button>
