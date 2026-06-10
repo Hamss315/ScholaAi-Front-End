@@ -1,17 +1,22 @@
 export interface ActiveSession {
   id: number;
-  student: string;
-  subject: string;
-  startTime: string;
-  focusScore: number;
-  status: "good" | "warning" | "bad";
-  isCurrent: boolean;
+  studentName: string;
+  subjectName: string;
+  scheduledAt: string;
+  studentFocusScore?: number;
 }
 
 export interface UpcomingClass {
   id: number;
-  student: string;
-  subject: string;
-  time: string;
-  duration: string;
+  studentName: string;
+  subjectName: string;
+  scheduledAt: string;
+}
+
+export interface RecentSession {
+  id: number;
+  studentName: string;
+  subjectName: string;
+  scheduledAt: string;
+  studentFocusScore: number;
 }
