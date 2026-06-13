@@ -15,6 +15,7 @@ import {
 } from "../../../services/api/teacherDashboard";
 import type { ActiveSession, UpcomingClass } from "../types/dashboard.types";
 
+
 const POLL_MS = 30_000; // 30 seconds
 const STORAGE_KEY = "teacher_upcoming_sessions";
 
@@ -27,6 +28,7 @@ const EMPTY: TeacherDashboardOverview = {
   activeSessions: [],
   upcomingClasses: [],
   recentSessions: [],
+  todayOverview: { sessionsToday: 0, hoursTaught: 0, avgFocusScore: 0 },
 };
 
 // ─── localStorage helpers ────────────────────────────────────────────────────
@@ -148,10 +150,7 @@ export default function TeacherDashboardPage() {
         overview.recentSessions.length
       : 0;
 
-  const todayKey = new Date().toISOString().split("T")[0];
-  const sessionsToday = upcomingClasses.filter(
-    (s) => s.scheduledAt && s.scheduledAt.startsWith(todayKey)
-  ).length;
+
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -206,9 +205,9 @@ export default function TeacherDashboardPage() {
               thisMonth={overview.thisMonthEarnings}
             />
             <TodayOverview
-              sessionsToday={sessionsToday}
-              hoursTaught={sessionsToday}
-              avgFocus={avgFocusScore}
+              sessionsToday={overview.todayOverview.sessionsToday}
+              hoursTaught={overview.todayOverview.hoursTaught}
+              avgFocus={overview.todayOverview.avgFocusScore}
             />
           </div>
         </div>

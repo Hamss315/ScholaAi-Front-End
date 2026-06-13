@@ -8,6 +8,7 @@ export interface ActiveSession {
 
 export interface UpcomingClass {
   id: number;
+  requestId: number;
   studentName: string;
   subjectName: string;
   scheduledAt: string;

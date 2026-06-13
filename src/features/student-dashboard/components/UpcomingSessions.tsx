@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback } from "../../../components/ui/avatar";
 import { Calendar, Clock } from "lucide-react";
 import type { UpcomingSession } from "../types/dashboard.types";
 import { useNavigate } from "react-router-dom";
+import { parseUTCDate } from "../../../utils/utils";
 
 export default function UpcomingSessions({
   sessions,
@@ -12,29 +13,9 @@ export default function UpcomingSessions({
 }) {
   const navigate = useNavigate();
 
-  const isJoinable = (scheduledAt: string) => {
-    try {
-      const sessionDate = new Date(scheduledAt);
-      const diffMinutes = (sessionDate.getTime() - Date.now()) / (1000 * 60);
-      // Enable 15 min before the session time — stays enabled with no upper
-      // limit until the session actually goes active on the backend
-      return diffMinutes <= 15;
-    } catch {
-      return false;
-    }
-  };
-
-  const handleJoin = (session: UpcomingSession) => {
-    const studentId = localStorage.getItem("userId");
-    const token = localStorage.getItem("token") ?? "test";
-    navigate(
-      `/session/${session.id}/stream?role=guest&peerId=${studentId}&token=${token}`
-    );
-  };
-
   const formatTime = (scheduledAt: string) => {
     try {
-      return new Date(scheduledAt).toLocaleString("en-US", {
+      return parseUTCDate(scheduledAt).toLocaleString("en-US", {
         month: "short",
         day: "numeric",
         hour: "numeric",
@@ -48,13 +29,13 @@ export default function UpcomingSessions({
 
   const getCountdown = (scheduledAt: string) => {
     try {
-      const diff = new Date(scheduledAt).getTime() - Date.now();
+      const diff = parseUTCDate(scheduledAt).getTime() - Date.now();
       if (diff <= 0) {
         const minsPast = Math.abs(Math.floor(diff / 60000));
-        if (minsPast < 2) return "Starting now";
-        if (minsPast < 60) return `${minsPast}m overdue`;
+        if (minsPast < 2) return "Starting soon";
+        if (minsPast < 60) return `${minsPast}m ago`;
         const hrs = Math.floor(minsPast / 60);
-        return `${hrs}h overdue`;
+        return `${hrs}h ago`;
       }
       const mins = Math.floor(diff / 60000);
       if (mins < 60) return `in ${mins}m`;
@@ -86,42 +67,38 @@ export default function UpcomingSessions({
         </div>
       ) : (
         <div className="space-y-4">
-          {sessions.map((s) => {
-            return (
-              <div
-                key={s.id}
-                className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                {/* LEFT */}
-                <div className="flex items-center gap-4">
-                  <Avatar>
-                    <AvatarFallback className="bg-[#3B82F6] text-white">
-                      {s.teacherName
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")
-                        .toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <div className="text-[#1E3A8A] font-medium">{s.teacherName}</div>
-                    <div className="text-sm text-gray-600">{s.subjectName}</div>
-                  </div>
-                </div>
-
-                {/* RIGHT */}
-                <div className="flex items-center gap-4">
-                  <div className="text-right">
-                    <div className="text-sm text-[#3B82F6]">{formatTime(s.scheduledAt)}</div>
-                    <div className="flex items-center gap-1 text-xs text-gray-500 justify-end mt-0.5">
-                      <Clock className="w-3 h-3" />
-                      {getCountdown(s.scheduledAt)}
-                    </div>
-                  </div>
+          {sessions.map((s) => (
+            <div
+              key={s.id}
+              className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              {/* LEFT */}
+              <div className="flex items-center gap-4">
+                <Avatar>
+                  <AvatarFallback className="bg-[#3B82F6] text-white">
+                    {s.teacherName
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")
+                      .toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <div className="text-[#1E3A8A] font-medium">{s.teacherName}</div>
+                  <div className="text-sm text-gray-600">{s.subjectName}</div>
                 </div>
               </div>
-            );
-          })}
+
+              {/* RIGHT — date + countdown only, no join button */}
+              <div className="text-right">
+                <div className="text-sm text-[#3B82F6]">{formatTime(s.scheduledAt)}</div>
+                <div className="flex items-center gap-1 text-xs text-gray-500 justify-end mt-0.5">
+                  <Clock className="w-3 h-3" />
+                  {getCountdown(s.scheduledAt)}
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       )}
     </Card>

@@ -170,6 +170,8 @@ import { Avatar, AvatarFallback } from "../../../components/ui/avatar";
 import { Clock, Loader2 } from "lucide-react";
 import type { UpcomingClass } from "../types/dashboard.types";
 import { Link } from "react-router-dom";
+import api from "../../../services/api";
+import { parseUTCDate } from "../../../utils/utils";
 
 interface Props {
   upcoming: UpcomingClass[];
@@ -182,7 +184,7 @@ export default function UpcomingClasses({ upcoming, onSessionStarted }: Props) {
   const isStartable = (scheduledAt: string) => {
     try {
       const diffMinutes =
-        (new Date(scheduledAt).getTime() - Date.now()) / (1000 * 60);
+        (parseUTCDate(scheduledAt).getTime() - Date.now()) / (1000 * 60);
       // Clickable 15 min before and any time after
       return diffMinutes <= 15;
     } catch {
@@ -190,13 +192,22 @@ export default function UpcomingClasses({ upcoming, onSessionStarted }: Props) {
     }
   };
 
-  // ── Start: move to active list, do NOT navigate to stream ─────────────────
+  // ── Start: call backend, then move to active list ─────────────────────────
   const handleStart = useCallback(
     async (session: UpcomingClass) => {
       setStarting(session.id);
       try {
-        // Notify parent → removes from upcoming, adds to activeSessions
-        onSessionStarted?.(session);
+        const res = await api.post(`/teacherSessions/${session.requestId}/start`);
+        const data = res.data;
+        // Backend returns { sessionId, roomId, peerId, role }
+        const realSessionId: number = data.sessionId ?? session.id;
+
+        // Notify parent with the real sessionId so active card uses correct ID
+        onSessionStarted?.({ ...session, id: realSessionId });
+      } catch (err: any) {
+        const errorMsg = err?.response?.data?.message || err?.message || "An unexpected error occurred.";
+        alert(`Failed to start session: ${errorMsg}`);
+        console.error("Start session error:", errorMsg);
       } finally {
         setStarting(null);
       }
@@ -206,7 +217,7 @@ export default function UpcomingClasses({ upcoming, onSessionStarted }: Props) {
 
   const formatTime = (scheduledAt: string) => {
     try {
-      return new Date(scheduledAt).toLocaleString("en-US", {
+      return parseUTCDate(scheduledAt).toLocaleString("en-US", {
         month: "short",
         day: "numeric",
         hour: "numeric",
@@ -220,7 +231,7 @@ export default function UpcomingClasses({ upcoming, onSessionStarted }: Props) {
 
   const getCountdown = (scheduledAt: string) => {
     try {
-      const diff = new Date(scheduledAt).getTime() - Date.now();
+      const diff = parseUTCDate(scheduledAt).getTime() - Date.now();
       if (diff <= 0) {
         const minsPast = Math.abs(Math.floor(diff / 60000));
         if (minsPast < 2) return "Starting now";

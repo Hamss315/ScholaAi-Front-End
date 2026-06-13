@@ -163,6 +163,13 @@ const EMPTY: StudentDashboardData = {
   upcomingSessions: [],
   activeSessions: [],
   recentSessions: [],
+  weeklyEngagement: [],
+  walletSummary: {
+    lastRechargeAmount: 0,
+    lastRechargeDate: null,
+    lastSessionAmount: 0,
+    lastSessionDate: null,
+  },
 };
 
 function readStorage(): UpcomingSession[] {
@@ -242,7 +249,12 @@ export default function StudentDashboardPage() {
           <p className="text-gray-600">Here's your learning overview for today</p>
         </div>
 
-        <StatsGrid />
+        <StatsGrid
+          walletBalance={data.walletBalance}
+          avgFocusScore={data.avgFocusScore}
+          sessionsThisMonth={data.sessionsThisMonth}
+          notesCount={data.recentSessions.length}
+        />
 
         {/* ── ActiveSessions is now INSIDE the left column, same width as the rest ── */}
         <div className="grid lg:grid-cols-3 gap-8 mt-8">
@@ -256,7 +268,11 @@ export default function StudentDashboardPage() {
           </div>
 
           {/* RIGHT */}
-          <RightSidebar />
+          <RightSidebar
+            walletBalance={data.walletBalance}
+            walletSummary={data.walletSummary}
+            weeklyEngagement={data.weeklyEngagement}
+          />
         </div>
       </div>
     </div>

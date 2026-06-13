@@ -155,14 +155,10 @@ import { Button } from "../../../components/ui/button";
 import { Badge } from "../../../components/ui/badge";
 import { Avatar, AvatarFallback } from "../../../components/ui/avatar";
 import type { ActiveSession } from "../types/dashboard.types";
+import api from "../../../services/api";
 
 async function endSessionApi(sessionId: number) {
-  const token = localStorage.getItem("token") ?? "";
-  const res = await fetch(`/api/teacherSessions/${sessionId}/end`, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) throw new Error("Failed to end session");
+  await api.post(`/teacherSessions/${sessionId}/end`, { focusScore: 0 });
 }
 
 export default function ActiveSessions({

@@ -5,6 +5,12 @@ import type {
   RecentSession,
 } from "../../features/teacher-dashboard/types/dashboard.types";
 
+export interface TodayOverview {
+  sessionsToday: number;
+  hoursTaught: number;
+  avgFocusScore: number;
+}
+
 export interface TeacherDashboardOverview {
   teacherName: string;
   todayEarnings: number;
@@ -17,6 +23,7 @@ export interface TeacherDashboardOverview {
   activeSessions: ActiveSession[];
   upcomingClasses: UpcomingClass[];
   recentSessions: RecentSession[];
+  todayOverview: TodayOverview;
 }
 
 export const getTeacherDashboard = async () => {
@@ -34,14 +41,15 @@ export const getTeacherDashboardOverview = async (): Promise<TeacherDashboardOve
     const recentRaw   = data?.recentSessions  ?? data?.RecentSessions  ?? [];
 
     const upcomingClasses: UpcomingClass[] = upcomingRaw.map((s: any, idx: number) => ({
-      id: s.id ?? idx + 1,
+      id: s.requestId ?? s.RequestId ?? idx + 1,
+      requestId: s.requestId ?? s.RequestId ?? idx + 1,
       studentName: s.studentName ?? s.StudentName ?? "Student",
       subjectName: s.subjectName ?? s.SubjectName ?? "Subject",
       scheduledAt: s.scheduledAt ?? s.ScheduledAt ?? "",
     }));
 
     const activeSessions: ActiveSession[] = activeRaw.map((s: any, idx: number) => ({
-      id: s.id ?? idx + 1,
+      id: s.sessionId ?? s.SessionId ?? s.id ?? idx + 1,
       studentName: s.studentName ?? s.StudentName ?? "Student",
       subjectName: s.subjectName ?? s.SubjectName ?? "Subject",
       scheduledAt: s.scheduledAt ?? s.ScheduledAt ?? "",
@@ -56,6 +64,8 @@ export const getTeacherDashboardOverview = async (): Promise<TeacherDashboardOve
       studentFocusScore: s.studentFocusScore ?? s.StudentFocusScore ?? 0,
     }));
 
+    const rawOverview = data?.todayOverview ?? data?.TodayOverview ?? {};
+
     return {
       teacherName: data?.teacherName ?? data?.TeacherName ?? "Teacher",
       todayEarnings: Number(data?.todayEarnings ?? 0),
@@ -68,6 +78,11 @@ export const getTeacherDashboardOverview = async (): Promise<TeacherDashboardOve
       activeSessions,
       upcomingClasses,
       recentSessions,
+      todayOverview: {
+        sessionsToday: Number(rawOverview?.sessionsToday ?? rawOverview?.SessionsToday ?? 0),
+        hoursTaught: Number(rawOverview?.hoursTaught ?? rawOverview?.HoursTaught ?? 0),
+        avgFocusScore: Number(rawOverview?.avgFocusScore ?? rawOverview?.AvgFocusScore ?? 0),
+      },
     };
   } catch (error) {
     console.error("Failed to fetch teacher dashboard", error);
@@ -80,6 +95,7 @@ export const getTeacherDashboardOverview = async (): Promise<TeacherDashboardOve
       activeSessions: [],
       upcomingClasses: [],
       recentSessions: [],
+      todayOverview: { sessionsToday: 0, hoursTaught: 0, avgFocusScore: 0 },
     };
   }
 };

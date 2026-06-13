@@ -3,6 +3,7 @@ import { Progress } from "../../../components/ui/progress";
 import { Avatar, AvatarFallback } from "../../../components/ui/avatar";
 import { BookOpen } from "lucide-react";
 import type { RecentSession } from "../types/dashboard.types";
+import { parseUTCDate } from "../../../utils/utils";
 
 export default function RecentSessions({
   sessions,
@@ -11,7 +12,7 @@ export default function RecentSessions({
 }) {
   const formatDate = (scheduledAt: string) => {
     try {
-      return new Date(scheduledAt).toLocaleString("en-US", {
+      return parseUTCDate(scheduledAt).toLocaleString("en-US", {
         month: "short",
         day: "numeric",
         year: "numeric",

@@ -1,22 +1,19 @@
 import type { UpcomingSession, RecentNote } from "../types/dashboard.types";
 
+// Legacy mock service — kept for backward compat, not used by the main dashboard page
 export const getUpcomingSessions = async (): Promise<UpcomingSession[]> => {
   return [
     {
       id: 1,
-      teacher: "Dr. Sarah Johnson",
-      subject: "Mathematics",
-      time: "Today, 2:00 PM",
-      duration: "1 hour",
-      isCurrent: true,
+      teacherName: "Dr. Sarah Johnson",
+      subjectName: "Mathematics",
+      scheduledAt: new Date(Date.now() + 3600000).toISOString(),
     },
     {
       id: 2,
-      teacher: "Prof. Michael Chen",
-      subject: "Physics",
-      time: "Tomorrow, 10:00 AM",
-      duration: "1.5 hours",
-      isCurrent: false,
+      teacherName: "Prof. Michael Chen",
+      subjectName: "Physics",
+      scheduledAt: new Date(Date.now() + 86400000).toISOString(),
     },
   ];
 };
