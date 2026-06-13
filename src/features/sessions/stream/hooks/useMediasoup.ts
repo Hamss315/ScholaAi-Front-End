@@ -18,6 +18,7 @@ export function useMediasoup() {
     const recvTransportRef = useRef<mediasoupClient.types.Transport | null>(null);
     const screenProducerRef = useRef<mediasoupClient.types.Producer | null>(null);
     const socketRef = useRef<Socket | null>(null);
+    const consumedProducerIds = useRef<Set<string>>(new Set());
 
     const [localStream, setLocalStream] = useState<MediaStream | null>(null);
     const [remoteStreams, setRemoteStreams] = useState<RemoteStream[]>([]);
@@ -131,6 +132,13 @@ export function useMediasoup() {
         producerId: string,
         appData?: any
     ): Promise<void> {
+        // Dedup: skip if we already consumed this producer
+        if (consumedProducerIds.current.has(producerId)) {
+            console.log('⏭️ Already consumed, skipping:', producerId);
+            return;
+        }
+        consumedProducerIds.current.add(producerId);
+
         console.log('🎯 consumeProducer START', producerId, appData);
         const device = deviceRef.current!;
         const transport = recvTransportRef.current!;
@@ -191,6 +199,7 @@ export function useMediasoup() {
         stopScreen();
         sendTransportRef.current?.close();
         recvTransportRef.current?.close();
+        consumedProducerIds.current.clear();
         setLocalStream(null);
         setRemoteStreams([]);
     }

@@ -64,20 +64,28 @@ export function useSession({ sessionId, peerId, role, token }: UseSessionOptions
             console.warn('Camera not available:', err);
         }
 
-        // Get existing producers
-        const { producers } = await new Promise<any>((resolve) => {
-            socket.emit('getProducers', resolve);
-        });
-
-        console.log('📋 Existing producers:', producers);
-
-        for (const producer of producers) {
-            await consumeProducerRef.current(socket, producer.producerId, {
-                source: producer.appData?.source ?? 'camera',
-                peerId: producer.peerId,
-                role: producer.role,
+        // Consume all existing producers in the room
+        const consumeExisting = async () => {
+            const { producers } = await new Promise<any>((resolve) => {
+                socket.emit('getProducers', resolve);
             });
-        }
+
+            console.log('📋 Existing producers:', producers);
+
+            for (const producer of producers) {
+                await consumeProducerRef.current(socket, producer.producerId, {
+                    source: producer.appData?.source ?? 'camera',
+                    peerId: producer.peerId,
+                    role: producer.role,
+                });
+            }
+        };
+
+        await consumeExisting();
+
+        // Re-sync after a short delay — handles same-PC race where newProducer
+        // events may arrive before the recv transport was fully connected.
+        setTimeout(consumeExisting, 1500);
 
     }, [sessionId, peerId, role, token]);
 

@@ -108,7 +108,7 @@ export default function StudentActiveSessions({
     const token = localStorage.getItem("token") ?? "test";
 
     navigate(
-      `/session/${session.id}/stream?role=guest&peerId=${studentId}&token=${token}`
+      `/session/${session.id}/stream?role=viewer&peerId=${studentId}&token=${token}`
     );
   };
 
