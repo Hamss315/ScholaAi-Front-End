@@ -13,9 +13,13 @@ export default function SessionStreamPage() {
 
     if (!sessionId) return <div className="text-white p-8">Invalid session</div>;
 
+    // sessionId in the URL is the integer DB primary key (e.g. /session/42/stream)
+    const sessionDbId = Number(sessionId);
+
     return (
         <SessionRoom
-            sessionId={sessionId!}
+            sessionId={sessionId}
+            sessionDbId={sessionDbId}
             peerId={peerId}
             role={role}
             token={token}
