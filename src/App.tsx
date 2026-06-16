@@ -70,8 +70,8 @@ function ChatPageWrapper() {
   const selectedChat: ChatConversation = stateChat || {
     id: otherUserId || "",
     otherUserId: otherUserId || "",
-    otherUserName: stateChat?.otherUserName || "Chat",
-    otherUserRole: stateChat?.otherUserRole || "student",
+    otherUserName: "Chat",
+    otherUserRole: "student",
     unreadCount: 0,
     online: false,
   };
