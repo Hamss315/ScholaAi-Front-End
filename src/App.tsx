@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useParams, useLocation, useNavigate } from "react-router-dom";
 
 /* Landing */
 import LandingPage from "./features/landing/pages/LandingPage";
@@ -34,6 +34,9 @@ import PaymentPage from "./features/payment/pages/PaymentPage";
 
 /* Chat */
 import ChatsListPage from "./features/chat/pages/ChatsListPage";
+import ChatPage from "./features/chat/pages/ChatPage";
+import { useAuth } from "./context/auth-context";
+import type { ChatConversation } from "./features/chat/types/chat";
 
 /* Search */
 import SearchTeachersPage from "./features/search-teacher/pages/SearchTeachersPage";
@@ -55,6 +58,40 @@ import TeacherDashboardPage from "./features/teacher-dashboard/pages/TeacherDash
 
 /* Session */ 
 import SessionStreamPage from "./features/sessions/pages/StreamPage";
+
+function ChatPageWrapper() {
+  const { otherUserId } = useParams<{ otherUserId: string }>();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const stateChat = location.state?.chat as ChatConversation | undefined;
+
+  const selectedChat: ChatConversation = stateChat || {
+    id: otherUserId || "",
+    otherUserId: otherUserId || "",
+    otherUserName: "Chat",
+    otherUserRole: "student",
+    unreadCount: 0,
+    online: false,
+  };
+
+  return (
+    <ChatPage
+      onNavigate={(page) => {
+        if (page === "chats-list") {
+          navigate("/chats");
+        } else {
+          navigate("/");
+        }
+      }}
+      userRole={user?.role || "student"}
+      selectedChat={selectedChat}
+      currentUserId={user?.userId || ""}
+      currentUserName={user?.userName || ""}
+    />
+  );
+}
 
 export default function App() {
   return (
@@ -103,6 +140,7 @@ export default function App() {
 
         {/* CHAT */}
         <Route path="/chats" element={<ChatsListPage userRole="student" />} />
+        <Route path="/chat/:otherUserId" element={<ChatPageWrapper />} />
 
         {/* SEARCH */}
         <Route path="/search-teachers" element={<SearchTeachersPage />} />
