@@ -52,9 +52,8 @@ export default function SessionAnalysisPage() {
     focusScore: 88,
   };
 
-  const handleBackToDashboard = () => {
-    // Navigate back to the dashboard, default to teacher dashboard
-    navigate("/teacher/dashboard");
+  const handleBack = () => {
+    navigate(-1);
   };
 
   const handleLogout = () => {
@@ -78,10 +77,8 @@ export default function SessionAnalysisPage() {
                   ScholaAi
                 </span>
               </div>
-              <Button variant="ghost" onClick={handleBackToDashboard}>
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Dashboard
-              </Button>
+              <Button variant="ghost" onClick={handleBack}>
+                <ArrowLeft className="w-4 h-4 mr-2" />Back</Button>
             </div>
             <div className="flex items-center gap-4">
               <Button variant="outline">

@@ -21,7 +21,7 @@ export default function PerformanceCTA() {
           </Button>
           <Button
             className="bg-transparent border border-white text-white hover:bg-white/20 hover:text-white"
-            onClick={() => navigate("/student/dashboard")}
+            onClick={() => navigate(-1)}
           >
             All Sessions
           </Button>

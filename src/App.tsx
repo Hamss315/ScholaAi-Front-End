@@ -55,6 +55,12 @@ import TeacherDashboardPage from "./features/teacher-dashboard/pages/TeacherDash
 
 /* Session */ 
 import SessionStreamPage from "./features/sessions/pages/StreamPage";
+import SessionRecordPage from "./features/sessions/pages/SessionRecordPage";
+import SessionNotesPage from "./features/sessions/pages/SessionNotesPage";
+import AllSessionsPage from "./features/sessions/pages/AllSessionsPage";
+
+/* Performance */
+import PerformanceReportPage from "./features/performance/pages/PerformanceReportPage";
 
 export default function App() {
   return (
@@ -86,6 +92,9 @@ export default function App() {
         <Route path="/student/dashboard" element={<StudentDashboardPage />} />
         <Route path="/teacher/dashboard" element={<TeacherDashboardPage />} />
 
+        {/* PERFORMANCE */}
+        <Route path="/student/performance" element={<PerformanceReportPage />} />
+
         {/* SESSIONS */}
         <Route path="/request-session" element={<RequestSessionPage />} />
         <Route path="/teacher/session-requests" element={<TeacherSessionRequestsPage />} />
@@ -93,8 +102,11 @@ export default function App() {
         {/* SCHEDULE */}
         <Route path="/teacher/schedule" element={<TeacherSchedulePage />} />
 
-        {/* CALENDAR */}
+        {/* Student Views */}
         <Route path="/student/calendar" element={<StudentCalendarPage />} />
+        <Route path="/student/sessions" element={<AllSessionsPage />} />
+
+        {/* CALENDAR */}
         <Route path="/teacher/calendar" element={<TeacherCalendarPage />} />
         <Route path="/teacher/payout" element={<TeacherPayoutPage />} />
 
@@ -116,6 +128,8 @@ export default function App() {
 
         {/* Session Stream */}
         <Route path="/session/:sessionId/stream" element={<SessionStreamPage />} />
+        <Route path="/session/record" element={<SessionRecordPage />} />
+        <Route path="/session/notes" element={<SessionNotesPage />} />
 
         {/* FALLBACK */}
         <Route path="*" element={<Navigate to="/" replace />} />

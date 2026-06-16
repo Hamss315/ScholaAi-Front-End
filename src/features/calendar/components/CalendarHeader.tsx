@@ -19,10 +19,8 @@ export default function CalendarHeader() {
               </span>
             </div>
 
-            <Button variant="ghost" onClick={() => navigate("/student/dashboard")}>
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Dashboard
-            </Button>
+            <Button variant="ghost" onClick={() => navigate(-1)}>
+              <ArrowLeft className="w-4 h-4 mr-2" />Back</Button>
           </div>
 
           <div className="flex items-center gap-4">
