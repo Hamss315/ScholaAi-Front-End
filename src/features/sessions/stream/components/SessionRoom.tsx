@@ -58,7 +58,11 @@ export function SessionRoom({ sessionId, peerId, role, token }: SessionRoomProps
     function handleLeave() {
         leaveSession();
         signalR.disconnect();    // SignalR cleanup 
-        navigate(-1);
+        if (role === 'viewer') {
+            navigate('/session/rating');
+        } else {
+            navigate(-1);
+        }
     }
 
     function handleToggleMute() {

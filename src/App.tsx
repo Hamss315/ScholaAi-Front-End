@@ -58,6 +58,7 @@ import SessionStreamPage from "./features/sessions/pages/StreamPage";
 import SessionRecordPage from "./features/sessions/pages/SessionRecordPage";
 import SessionNotesPage from "./features/sessions/pages/SessionNotesPage";
 import AllSessionsPage from "./features/sessions/pages/AllSessionsPage";
+import SessionRatingPage from "./features/sessions/pages/SessionRatingPage";
 
 /* Performance */
 import PerformanceReportPage from "./features/performance/pages/PerformanceReportPage";
@@ -130,6 +131,7 @@ export default function App() {
         <Route path="/session/:sessionId/stream" element={<SessionStreamPage />} />
         <Route path="/session/record" element={<SessionRecordPage />} />
         <Route path="/session/notes" element={<SessionNotesPage />} />
+        <Route path="/session/rating" element={<SessionRatingPage />} />
 
         {/* FALLBACK */}
         <Route path="*" element={<Navigate to="/" replace />} />
