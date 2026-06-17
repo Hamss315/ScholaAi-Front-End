@@ -35,7 +35,7 @@ export default function DashboardHeader() {
               </Link>
             </Button>
             <Button variant="ghost" asChild>
-              <Link to="/teacher/schedule" className="flex items-center">
+              <Link to="/teacher/calendar" className="flex items-center">
                 <Calendar className="w-4 h-4 mr-2" />
                 My Schedule
               </Link>

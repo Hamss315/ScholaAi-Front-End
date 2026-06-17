@@ -133,7 +133,7 @@ export default function TeacherSidebar({
                   <Button
                     className="w-full mt-3 bg-blue-500"
                     size="sm"
-                    onClick={() => navigate("/teacher/live-session")}
+                    onClick={() => navigate(`/session/${session.id}/stream`)}
                   >
                     <Video className="w-4 h-4 mr-2" />
                     Join Session

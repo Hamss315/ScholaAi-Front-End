@@ -22,11 +22,21 @@ export const chatApi = {
       throw new Error("Failed to fetch conversations");
     }
 
-    return response.json();
+    const data = await response.json();
+    return data.map((c: any) => ({
+      id: c.otherUserId,
+      otherUserId: c.otherUserId,
+      otherUserName: c.otherUserName,
+      otherUserRole: c.otherUserRole,
+      unreadCount: c.unreadCount,
+      lastMessage: c.lastMessageText,
+      lastMessageTime: c.lastMessageTime ? new Date(c.lastMessageTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "",
+      online: false,
+    }));
   },
 
   async getMessages(otherUserId: string): Promise<ChatMessage[]> {
-    const response = await fetch(`${BASE_URL}/chat/messages/${otherUserId}`, {
+    const response = await fetch(`${BASE_URL}/chat/history/${otherUserId}`, {
       method: "GET",
       headers: getAuthHeaders(),
     });
@@ -38,14 +48,14 @@ export const chatApi = {
     return response.json();
   },
 
-  async markAsRead(messageId: number): Promise<void> {
-    const response = await fetch(`${BASE_URL}/chat/messages/${messageId}/read`, {
-      method: "PUT",
+  async markAsRead(senderId: string): Promise<void> {
+    const response = await fetch(`${BASE_URL}/chat/read/${senderId}`, {
+      method: "POST",
       headers: getAuthHeaders(),
     });
 
     if (!response.ok) {
-      throw new Error("Failed to mark message as read");
+      throw new Error("Failed to mark messages as read");
     }
   },
 };

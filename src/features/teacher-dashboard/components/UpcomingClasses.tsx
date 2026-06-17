@@ -3,27 +3,26 @@ import { Card } from "../../../components/ui/card";
 import { Button } from "../../../components/ui/button";
 import { Avatar, AvatarFallback } from "../../../components/ui/avatar";
 import { Clock } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function UpcomingClasses({ upcoming }: { upcoming: any[] }) {
-  const isStartable = (timeStr: string) => {
-    if (timeStr.includes("Tomorrow")) return false;
-    
+  const navigate = useNavigate();
+
+  const isStartable = (scheduledAt: string) => {
     try {
       const now = new Date();
-      const [time, modifier] = timeStr.split(' ');
-      const [hours, minutes] = time.split(':').map(Number);
-      
-      let sessionHours = hours;
-      if (modifier === 'PM' && hours < 12) sessionHours += 12;
-      if (modifier === 'AM' && hours === 12) sessionHours = 0;
-      
-      const sessionDate = new Date(now);
-      sessionDate.setHours(sessionHours, minutes || 0, 0, 0);
-      
-      return now >= sessionDate;
+      const sessionDate = new Date(scheduledAt); // ISO string parses directly
+      const diffMinutes = (sessionDate.getTime() - now.getTime()) / (1000 * 60);
+      return diffMinutes <= 15; // allow starting 15 min before
     } catch (e) {
       return false;
     }
+  };
+
+  const handleStart = (session: any) => {
+    const teacherId = localStorage.getItem("userId"); 
+    const token = localStorage.getItem("token") ?? "test";
+    navigate(`/session/${session.id}/stream?role=host&peerId=${teacherId}&token=${token}`);
   };
 
   return (
@@ -31,7 +30,7 @@ export default function UpcomingClasses({ upcoming }: { upcoming: any[] }) {
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl" style={{ color: '#1E3A8A' }}>Upcoming Classes</h2>
         <Button variant="outline" asChild>
-          <Link to="/teacher-schedule">
+          <Link to="/teacher/calendar">
             <Clock className="w-4 h-4 mr-2" />
             Set Availability
           </Link>
@@ -51,23 +50,26 @@ export default function UpcomingClasses({ upcoming }: { upcoming: any[] }) {
                 <div className="text-sm text-gray-600">{session.subject}</div>
               </div>
             </div>
-            
+
             <div className="flex items-center gap-4">
-              <Button 
+              <Button
                 size="sm"
                 className="bg-[#22C55E] hover:bg-[#22C55E]/90 disabled:opacity-50 disabled:cursor-not-allowed"
-                asChild={isStartable(session.time)}
                 disabled={!isStartable(session.time)}
+                onClick={() => handleStart(session)}
               >
-                {isStartable(session.time) ? (
-                  <Link to="/live-session">Start</Link>
+                {isStartable(session.scheduledAt) ? (
+                  <Link to={`/live-session/${session.id}`}>Start</Link>
                 ) : (
                   <span>Start</span>
                 )}
               </Button>
-              <div className="text-right min-w-[100px]">
-                <div className="text-sm" style={{ color: '#3B82F6' }}>{session.time}</div>
-                <div className="text-sm text-gray-500">{session.duration}</div>
+              <div className="text-sm" style={{ color: '#3B82F6' }}>
+                {new Date(session.scheduledAt).toLocaleString('en-US', {
+                  month: 'short', day: 'numeric',
+                  hour: 'numeric', minute: '2-digit',
+                  hour12: true
+                })}
               </div>
             </div>
           </div>

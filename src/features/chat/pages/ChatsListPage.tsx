@@ -19,13 +19,16 @@ import { Badge } from "../../../components/ui/badge";
 import ConversationCard from "../components/ConversationCard";
 import { chatApi } from "../services/chatApi";
 import type { ChatConversation, UserRole } from "../types/chat";
+import { useAuth } from "../../../context/auth-context";
 
 interface ChatsListPageProps {
   userRole: UserRole | null;
 }
 
-export default function ChatsListPage({ userRole }: ChatsListPageProps) {
+export default function ChatsListPage({ userRole: propUserRole }: ChatsListPageProps) {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const userRole = user?.role || propUserRole;
 
   const [searchQuery, setSearchQuery] = useState("");
   const [chats, setChats] = useState<ChatConversation[]>([]);

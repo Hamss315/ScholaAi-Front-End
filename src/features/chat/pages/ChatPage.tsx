@@ -46,8 +46,9 @@ export default function ChatPage({
         setLoading(true);
         const data = await chatApi.getMessages(selectedChat.otherUserId);
         setMessages(data);
+        await chatApi.markAsRead(selectedChat.otherUserId);
       } catch (error) {
-        console.error("Failed to load messages:", error);
+        console.error("Failed to load messages or mark as read:", error);
       } finally {
         setLoading(false);
       }
