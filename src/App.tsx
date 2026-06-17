@@ -58,6 +58,13 @@ import TeacherDashboardPage from "./features/teacher-dashboard/pages/TeacherDash
 
 /* Session */ 
 import SessionStreamPage from "./features/sessions/pages/StreamPage";
+import SessionRecordPage from "./features/sessions/pages/SessionRecordPage";
+import SessionNotesPage from "./features/sessions/pages/SessionNotesPage";
+import AllSessionsPage from "./features/sessions/pages/AllSessionsPage";
+import SessionRatingPage from "./features/sessions/pages/SessionRatingPage";
+
+/* Performance */
+import PerformanceReportPage from "./features/performance/pages/PerformanceReportPage";
 
 function ChatPageWrapper() {
   const { otherUserId } = useParams<{ otherUserId: string }>();
@@ -123,11 +130,17 @@ export default function App() {
         <Route path="/student/dashboard" element={<StudentDashboardPage />} />
         <Route path="/teacher/dashboard" element={<TeacherDashboardPage />} />
 
+        {/* PERFORMANCE */}
+        <Route path="/student/performance" element={<PerformanceReportPage />} />
+
         {/* SCHEDULE */}
         <Route path="/teacher/schedule" element={<TeacherSchedulePage />} />
 
-        {/* CALENDAR */}
+        {/* Student Views */}
         <Route path="/student/calendar" element={<StudentCalendarPage />} />
+        <Route path="/student/sessions" element={<AllSessionsPage />} />
+
+        {/* CALENDAR */}
         <Route path="/teacher/calendar" element={<TeacherCalendarPage />} />
         <Route path="/teacher/payout" element={<TeacherPayoutPage />} />
 
@@ -155,6 +168,9 @@ export default function App() {
 
         {/* SESSION STREAM */}
         <Route path="/session/:sessionId/stream" element={<SessionStreamPage />} />
+        <Route path="/session/record" element={<SessionRecordPage />} />
+        <Route path="/session/notes" element={<SessionNotesPage />} />
+        <Route path="/session/rating" element={<SessionRatingPage />} />
 
         {/* FALLBACK */}
         <Route path="*" element={<Navigate to="/" replace />} />

@@ -12,7 +12,7 @@ export default function RequestSessionHeader() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <Button variant="ghost" onClick={() => navigate("/student/dashboard")}>
+              <Button variant="ghost" onClick={() => navigate(-1)}>
               <ArrowLeft />
               </Button>
               <Brain className="w-8 h-8 text-purple-500" />

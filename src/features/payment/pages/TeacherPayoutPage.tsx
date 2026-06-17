@@ -85,11 +85,9 @@ export default function TeacherPayoutPage() {
             </div>
             <Button
               variant="ghost"
-              onClick={() => navigate("/teacher/dashboard")}
+              onClick={() => navigate(-1)}
             >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Dashboard
-            </Button>
+              <ArrowLeft className="w-4 h-4 mr-2" />Back</Button>
           </div>
         </div>
       </header>

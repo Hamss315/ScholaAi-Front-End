@@ -1,11 +1,10 @@
-import { Brain, ArrowLeft, LogOut } from "lucide-react";
+import { Brain, ArrowLeft, Download, LogOut } from "lucide-react";
+import { Button } from "../../../../components/ui/button";
+import { Avatar, AvatarFallback } from "../../../../components/ui/avatar";
 import { useNavigate } from "react-router-dom";
-import { Button } from "../../../components/ui/button";
-import { Avatar, AvatarFallback } from "../../../components/ui/avatar";
 
-export default function PerformanceHeader() {
+export default function NotesHeader() {
   const navigate = useNavigate();
-
   return (
     <header className="bg-white border-b sticky top-0 z-50">
       <div className="container mx-auto px-4 py-4">
@@ -15,11 +14,17 @@ export default function PerformanceHeader() {
               <Brain className="w-8 h-8" style={{ color: '#8B5CF6' }} />
               <span className="text-2xl" style={{ color: '#1E3A8A' }}>ScholaAi</span>
             </div>
-            <Button variant="ghost" onClick={() => navigate(-1)}>
-              <ArrowLeft className="w-4 h-4 mr-2" />Back</Button>
+            <Button variant="ghost" onClick={() => navigate("/student/sessions")}>
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Sessions
+            </Button>
           </div>
           <div className="flex items-center gap-3">
-            <Avatar className="cursor-pointer" onClick={() => navigate("/student/profile")}>
+            <Button variant="outline">
+              <Download className="w-4 h-4 mr-2" />
+              Download Notes
+            </Button>
+            <Avatar>
               <AvatarFallback className="bg-[#8B5CF6] text-white">JS</AvatarFallback>
             </Avatar>
             <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
