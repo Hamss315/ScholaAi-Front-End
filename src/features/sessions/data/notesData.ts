@@ -15,57 +15,28 @@ export const sessionData = {
   focusScore: 88,
 };
 
-export const aiNotes = {
-  keyTopics: [
-    {
-      title: "Standard Form of a Quadratic Equation",
-      content: "A quadratic equation has the form ax² + bx + c = 0, where a ≠ 0. The coefficient 'a' determines whether the parabola opens upward (a > 0) or downward (a < 0).",
-    },
-    {
-      title: "Factoring Method",
-      content: "When ax² + bx + c = 0 can be factored, find two numbers that multiply to give 'ac' and add to give 'b'. Rewrite the middle term and factor by grouping. Example: x² + 5x + 6 = (x+2)(x+3) = 0 → x = -2 or x = -3.",
-    },
-    {
-      title: "Completing the Square",
-      content: "Rearrange to x² + bx = -c, then add (b/2)² to both sides to create a perfect square trinomial. This method is the basis for deriving the quadratic formula.",
-    },
-    {
-      title: "The Quadratic Formula",
-      content: "x = (-b ± √(b²-4ac)) / 2a. The discriminant Δ = b²-4ac tells us the nature of roots: Δ > 0 → two real roots, Δ = 0 → one repeated root, Δ < 0 → no real roots (complex roots).",
-    },
-    {
-      title: "Real-World Applications",
-      content: "Quadratic equations model projectile motion (h = -½gt² + v₀t + h₀), area optimization problems, and revenue/profit curves in economics.",
-    },
-  ],
-  keyTakeaways: [
-    "Always identify 'a', 'b', 'c' before choosing a solving method.",
-    "Factoring is fastest when the equation has simple integer roots.",
-    "The quadratic formula works for any quadratic regardless of discriminant.",
-    "Always check your answers by substituting back into the original equation.",
-    "The vertex of the parabola is at x = -b/(2a).",
-  ],
-  practiceProblems: [
-    {
-      problem: "Solve: x² - 5x + 6 = 0",
-      solution: "Factor: (x-2)(x-3) = 0 → x = 2 or x = 3",
-      solved: true,
-    },
-    {
-      problem: "Solve: 2x² + 3x - 2 = 0",
-      solution: "Using the quadratic formula: x = (-3 ± √(9+16)) / 4 = (-3 ± 5) / 4 → x = ½ or x = -2",
-      solved: true,
-    },
-    {
-      problem: "A ball is thrown with h(t) = -5t² + 20t + 1. When does it hit the ground?",
-      solution: "Set h(t) = 0, use quadratic formula: t ≈ 4.05 seconds",
-      solved: false,
-    },
-  ],
-  areasForImprovement: [
-    "Translating word problems into quadratic equations",
-    "Checking sign errors when applying the quadratic formula",
-    "Understanding complex roots (when discriminant < 0)",
-  ],
-  teacherRecommendations: "John should practice 5–10 word problems before the next session. Suggested exercises from the textbook: Chapter 4, problems 12–22. Focus especially on projectile motion problems. John has strong algebraic manipulation skills — the main gap is problem-setup from text descriptions.",
-};
+export const aiNotesMarkdown = `## 📚 موضوع المحاضرة
+نظرية فيثاغورس في المثلثات القائمة الزاوية.
+
+## 🗂 المواضيع التي تم تناولها
+- تعريف المثلث القائم الزاوية
+- نظرية فيثاغورس
+- كيفية استخدام نظرية فيثاغورس لحل المسائل
+- أمثلة على تطبيق نظرية فيثاغورس
+
+## 📝 شرح النقاط المناقشة
+المثلث القائم الزاوية
+← المثلث القائم الزاوية هو مثلث له زاوية واحدة قياسها 90 درجة. الضلع المقابل للزاوية القائمة يسمى الوتر، وهو أطول ضلع في المثلث.
+
+نظرية فيثاغورس
+← نظرية فيثاغورس تقول أن في المثلث القائم الزاوية، مربع طول الوتر يساوي مجموع مربعي طولي الضلعين الآخرين. يمكن التعبير عنها بالعلاقة: C^2 = A^2 + B^2، حيث C هو طول الوتر، وA وB هي أطوال الضلعين الآخرين.
+
+تطبيق نظرية فيثاغورس
+← يمكن استخدام نظرية فيثاغورس لحل مسائل مختلفة تتعلق بالمثلثات القائمة الزاوية، مثل إيجاد طول الوتر أو طول أحد الضلعين الآخرين. يتم ذلك عن طريق تطبيق العلاقة الرياضية على القيم المعروفة في المثلث.
+
+## ⚠️ نقاط مهمة نبّه عليها الدكتور
+- يجب دائمًا التأكد من أن المثلث هو مثلث قائم الزاوية قبل تطبيق نظرية فيثاغورس.
+- يجب الحفاظ على الترتيب الصحيح للعمليات الحسابية عند تطبيق نظرية فيثاغورس.
+
+## ✅ خلاصة
+نظرية فيثاغورس هي أداة أساسية في الرياضيات والفيزياء، وتستخدم لحل مسائل تتعلق بالمثلثات القائمة الزاوية. يمكن تطبيق هذه النظرية بسهولة عن طريق استخدام العلاقة C^2 = A^2 + B^2، حيث C هو طول الوتر، وA وB هي أطوال الضلعين الآخرين. من خلال فهم وتطبيق نظرية فيثاغورس، يمكن حل مسائل مختلفة في الرياضيات والفيزياء بسهولة ودقة.`;

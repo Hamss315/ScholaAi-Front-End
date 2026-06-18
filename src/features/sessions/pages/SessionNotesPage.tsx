@@ -1,6 +1,5 @@
 import { FileText } from "lucide-react";
 import NotesHeader from "../components/notes/NotesHeader";
-import NotesAnalysis from "../components/notes/NotesAnalysis";
 import AiNotesSection from "../components/notes/AiNotesSection";
 import NotesCTA from "../components/notes/NotesCTA";
 
@@ -16,10 +15,9 @@ export default function SessionNotesPage() {
             <FileText className="w-8 h-8" style={{ color: '#8B5CF6' }} />
             <h1 className="text-4xl" style={{ color: '#1E3A8A' }}>Session Notes</h1>
           </div>
-          <p className="text-gray-600">Session analysis, AI-generated notes, and personalized insights for your review.</p>
+          <p className="text-gray-600">AI-generated notes from your session recording.</p>
         </div>
 
-        <NotesAnalysis />
         <AiNotesSection />
         <NotesCTA />
       </div>
