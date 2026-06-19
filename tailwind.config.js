@@ -35,6 +35,7 @@ export default {
         // ✅ IMPORTANT: separate border color vs input background color
         input: "var(--border)", // used by border-input
         "input-background": "var(--input-background)", // used by bg-input-background
+        "switch-background": "var(--switch-background)",
       },
 
       borderRadius: {

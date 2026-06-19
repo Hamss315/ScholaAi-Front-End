@@ -16,6 +16,7 @@ import ResetPasswordSuccessPage from "./features/auth/pages/ResetPasswordSuccess
 /* Profiles */
 import StudentProfilePage from "./features/student/pages/StudentProfilePage";
 import TeacherProfilePage from "./features/teacher/pages/TeacherProfilePage";
+import AdminProfilePage from "./features/admin/pages/AdminProfilePage";
 
 /* Onboarding */
 import StudentOnboardingPage from "./features/onboarding/pages/StudentOnboardingPage";
@@ -125,6 +126,8 @@ export default function App() {
         {/* PROFILES */}
         <Route path="/student/profile" element={<StudentProfilePage />} />
         <Route path="/teacher/profile" element={<TeacherProfilePage />} />
+        <Route path="/admin/profile" element={<AdminProfilePage />} />
+        <Route path="/admin/panel" element={<Navigate to="/admin/profile" replace />} />
 
         {/* DASHBOARD */}
         <Route path="/student/dashboard" element={<StudentDashboardPage />} />
