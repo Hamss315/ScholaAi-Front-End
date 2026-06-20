@@ -26,13 +26,13 @@ import {
   SelectValue,
 } from "../../../../components/ui/select";
 import { useNavigate } from "react-router-dom";
-import { allSessions, subjects, focusColor, subjectColor } from "../../data/allSessionsData";
+import { subjects, focusColor, subjectColor } from "../../data/allSessionsData";
+import { getStudentSessions } from "../../../../services/api/studentSessions";
 import {
-  getRating,
-  setRating,
-  deleteRating,
-  type SessionRating,
-} from "../../../../utils/ratingService";
+  createRating,
+  updateRating,
+  deleteRating as deleteRatingApi,
+} from "../../../../services/api/rating";
 
 // ─── Star display (read-only) ─────────────────────────────────────────────────
 function StarDisplay({ stars }: { stars: number }) {
@@ -54,38 +54,19 @@ function StarDisplay({ stars }: { stars: number }) {
 
 // ─── Inline rating editor ─────────────────────────────────────────────────────
 function InlineRatingEditor({
-  sessionId,
-  teacherName,
-  date,
-  existing,
+  currentValue,
+  saving,
   onSave,
   onCancel,
 }: {
-  sessionId: number;
-  teacherName: string;
-  date: string;
-  existing: SessionRating | null;
-  onSave: (r: SessionRating) => void;
+  currentValue: number | null;
+  saving: boolean;
+  onSave: (stars: number) => void;
   onCancel: () => void;
 }) {
   const [hovered, setHovered] = useState(0);
-  const [stars, setStars] = useState(existing?.stars ?? 0);
+  const [stars, setStars] = useState(currentValue ?? 0);
   const displayed = hovered || stars;
-
-  const handleSave = () => {
-    if (stars === 0) return;
-    const rating: SessionRating = {
-      sessionId,
-      teacherName,
-      stars,
-      comment: "",
-      date,
-      studentName: "John Smith",
-      studentInitials: "JS",
-    };
-    setRating(rating);
-    onSave(rating);
-  };
 
   return (
     <div className="mt-3 pt-3 border-t flex flex-wrap items-center gap-4">
@@ -112,12 +93,12 @@ function InlineRatingEditor({
       <div className="flex gap-2">
         <Button
           size="sm"
-          disabled={stars === 0}
+          disabled={stars === 0 || saving}
           className="bg-[#3B82F6] hover:bg-[#3B82F6]/90 text-white flex items-center gap-1"
-          onClick={handleSave}
+          onClick={() => onSave(stars)}
         >
           <Check className="w-3.5 h-3.5" />
-          Save
+          {saving ? "Saving..." : "Save"}
         </Button>
         <Button
           size="sm"
@@ -136,32 +117,73 @@ function InlineRatingEditor({
 export default function AllSessionsContent() {
   const navigate = useNavigate();
 
+  const [sessions, setSessions] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [selectedSubject, setSelectedSubject] = useState("All Subjects");
-  const [ratings, setRatings] = useState<Record<number, SessionRating | null>>({});
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [savingRating, setSavingRating] = useState(false);
 
-  // Load all ratings from localStorage on mount
+  // Load all sessions from backend on mount
   useEffect(() => {
-    const loaded: Record<number, SessionRating | null> = {};
-    allSessions.forEach((s) => {
-      loaded[s.id] = getRating(s.id);
-    });
-    setRatings(loaded);
+    async function loadData() {
+      try {
+        setLoading(true);
+        const data = await getStudentSessions();
+        setSessions(data);
+      } catch (err) {
+        console.error("Failed to load sessions:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
   }, []);
 
-  const handleSaveRating = (r: SessionRating) => {
-    setRatings((prev) => ({ ...prev, [r.sessionId]: r }));
-    setEditingId(null);
+  // Save or update a rating via the backend API
+  const handleSaveRating = async (sessionId: number, ratingId: number | null, stars: number) => {
+    try {
+      setSavingRating(true);
+      if (ratingId) {
+        // Update existing rating
+        await updateRating(ratingId, stars);
+        setSessions((prev) =>
+          prev.map((s) => (s.id === sessionId ? { ...s, ratingValue: stars } : s))
+        );
+      } else {
+        // Create new rating
+        const result = await createRating(sessionId, stars);
+        const newRatingId = result?.data?.ratingId ?? result?.ratingId;
+        setSessions((prev) =>
+          prev.map((s) =>
+            s.id === sessionId ? { ...s, ratingId: newRatingId, ratingValue: stars } : s
+          )
+        );
+      }
+      setEditingId(null);
+    } catch (err) {
+      console.error("Failed to save rating:", err);
+    } finally {
+      setSavingRating(false);
+    }
   };
 
-  const handleDeleteRating = (sessionId: number) => {
-    deleteRating(sessionId);
-    setRatings((prev) => ({ ...prev, [sessionId]: null }));
-    setEditingId(null);
+  // Delete a rating via the backend API
+  const handleDeleteRating = async (sessionId: number, ratingId: number) => {
+    try {
+      await deleteRatingApi(ratingId);
+      setSessions((prev) =>
+        prev.map((s) =>
+          s.id === sessionId ? { ...s, ratingId: null, ratingValue: null } : s
+        )
+      );
+      setEditingId(null);
+    } catch (err) {
+      console.error("Failed to delete rating:", err);
+    }
   };
 
-  const filtered = allSessions.filter((s) => {
+  const filtered = sessions.filter((s) => {
     const matchSubject =
       selectedSubject === "All Subjects" || s.subject === selectedSubject;
     const matchSearch =
@@ -202,7 +224,12 @@ export default function AllSessionsContent() {
       </div>
 
       {/* Sessions List */}
-      {filtered.length === 0 ? (
+      {loading ? (
+        <Card className="p-12 text-center flex flex-col items-center justify-center gap-4">
+          <div className="w-10 h-10 rounded-full border-4 border-gray-200 border-t-[#3B82F6] animate-spin" />
+          <p className="text-gray-500 text-sm">Loading sessions...</p>
+        </Card>
+      ) : filtered.length === 0 ? (
         <Card className="p-12 text-center">
           <Video className="w-12 h-12 text-gray-300 mx-auto mb-3" />
           <div className="text-gray-500">No sessions match your search.</div>
@@ -210,7 +237,7 @@ export default function AllSessionsContent() {
       ) : (
         <div className="space-y-4">
           {filtered.map((session) => {
-            const rating = ratings[session.id] ?? null;
+            const hasRating = session.ratingId != null && session.ratingValue != null;
             const isEditing = editingId === session.id;
 
             return (
@@ -257,9 +284,9 @@ export default function AllSessionsContent() {
                     {/* Rating row (shown when NOT editing) */}
                     {!isEditing && (
                       <div className="flex items-center gap-3">
-                        {rating ? (
+                        {hasRating ? (
                           <>
-                            <StarDisplay stars={rating.stars} />
+                            <StarDisplay stars={session.ratingValue} />
                             <button
                               className="text-gray-400 hover:text-blue-500 transition-colors"
                               title="Edit rating"
@@ -270,12 +297,12 @@ export default function AllSessionsContent() {
                             <button
                               className="text-gray-400 hover:text-red-500 transition-colors"
                               title="Delete rating"
-                              onClick={() => handleDeleteRating(session.id)}
+                              onClick={() => handleDeleteRating(session.id, session.ratingId)}
                             >
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
                           </>
-                        ) : (
+                        ) : session.status === "ended" ? (
                           <button
                             className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-yellow-500 transition-colors"
                             onClick={() => setEditingId(session.id)}
@@ -283,36 +310,40 @@ export default function AllSessionsContent() {
                             <Star className="w-3.5 h-3.5" />
                             Rate this session
                           </button>
-                        )}
+                        ) : null}
                       </div>
                     )}
                   </div>
 
                   {/* Focus Score */}
-                  <div className="hidden sm:flex flex-col items-center gap-1 shrink-0 w-24">
-                    <div className="text-sm text-gray-500">Focus</div>
-                    <div
-                      className="text-xl font-medium"
-                      style={{ color: focusColor(session.focusScore) }}
-                    >
-                      {session.focusScore}%
+                  {session.focusScore != null && (
+                    <div className="hidden sm:flex flex-col items-center gap-1 shrink-0 w-24">
+                      <div className="text-sm text-gray-500">Focus</div>
+                      <div
+                        className="text-xl font-medium"
+                        style={{ color: focusColor(session.focusScore) }}
+                      >
+                        {session.focusScore}%
+                      </div>
+                      <Progress value={session.focusScore} className="h-1.5 w-full" />
                     </div>
-                    <Progress value={session.focusScore} className="h-1.5 w-full" />
-                  </div>
+                  )}
                 </div>
 
                 {/* Action buttons */}
                 <div className="flex gap-3 mt-4 pt-3 border-t">
                   <Button
                     className="flex-1 flex items-center justify-center gap-2 bg-white border-2 border-[#3B82F6] text-[#3B82F6] hover:bg-blue-50 hover:text-[#3B82F6]"
-                    onClick={() => navigate("/session/record")}
+                    disabled={!session.recordedSession}
+                    onClick={() => navigate(`/session/${session.id}/record`)}
                   >
                     <Video className="w-4 h-4" />
                     Session Record
                   </Button>
                   <Button
                     className="flex-1 flex items-center justify-center gap-2 bg-[#8B5CF6] hover:bg-[#8B5CF6]/90 text-white"
-                    onClick={() => navigate("/session/notes")}
+                    disabled={!session.summary}
+                    onClick={() => navigate(`/session/${session.id}/notes`)}
                   >
                     <FileText className="w-4 h-4" />
                     View Notes
@@ -322,11 +353,9 @@ export default function AllSessionsContent() {
                 {/* Inline editor (shown when editing) */}
                 {isEditing && (
                   <InlineRatingEditor
-                    sessionId={session.id}
-                    teacherName={session.teacher}
-                    date={session.date}
-                    existing={rating}
-                    onSave={handleSaveRating}
+                    currentValue={session.ratingValue}
+                    saving={savingRating}
+                    onSave={(stars) => handleSaveRating(session.id, session.ratingId, stars)}
                     onCancel={() => setEditingId(null)}
                   />
                 )}
