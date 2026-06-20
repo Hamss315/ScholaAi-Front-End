@@ -6,7 +6,11 @@ export interface SignalRPeer {
     role: string;
 }
 
-export function useSignalRSession(roomId: string, role: 'host' | 'viewer') {
+export function useSignalRSession(
+    roomId: string,
+    role: 'host' | 'viewer',
+    onDistractionAlert?: (reason: string) => void,
+) {
     const hubRef = useRef<signalR.HubConnection | null>(null);
     const [peers, setPeers] = useState<SignalRPeer[]>([]);
     const [connected, setConnected] = useState(false);
@@ -41,6 +45,12 @@ export function useSignalRSession(roomId: string, role: 'host' | 'viewer') {
         hub.on('Error', (msg: string) => {
             console.error('[SignalR] Hub error:', msg);
             setError(msg);
+        });
+
+        // Real-time distraction alert from focus_server.py (routed via .NET backend)
+        hub.on('DistractionAlert', (reason: string) => {
+            console.warn('[SignalR] ⚠️ DistractionAlert:', reason);
+            onDistractionAlert?.(reason);
         });
 
         try {

@@ -104,8 +104,8 @@ export function useMediasoup() {
         if (audioTrack) await transport.produce({ track: audioTrack, appData: { source: 'mic' } });
     }
 
-    async function produceScreen(onStopped?: () => void): Promise<void> {
-        const stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+    async function produceScreen(onStopped?: () => void, existingStream?: MediaStream): Promise<MediaStream> {
+        const stream = existingStream || await navigator.mediaDevices.getDisplayMedia({ video: true });
         const transport = sendTransportRef.current!;
         const videoTrack = stream.getVideoTracks()[0];
         const producer = await transport.produce({ track: videoTrack, appData: { source: 'screen' } });
@@ -115,6 +115,7 @@ export function useMediasoup() {
             stopScreen();
             onStopped?.();
         };
+        return stream;
     }
 
     function stopScreen(): void {

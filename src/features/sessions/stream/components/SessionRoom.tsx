@@ -26,10 +26,19 @@ export function SessionRoom({ sessionId, sessionDbId, peerId, role, token }: Ses
     const [sessionDuration, setSessionDuration] = useState(0);
     const [isSaving, setIsSaving] = useState(false);
     const [savingMessage, setSavingMessage] = useState('Saving local recording…');
+    // Distraction alert received by teacher via SignalR
+    const [distractionAlert, setDistractionAlert] = useState<string | null>(null);
     const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
     const recordingStartedRef = useRef(false);
 
-    const signalR = useSignalRSession(sessionId, role);
+    const preCapturedScreenStreamRef = useRef<MediaStream | null>(null);
+
+    const signalR = useSignalRSession(
+        sessionId,
+        role,
+        // Only show distraction alerts to the teacher (host)
+        role === 'host' ? (reason) => setDistractionAlert(reason) : undefined,
+    );
     const { startRecording, stopRecording } = useRecording({ sessionDbId });
 
     const {
@@ -67,20 +76,82 @@ export function SessionRoom({ sessionId, sessionDbId, peerId, role, token }: Ses
         if (!joined || !localStream) return;
         if (recordingStartedRef.current) return;
 
-        recordingStartedRef.current = true;
-        console.log(`[SessionRoom] 🎞 Starting recording for sessionDbId=${sessionDbId}`);
-        startRecording(localStream);
-    }, [role, joined, localStream, startRecording, sessionDbId]);
+        const activeStream = localStream; // capture to satisfy TS compiler
+
+        async function initScreenRecording() {
+            try {
+                recordingStartedRef.current = true;
+                let screenStream = preCapturedScreenStreamRef.current;
+                
+                if (screenStream) {
+                    console.log(`[SessionRoom] 🖥 Publishing pre-captured screen share`);
+                    await produceScreen(() => setIsSharing(false), screenStream);
+                    setIsSharing(true);
+                } else {
+                    console.log(`[SessionRoom] 🖥 No pre-captured screen found, prompting host`);
+                    screenStream = await produceScreen(() => setIsSharing(false));
+                    setIsSharing(true);
+                }
+
+                // Combine screen video with microphone audio track
+                const micTrack = activeStream.getAudioTracks()[0];
+                const tracks = [...screenStream.getVideoTracks()];
+                if (micTrack) {
+                    tracks.push(micTrack);
+                }
+
+                const combinedStream = new MediaStream(tracks);
+                console.log(`[SessionRoom] 🎞 Starting screen recording for sessionDbId=${sessionDbId}`);
+                startRecording(combinedStream);
+            } catch (err) {
+                console.error('[SessionRoom] Failed to initialize screen recording:', err);
+                // Fallback to camera stream if screen sharing is canceled
+                console.log(`[SessionRoom] 🎞 Falling back to camera recording for sessionDbId=${sessionDbId}`);
+                startRecording(activeStream);
+            }
+        }
+
+        initScreenRecording();
+    }, [role, joined, localStream, produceScreen, startRecording, sessionDbId]);
 
     // ── Join ──────────────────────────────────────────────────────────────────
     async function handleJoin() {
         setLoading(true);
+        if (role === 'host') {
+            try {
+                console.log('[SessionRoom] 🖥 Prompting host for screen share (User Gesture)');
+                const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+                preCapturedScreenStreamRef.current = screenStream;
+            } catch (err) {
+                console.warn('[SessionRoom] Host declined screen share prompt or it failed:', err);
+            }
+        }
+
         try {
             await Promise.all([
                 joinSession(),
                 signalR.connect(),
             ]);
             setJoined(true);
+
+            // Student: start focus agent on localhost:8000
+            if (role === 'viewer') {
+                const token = localStorage.getItem('token') ?? '';
+                // roomId comes from the session data — we use sessionId as a proxy
+                // The agent will use its own stored roomId for SignalR routing
+                fetch('http://localhost:8000/focus/start', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        session_id: sessionDbId,
+                        room_id: sessionId,   // mediasoup room ID string
+                        token,
+                    }),
+                }).catch(() => {
+                    // Agent not running — non-fatal, session continues without focus tracking
+                    console.warn('[SessionRoom] Focus agent not available on localhost:8000');
+                });
+            }
         } catch (err) {
             console.error('Failed to join:', err);
         } finally {
@@ -102,6 +173,16 @@ export function SessionRoom({ sessionId, sessionDbId, peerId, role, token }: Ses
             } finally {
                 setIsSaving(false);
             }
+
+            if (preCapturedScreenStreamRef.current) {
+                preCapturedScreenStreamRef.current.getTracks().forEach(t => t.stop());
+                preCapturedScreenStreamRef.current = null;
+            }
+        }
+
+        // Student: stop focus agent gracefully
+        if (role === 'viewer') {
+            fetch('http://localhost:8000/focus/stop', { method: 'POST' }).catch(() => {});
         }
 
         leaveSession();
@@ -133,12 +214,17 @@ export function SessionRoom({ sessionId, sessionDbId, peerId, role, token }: Ses
 
         try {
             console.log(`[SessionRoom] 🏁 Marking session as ended in DB`);
-            await endSession(sessionDbId);
+            // FocusScore is already saved live by focus_server.py — pass 0 as fallback
+            await endSession(sessionDbId, 0);
             console.log('[SessionRoom] ✅ Session ended successfully');
         } catch (err) {
             console.error('[SessionRoom] Error ending session:', err);
         } finally {
             setIsSaving(false);
+            if (preCapturedScreenStreamRef.current) {
+                preCapturedScreenStreamRef.current.getTracks().forEach(t => t.stop());
+                preCapturedScreenStreamRef.current = null;
+            }
             leaveSession();
             signalR.disconnect();
             navigate('/teacher/dashboard', { replace: true });
@@ -264,6 +350,27 @@ export function SessionRoom({ sessionId, sessionDbId, peerId, role, token }: Ses
     // ── Active Session ────────────────────────────────────────────────────────
     return (
         <div className="min-h-screen bg-[#0f1117] flex flex-col overflow-hidden">
+
+            {/* ── Distraction Alert Toast (teacher only) ───────────────── */}
+            {distractionAlert && (
+                <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-3
+                                bg-red-500/90 backdrop-blur-sm border border-red-400/50
+                                text-white rounded-2xl px-5 py-3 shadow-2xl
+                                animate-[slideDown_0.3s_ease-out]">
+                    <span className="text-xl">⚠️</span>
+                    <div>
+                        <p className="font-semibold text-sm">Student is not focused</p>
+                        <p className="text-red-100 text-xs opacity-90">{distractionAlert}</p>
+                    </div>
+                    <button
+                        onClick={() => setDistractionAlert(null)}
+                        className="ml-2 text-red-100 hover:text-white transition-colors text-lg leading-none"
+                        aria-label="Dismiss alert"
+                    >
+                        ✕
+                    </button>
+                </div>
+            )}
 
             {/* ── Top Bar ─────────────────────────────────────────────── */}
             <div className="flex items-center justify-between px-6 py-4">

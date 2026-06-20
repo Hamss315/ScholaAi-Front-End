@@ -75,8 +75,8 @@ export default function RightSidebar({
 
         <div className="space-y-3">
           {weeklyEngagement.length > 0 ? (
-            weeklyEngagement.map((d) => (
-              <div key={d.day}>
+            weeklyEngagement.map((d, index) => (
+              <div key={`${d.day}-${index}`}>
                 <div className="flex justify-between text-sm mb-1">
                   <span>{d.day}</span>
                   <span
