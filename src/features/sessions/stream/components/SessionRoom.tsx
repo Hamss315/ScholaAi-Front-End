@@ -117,7 +117,7 @@ export function SessionRoom({ sessionId, sessionDbId, peerId, role, token }: Ses
         try {
             console.log(`[SessionRoom] ⏹ Stopping recording for end of sessionDbId=${sessionDbId}`);
             await stopRecording();
-            
+
             const pending = pendingRecordingStore.get();
             if (pending && pending.sessionDbId === sessionDbId) {
                 console.log(`[SessionRoom] ⬆️ Uploading recording...`);

@@ -2,6 +2,7 @@ import { Avatar, AvatarFallback } from "../../../components/ui/avatar";
 import { Button } from "../../../components/ui/button";
 import { Star, Calendar, MessageSquare, TrendingUp } from "lucide-react";
 import type { Student } from "../types/students.types";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   student: Student;
@@ -10,6 +11,8 @@ interface Props {
 }
 
 export default function StudentCard({ student, variant, onNavigate }: Props) {
+  const navigate = useNavigate();
+
   return (
     <div
       className={`p-4 bg-gray-50 rounded-lg border border-gray-200 transition ${
@@ -19,7 +22,7 @@ export default function StudentCard({ student, variant, onNavigate }: Props) {
       <div className="flex items-start justify-between gap-4">
 
         <div className="flex items-start gap-4 flex-1">
-          <Avatar className="w-12 h-12 cursor-pointer" onClick={() => onNavigate("student-public-profile")}>
+          <Avatar className="w-12 h-12 cursor-pointer" onClick={() => navigate("/student/profile")}>
             <AvatarFallback className={variant === "active" ? "bg-blue-500 text-white" : "bg-gray-400 text-white"}>
               {student.initials}
             </AvatarFallback>
@@ -29,7 +32,7 @@ export default function StudentCard({ student, variant, onNavigate }: Props) {
             <div className="flex items-center gap-2 mb-1">
               <div
                 className="cursor-pointer hover:underline text-[#1E3A8A]"
-                onClick={() => onNavigate("student-public-profile")}
+                onClick={() => navigate("/student/profile")}
               >
                 {student.name}
               </div>
@@ -73,13 +76,30 @@ export default function StudentCard({ student, variant, onNavigate }: Props) {
         </div>
 
         <div className="flex flex-col gap-2">
-          <Button size="sm" variant="outline" onClick={() => onNavigate("chat")}>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() =>
+              navigate(`/chat/${student.id}`, {
+                state: {
+                  chat: {
+                    id: student.id.toString(),
+                    otherUserId: student.id.toString(),
+                    otherUserName: student.name,
+                    otherUserRole: "student",
+                    unreadCount: 0,
+                    online: false,
+                  },
+                },
+              })
+            }
+          >
             <MessageSquare className="w-4 h-4 mr-2" />
             Message
           </Button>
 
           {variant === "active" && (
-            <Button size="sm" variant="outline" onClick={() => onNavigate("session-analysis")}>
+            <Button size="sm" variant="outline" onClick={() => navigate("/session-analysis")}>
               <TrendingUp className="w-4 h-4 mr-2" />
               View Progress
             </Button>

@@ -120,14 +120,16 @@ export default function RightSidebar({
           <Button
             variant="outline"
             className="w-full justify-start"
+            onClick={() => navigate("/student/sessions")}
           >
             <FileText className="w-4 h-4 mr-2" />
-            All Notes
+            All Sessions
           </Button>
 
           <Button
             variant="outline"
             className="w-full justify-start"
+            onClick={() => navigate("/student/performance")}
           >
             <TrendingUp className="w-4 h-4 mr-2" />
             Performance Report

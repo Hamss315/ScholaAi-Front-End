@@ -105,8 +105,20 @@ export default function TeacherProfileTabs({
   onSaveProfessional,
   onChangePassword,
 }: Props) {
+  const totalReviewsCount = recentReviews.length;
+  const starCounts = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+  recentReviews.forEach((r) => {
+    const star = Math.min(5, Math.max(1, Math.round(r.rating))) as 5 | 4 | 3 | 2 | 1;
+    starCounts[star]++;
+  });
+
+  const getPercent = (stars: 5 | 4 | 3 | 2 | 1) => {
+    if (totalReviewsCount === 0) return 0;
+    return Math.round((starCounts[stars] / totalReviewsCount) * 100);
+  };
+
   return (
-    <div className="md:col-span-2">
+    <div className="md:col-span-2 font-sans">
       <Tabs defaultValue="profile" className="w-full">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="profile">Profile</TabsTrigger>
@@ -397,28 +409,28 @@ export default function TeacherProfileTabs({
                 <div className="flex-1 space-y-2">
                   <div className="flex items-center gap-3">
                     <span className="w-12 text-sm">5 stars</span>
-                    <Progress value={85} className="flex-1" />
-                    <span className="w-12 text-sm text-gray-600">85%</span>
+                    <Progress value={getPercent(5)} className="flex-1" />
+                    <span className="w-12 text-sm text-gray-600">{getPercent(5)}%</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <span className="w-12 text-sm">4 stars</span>
-                    <Progress value={12} className="flex-1" />
-                    <span className="w-12 text-sm text-gray-600">12%</span>
+                    <Progress value={getPercent(4)} className="flex-1" />
+                    <span className="w-12 text-sm text-gray-600">{getPercent(4)}%</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <span className="w-12 text-sm">3 stars</span>
-                    <Progress value={2} className="flex-1" />
-                    <span className="w-12 text-sm text-gray-600">2%</span>
+                    <Progress value={getPercent(3)} className="flex-1" />
+                    <span className="w-12 text-sm text-gray-600">{getPercent(3)}%</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <span className="w-12 text-sm">2 stars</span>
-                    <Progress value={1} className="flex-1" />
-                    <span className="w-12 text-sm text-gray-600">1%</span>
+                    <Progress value={getPercent(2)} className="flex-1" />
+                    <span className="w-12 text-sm text-gray-600">{getPercent(2)}%</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <span className="w-12 text-sm">1 star</span>
-                    <Progress value={0} className="flex-1" />
-                    <span className="w-12 text-sm text-gray-600">0%</span>
+                    <Progress value={getPercent(1)} className="flex-1" />
+                    <span className="w-12 text-sm text-gray-600">{getPercent(1)}%</span>
                   </div>
                 </div>
               </div>
@@ -455,7 +467,7 @@ export default function TeacherProfileTabs({
                     </div>
                   </div>
 
-                  <p className="text-gray-700">{review.comment}</p>
+                  {review.comment && <p className="text-gray-700 mt-2">{review.comment}</p>}
                 </div>
               ))}
             </div>

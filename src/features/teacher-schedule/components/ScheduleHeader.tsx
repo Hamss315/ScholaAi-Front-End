@@ -20,7 +20,7 @@ export default function ScheduleHeader({ fullName }: Props) {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => navigate("/teacher/dashboard")}
+              onClick={() => navigate(-1)}
             >
               <ArrowLeft className="w-5 h-5" />
             </Button>

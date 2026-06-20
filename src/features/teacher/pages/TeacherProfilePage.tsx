@@ -19,6 +19,7 @@ import {
   changeTeacherPassword,
 } from "../services/teacherProfile.service";
 import type { UpdateTeacherProfileDto } from "../services/teacherProfile.service";
+import { getAllRatings } from "../../../utils/ratingService";
 
 export default function TeacherProfilePage() {
   const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -145,11 +146,42 @@ export default function TeacherProfilePage() {
     fetchProfile();
   }, []);
 
-  const recentReviews: TeacherReview[] = [
-    { id: 1, student: "Emily Parker", rating: 5, comment: "Excellent teacher!", date: "Nov 20, 2025" },
-    { id: 2, student: "James Wilson", rating: 5, comment: "Highly recommend!", date: "Nov 18, 2025" },
-    { id: 3, student: "Sarah Martinez", rating: 4, comment: "Very good sessions.", date: "Nov 15, 2025" },
-  ];
+  const [reviewsList, setReviewsList] = useState<TeacherReview[]>([]);
+
+  useEffect(() => {
+    const allRatings = getAllRatings();
+    const matchedRatings = allRatings.filter(r => 
+      profileData.lastName && r.teacherName.toLowerCase().includes(profileData.lastName.toLowerCase())
+    );
+
+    const mapped: TeacherReview[] = matchedRatings.map((r) => ({
+      id: r.sessionId,
+      student: r.studentName,
+      rating: r.stars,
+      comment: "",
+      date: r.date
+    }));
+
+    const initialReviews: TeacherReview[] = [
+      { id: 101, student: "Emily Parker", rating: 5, comment: "", date: "Nov 20, 2025" },
+      { id: 102, student: "James Wilson", rating: 5, comment: "", date: "Nov 18, 2025" },
+      { id: 103, student: "Sarah Martinez", rating: 4, comment: "", date: "Nov 15, 2025" },
+    ];
+
+    const combined = [...mapped, ...initialReviews];
+    setReviewsList(combined);
+
+    const totalReviewsCount = combined.length;
+    const avg = totalReviewsCount > 0 
+      ? Math.round((combined.reduce((sum, r) => sum + r.rating, 0) / totalReviewsCount) * 10) / 10
+      : 0;
+
+    setWorkSummary(prev => ({
+      ...prev,
+      averageRating: avg,
+      totalReviews: totalReviewsCount
+    }));
+  }, [profileData.lastName, profileData.firstName]);
 
   // ✅ SAVE PROFILE (aligned with backend DTO)
   const handleSaveProfile = async () => {
@@ -270,7 +302,7 @@ export default function TeacherProfilePage() {
               setProfessionalData={setProfessionalData}
               certifications={certifications}
               workSummary={workSummary}
-              recentReviews={recentReviews}
+              recentReviews={reviewsList}
               notifications={notifications}
               setNotifications={setNotifications}
               language={language}
