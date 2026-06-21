@@ -51,6 +51,11 @@ export function useMediasoup() {
                 (res: any) => res.error ? errback(new Error(res.error)) : callback({ id: res.id }));
         });
 
+        // ── DEBUG: log ICE/DTLS state transitions ──────────────────────────────
+        transport.on('connectionstatechange', (state) => {
+            console.log('[SEND transport] connectionstatechange:', state);
+        });
+
         sendTransportRef.current = transport;
     }
 
@@ -65,6 +70,17 @@ export function useMediasoup() {
         transport.on('connect', ({ dtlsParameters }, callback, errback) => {
             socket.emit('connectTransport', { transportId: transport.id, dtlsParameters },
                 (res: any) => res.error ? errback(new Error(res.error)) : callback());
+        });
+
+        // ── DEBUG: log ICE/DTLS state transitions ──────────────────────────────
+        transport.on('connectionstatechange', (state) => {
+            console.log('[RECV transport] connectionstatechange:', state);
+        });
+        transport.on('connectionstatechange', (state) => {
+            console.log('[SEND transport] connectionstatechange:', state);
+        });
+        transport.on('connectionstatechange', (state) => {
+            console.log('[RECV transport] connectionstatechange:', state);
         });
 
         recvTransportRef.current = transport;
