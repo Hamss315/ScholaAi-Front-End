@@ -219,7 +219,11 @@ export default function ChatsListPage({ userRole: propUserRole }: ChatsListPageP
           {/* CALENDAR */}
           <Card
             className="p-6 hover:shadow-lg transition-shadow cursor-pointer"
-            onClick={() => navigate("/calendar")}
+            onClick={()=>navigate(
+                userRole === "teacher"
+                  ? "/teacher/calendar"
+                  : "/student/calendar"
+              )}
           >
             <div className="flex items-center gap-4">
 
@@ -228,7 +232,7 @@ export default function ChatsListPage({ userRole: propUserRole }: ChatsListPageP
               </div>
 
               <div>
-                <h3 className="font-medium text-[#1E3A8A]">
+                <h3 className="font-medium text-[#1E3A8A]" >
                   View Calendar
                 </h3>
                 <p className="text-sm text-gray-600">
@@ -245,8 +249,8 @@ export default function ChatsListPage({ userRole: propUserRole }: ChatsListPageP
             onClick={() =>
               navigate(
                 userRole === "teacher"
-                  ? "/session-requests"
-                  : "/request-session"
+                  ? "/teacher/session-requests"
+                  : "/student/request-session"
               )
             }
           >
