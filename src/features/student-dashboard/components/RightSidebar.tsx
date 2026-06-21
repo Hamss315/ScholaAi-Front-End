@@ -1,10 +1,21 @@
 import { Card } from "../../../components/ui/card";
 import { Button } from "../../../components/ui/button";
 import { Progress } from "../../../components/ui/progress";
-import { Calendar, FileText, TrendingUp, Video } from "lucide-react";
+import { Calendar, FileText, TrendingUp } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import type { WeeklyEngagement, WalletSummary } from "../../../services/api/studentDashboard";
 
-export default function RightSidebar() {
+interface RightSidebarProps {
+  walletBalance: number;
+  walletSummary: WalletSummary;
+  weeklyEngagement: WeeklyEngagement[];
+}
+
+export default function RightSidebar({
+  walletBalance,
+  walletSummary,
+  weeklyEngagement,
+}: RightSidebarProps) {
   const navigate = useNavigate();
 
   return (
@@ -23,7 +34,7 @@ export default function RightSidebar() {
               Available Balance
             </div>
             <div className="text-3xl mb-2">
-              $125.50
+              ${walletBalance.toFixed(2)}
             </div>
           </div>
 
@@ -31,12 +42,16 @@ export default function RightSidebar() {
 
             <div className="flex justify-between">
               <span className="text-gray-600">Last Recharge</span>
-              <span className="text-green-600">+$100.00</span>
+              <span className="text-green-600">
+                +${walletSummary.lastRechargeAmount.toFixed(2)}
+              </span>
             </div>
 
             <div className="flex justify-between">
               <span className="text-gray-600">Last Session</span>
-              <span className="text-red-600">-$45.00</span>
+              <span className="text-red-600">
+                -${Math.abs(walletSummary.lastSessionAmount).toFixed(2)}
+              </span>
             </div>
 
           </div>
@@ -59,36 +74,29 @@ export default function RightSidebar() {
         </h3>
 
         <div className="space-y-3">
-
-          {[
-            { day: "Monday", value: 95 },
-            { day: "Tuesday", value: 88 },
-            { day: "Wednesday", value: 92 },
-            { day: "Thursday", value: 78 },
-            { day: "Friday", value: 94 },
-          ].map((d) => (
-            <div key={d.day}>
-
-              <div className="flex justify-between text-sm mb-1">
-                <span>{d.day}</span>
-                <span
-                  className={
-                    d.value >= 90
-                      ? "text-green-500"
-                      : d.value < 80
-                      ? "text-yellow-500"
-                      : "text-blue-500"
-                  }
-                >
-                  {d.value}%
-                </span>
+          {weeklyEngagement.length > 0 ? (
+            weeklyEngagement.map((d, index) => (
+              <div key={`${d.day}-${index}`}>
+                <div className="flex justify-between text-sm mb-1">
+                  <span>{d.day}</span>
+                  <span
+                    className={
+                      d.avgFocusScore >= 90
+                        ? "text-green-500"
+                        : d.avgFocusScore < 80
+                        ? "text-yellow-500"
+                        : "text-blue-500"
+                    }
+                  >
+                    {Math.round(d.avgFocusScore)}%
+                  </span>
+                </div>
+                <Progress value={d.avgFocusScore} className="h-2" />
               </div>
-
-              <Progress value={d.value} className="h-2" />
-
-            </div>
-          ))}
-
+            ))
+          ) : (
+            <div className="text-sm text-gray-400 text-center py-4">No engagement data this week</div>
+          )}
         </div>
       </Card>
 

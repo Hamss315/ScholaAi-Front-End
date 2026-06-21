@@ -1,4 +1,15 @@
 import api from "../api";
+import type {
+  ActiveSession,
+  UpcomingClass,
+  RecentSession,
+} from "../../features/teacher-dashboard/types/dashboard.types";
+
+export interface TodayOverview {
+  sessionsToday: number;
+  hoursTaught: number;
+  avgFocusScore: number;
+}
 
 export interface TeacherDashboardOverview {
   teacherName: string;
@@ -9,30 +20,10 @@ export interface TeacherDashboardOverview {
     thisWeek: number;
     lastMonth: number;
   };
-  activeSessions: Array<{
-    id: number;
-    student: string;
-    subject: string;
-    startTime: string;
-    focusScore: number;
-    status: "good" | "warning";
-    isCurrent: boolean;
-  }>;
-  upcomingClasses: Array<{
-    id: number;
-    student: string;
-    subject: string;
-    time: string;
-    duration: string;
-    scheduledAt: string;
-  }>;
-  recentSessions: Array<{
-    id: number;
-    student: string;
-    subject: string;
-    scheduledAt: string;
-    focusScore: number;
-  }>;
+  activeSessions: ActiveSession[];
+  upcomingClasses: UpcomingClass[];
+  recentSessions: RecentSession[];
+  todayOverview: TodayOverview;
 }
 
 export const getTeacherDashboard = async () => {
@@ -45,44 +36,53 @@ export const getTeacherDashboardOverview = async (): Promise<TeacherDashboardOve
     const res = await getTeacherDashboard();
     const data = res?.data ?? res ?? {};
 
-    const upcoming = data?.upcomingSessions ?? data?.UpcomingSessions ?? [];
-    const recent = data?.recentSessions ?? data?.RecentSessions ?? [];
+    const upcomingRaw = data?.upcomingSessions ?? data?.UpcomingSessions ?? [];
+    const activeRaw   = data?.activeSessions  ?? data?.ActiveSessions  ?? [];
+    const recentRaw   = data?.recentSessions  ?? data?.RecentSessions  ?? [];
 
-    const upcomingClasses = upcoming.map((s: any, idx: number) => {
-      const scheduledAt = s?.scheduledAt ?? s?.ScheduledAt ?? null;
-      const parsed = scheduledAt ? new Date(scheduledAt) : null;
-      return {
-        id: idx + 1,
-        student: s?.studentName ?? s?.StudentName ?? "Student",
-        subject: s?.subjectName ?? s?.SubjectName ?? "Subject",
-        time: parsed
-          ? parsed.toLocaleString([], { dateStyle: "medium", timeStyle: "short" })
-          : "TBD",
-        duration: "1 hour",
-        scheduledAt: parsed ? parsed.toISOString() : "",
-      };
-    });
-
-    const recentSessions = recent.map((s: any, idx: number) => ({
-      id: idx + 1,
-      student: s?.studentName ?? s?.StudentName ?? "Student",
-      subject: s?.subjectName ?? s?.SubjectName ?? "Subject",
-      scheduledAt: s?.scheduledAt ?? s?.ScheduledAt ?? "",
-      focusScore: s?.studentFocusScore ?? s?.StudentFocusScore ?? 0,
+    const upcomingClasses: UpcomingClass[] = upcomingRaw.map((s: any, idx: number) => ({
+      id: s.requestId ?? s.RequestId ?? idx + 1,
+      requestId: s.requestId ?? s.RequestId ?? idx + 1,
+      studentName: s.studentName ?? s.StudentName ?? "Student",
+      subjectName: s.subjectName ?? s.SubjectName ?? "Subject",
+      scheduledAt: s.scheduledAt ?? s.ScheduledAt ?? "",
     }));
+
+    const activeSessions: ActiveSession[] = activeRaw.map((s: any, idx: number) => ({
+      id: s.sessionId ?? s.SessionId ?? s.id ?? idx + 1,
+      studentName: s.studentName ?? s.StudentName ?? "Student",
+      subjectName: s.subjectName ?? s.SubjectName ?? "Subject",
+      scheduledAt: s.scheduledAt ?? s.ScheduledAt ?? "",
+      studentFocusScore: s.studentFocusScore ?? s.StudentFocusScore,
+    }));
+
+    const recentSessions: RecentSession[] = recentRaw.map((s: any, idx: number) => ({
+      id: s.id ?? idx + 1,
+      studentName: s.studentName ?? s.StudentName ?? "Student",
+      subjectName: s.subjectName ?? s.SubjectName ?? "Subject",
+      scheduledAt: s.scheduledAt ?? s.ScheduledAt ?? "",
+      studentFocusScore: s.studentFocusScore ?? s.StudentFocusScore ?? 0,
+    }));
+
+    const rawOverview = data?.todayOverview ?? data?.TodayOverview ?? {};
 
     return {
       teacherName: data?.teacherName ?? data?.TeacherName ?? "Teacher",
-      todayEarnings: Number(data?.todayEarnings ?? data?.TodayEarnings ?? 0),
-      thisMonthEarnings: Number(data?.thisMonthEarnings ?? data?.ThisMonthEarnings ?? 0),
-      avgRating: Number(data?.avgRating ?? data?.AvgRating ?? 0),
+      todayEarnings: Number(data?.todayEarnings ?? 0),
+      thisMonthEarnings: Number(data?.thisMonthEarnings ?? 0),
+      avgRating: Number(data?.avgRating ?? 0),
       earningsSummary: {
-        thisWeek: Number(data?.earningsSummary?.thisWeek ?? data?.EarningsSummary?.ThisWeek ?? 0),
-        lastMonth: Number(data?.earningsSummary?.lastMonth ?? data?.EarningsSummary?.LastMonth ?? 0),
+        thisWeek: Number(data?.earningsSummary?.thisWeek ?? 0),
+        lastMonth: Number(data?.earningsSummary?.lastMonth ?? 0),
       },
-      activeSessions: [],
+      activeSessions,
       upcomingClasses,
       recentSessions,
+      todayOverview: {
+        sessionsToday: Number(rawOverview?.sessionsToday ?? rawOverview?.SessionsToday ?? 0),
+        hoursTaught: Number(rawOverview?.hoursTaught ?? rawOverview?.HoursTaught ?? 0),
+        avgFocusScore: Number(rawOverview?.avgFocusScore ?? rawOverview?.AvgFocusScore ?? 0),
+      },
     };
   } catch (error) {
     console.error("Failed to fetch teacher dashboard", error);
@@ -95,11 +95,21 @@ export const getTeacherDashboardOverview = async (): Promise<TeacherDashboardOve
       activeSessions: [],
       upcomingClasses: [],
       recentSessions: [],
+      todayOverview: { sessionsToday: 0, hoursTaught: 0, avgFocusScore: 0 },
     };
   }
 };
 
-// Backward-compatible helpers for current component usage.
+export const endSession = async (sessionId: number | string): Promise<void> => {
+  try {
+    await api.post(`/Session/${sessionId}/end`);
+  } catch (error) {
+    console.error("Failed to end session", error);
+    throw error;
+  }
+};
+
+// Backward-compat helpers
 export const getActiveSessions = async () => {
   const overview = await getTeacherDashboardOverview();
   return overview.activeSessions;

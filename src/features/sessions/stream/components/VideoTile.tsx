@@ -12,8 +12,13 @@ export function VideoTile({ stream, muted = false, label, className = '', isLoca
     const videoRef = useRef<HTMLVideoElement>(null);
 
     useEffect(() => {
-        if (videoRef.current && stream) {
-            videoRef.current.srcObject = stream;
+        const video = videoRef.current;
+        if (video && stream) {
+            // Only reassign if different to avoid re-triggering buffering
+            if (video.srcObject !== stream) {
+                video.srcObject = stream;
+            }
+            video.play().catch(() => {/* autoplay blocked - user gesture required */});
         }
     }, [stream]);
 
