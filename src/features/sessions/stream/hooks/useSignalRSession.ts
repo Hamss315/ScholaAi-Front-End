@@ -18,7 +18,7 @@ export function useSignalRSession(
 
     const connect = useCallback(async () => {
         const hub = new signalR.HubConnectionBuilder()
-            .withUrl('http://localhost:5254/hub/session', {  // match .NET port
+            .withUrl(`http://${window.location.hostname}:5254/hub/session`, {  // match .NET port
                 withCredentials: true,
             })
             .withAutomaticReconnect()
