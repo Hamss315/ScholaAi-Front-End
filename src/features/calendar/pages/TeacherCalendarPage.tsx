@@ -10,6 +10,7 @@ import TeacherSidebar from "../components/TeacherSidebar";
 
 import type { TeacherSession } from "../types/calendar.types";
 import { getTeacherSessions } from "../../../services/api/teacherCalendar";
+import { getSessionsForDate } from "../services/calendar.service";
 
 export default function TeacherCalendarPage() {
   const navigate = useNavigate();
@@ -30,20 +31,8 @@ export default function TeacherCalendarPage() {
     setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1));
   };
 
-  const formatDateKey = (date: Date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
-  };
-
-  const getSessionsForDate = (date: Date) => {
-    const dateString = formatDateKey(date);
-    return sessions.filter((s) => s.date === dateString);
-  };
-
   const selectedDateSessions = selectedDate
-    ? getSessionsForDate(selectedDate)
+    ? getSessionsForDate(selectedDate, sessions)
     : [];
 
   return (

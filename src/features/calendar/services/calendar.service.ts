@@ -1,4 +1,5 @@
 import type { SessionStatus, StudentSession } from "../types/calendar.types";
+import { parseUTCDate } from "../../../utils/utils";
 
 export const DEFAULT_SESSION_DURATION_MINUTES = 60;
 
@@ -8,6 +9,41 @@ export const formatDateKey = (date: Date) => {
   const day = String(date.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 };
+
+/** Parse YYYY-MM-DD as local calendar date (avoids UTC midnight shift). */
+export function parseLocalDateKey(dateKey: string): Date {
+  const [year, month, day] = dateKey.split("-").map(Number);
+  return new Date(year, month - 1, day);
+}
+
+/** Map API datetime to the local calendar day shown in the grid. */
+export function toLocalDateKey(dateStr: string): string {
+  if (!dateStr) return "";
+
+  const dateOnly = dateStr.match(/^(\d{4}-\d{2}-\d{2})$/);
+  if (dateOnly) {
+    return formatDateKey(parseLocalDateKey(dateOnly[1]));
+  }
+
+  const parsed = parseUTCDate(dateStr);
+  if (!isNaN(parsed.getTime())) {
+    return formatDateKey(parsed);
+  }
+
+  const fallback = dateStr.split("T")[0];
+  if (/^\d{4}-\d{2}-\d{2}$/.test(fallback)) {
+    return formatDateKey(parseLocalDateKey(fallback));
+  }
+
+  return "";
+}
+
+export function isSameLocalMonth(dateKey: string, month: Date): boolean {
+  const d = parseLocalDateKey(dateKey);
+  return (
+    d.getMonth() === month.getMonth() && d.getFullYear() === month.getFullYear()
+  );
+}
 
 export const getDaysInMonth = (date: Date) => {
   const year = date.getFullYear();
@@ -22,9 +58,9 @@ export const getDaysInMonth = (date: Date) => {
   };
 };
 
-export const getSessionsForDate = (
+export const getSessionsForDate = <T extends { date: string }>(
   date: Date,
-  sessions: StudentSession[]
+  sessions: T[]
 ) => {
   const dateString = formatDateKey(date);
   return sessions.filter((s) => s.date === dateString);
@@ -93,7 +129,7 @@ export function deriveSessionStatus(
   );
 
   if (preferredDateStr) {
-    const start = new Date(preferredDateStr);
+    const start = parseUTCDate(preferredDateStr);
     if (!isNaN(start.getTime())) {
       const durationMinutes = parseDurationMinutes(
         (req.duration ?? req.Duration) as string | number | undefined
@@ -109,4 +145,40 @@ export function deriveSessionStatus(
   }
 
   return "upcoming";
+}
+
+export function getScheduledAt(req: Record<string, unknown>): string {
+  return String(
+    req.preferredDate ?? req.PreferredDate ?? req.scheduledAt ?? req.ScheduledAt ?? ""
+  );
+}
+
+export function getSessionId(req: Record<string, unknown>): number | null {
+  const id = req.sessionId ?? req.SessionId ?? req.id ?? req.Id;
+  if (id == null) return null;
+  const num = Number(id);
+  return Number.isNaN(num) ? null : num;
+}
+
+export function dedupeSessionRecords(
+  records: Record<string, unknown>[]
+): Record<string, unknown>[] {
+  const byId = new Map<number, Record<string, unknown>>();
+
+  for (const req of records) {
+    const id = getSessionId(req);
+    if (id == null) continue;
+
+    const existing = byId.get(id);
+    byId.set(id, existing ? { ...existing, ...req } : req);
+  }
+
+  return Array.from(byId.values());
+}
+
+export function formatSessionTime(scheduledAt: string): string {
+  if (!scheduledAt) return "--:--";
+  const parsed = parseUTCDate(scheduledAt);
+  if (isNaN(parsed.getTime())) return "--:--";
+  return parsed.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }

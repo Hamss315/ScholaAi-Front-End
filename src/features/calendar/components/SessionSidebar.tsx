@@ -5,6 +5,7 @@ import { Badge } from "../../../components/ui/badge";
 import { useNavigate } from "react-router-dom";
 
 import type { StudentSession } from "../types/calendar.types";
+import { isSameLocalMonth } from "../services/calendar.service";
 
 interface Props {
   selectedDate: Date | null;
@@ -150,13 +151,7 @@ export default function SessionSidebar({
           <div className="flex justify-between">
             <span className="text-gray-600">Total Sessions</span>
             <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100">
-              {allSessions.filter((s) => {
-                const d = new Date(s.date);
-                return (
-                  d.getMonth() === currentMonth.getMonth() &&
-                  d.getFullYear() === currentMonth.getFullYear()
-                );
-              }).length}
+              {allSessions.filter((s) => isSameLocalMonth(s.date, currentMonth)).length}
             </Badge>
           </div>
 
@@ -164,14 +159,9 @@ export default function SessionSidebar({
           <div className="flex justify-between">
             <span className="text-gray-600">Completed</span>
             <Badge className="bg-green-100 text-green-700 hover:bg-green-100">
-              {allSessions.filter((s) => {
-                const d = new Date(s.date);
-                return (
-                  s.status === "completed" &&
-                  d.getMonth() === currentMonth.getMonth() &&
-                  d.getFullYear() === currentMonth.getFullYear()
-                );
-              }).length}
+              {allSessions.filter(
+                (s) => s.status === "completed" && isSameLocalMonth(s.date, currentMonth)
+              ).length}
             </Badge>
           </div>
 
@@ -179,14 +169,9 @@ export default function SessionSidebar({
           <div className="flex justify-between">
             <span className="text-gray-600">Upcoming</span>
             <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100">
-              {allSessions.filter((s) => {
-                const d = new Date(s.date);
-                return (
-                  s.status === "upcoming" &&
-                  d.getMonth() === currentMonth.getMonth() &&
-                  d.getFullYear() === currentMonth.getFullYear()
-                );
-              }).length}
+              {allSessions.filter(
+                (s) => s.status === "upcoming" && isSameLocalMonth(s.date, currentMonth)
+              ).length}
             </Badge>
           </div>
         </div>
