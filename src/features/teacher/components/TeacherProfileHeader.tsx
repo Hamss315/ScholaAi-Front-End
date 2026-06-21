@@ -26,7 +26,6 @@ export default function TeacherProfileHeader() {
             <Button variant="ghost" onClick={() => navigate("/teacher/session-requests")}>
               <Inbox className="w-4 h-4 mr-2 shrink-0"/>
               Requests
-              <Badge className="ml-2 bg-yellow-100 text-yellow-700 hover:bg-yellow-100">2</Badge>
             </Button>
 
             <Button variant="ghost" onClick={() => navigate("/teacher/messages")}>

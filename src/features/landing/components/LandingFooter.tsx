@@ -1,11 +1,6 @@
 import { Brain } from "lucide-react";
-import { Button } from "../../../components/ui/button";
 
-type Props = {
-  onTestResetPassword: () => void;
-};
-
-export default function LandingFooter({ onTestResetPassword }: Props) {
+export default function LandingFooter() {
   return (
     <footer className="bg-gray-900 text-white py-12">
       <div className="container mx-auto px-4">
@@ -48,16 +43,6 @@ export default function LandingFooter({ onTestResetPassword }: Props) {
 
         <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
           <p>&copy; 2025 ScholaAi. All rights reserved.</p>
-          <div className="mt-4">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onTestResetPassword}
-              className="text-gray-400 border-gray-700 hover:text-white hover:border-white"
-            >
-              Test Password Reset Flow
-            </Button>
-          </div>
         </div>
       </div>
     </footer>

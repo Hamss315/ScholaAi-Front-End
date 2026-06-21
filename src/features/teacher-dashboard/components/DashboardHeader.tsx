@@ -25,7 +25,6 @@ export default function DashboardHeader() {
               <Link to="/teacher/session-requests" className="flex items-center">
                 <Inbox className="w-4 h-4 mr-2" />
                 Requests
-                <Badge className="ml-2 bg-yellow-100 text-yellow-700 hover:bg-yellow-100">2</Badge>
               </Link>
             </Button>
             <Button variant="ghost" asChild>
