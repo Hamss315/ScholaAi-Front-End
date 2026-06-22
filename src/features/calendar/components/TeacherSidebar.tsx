@@ -7,6 +7,7 @@ import { Badge } from "../../../components/ui/badge";
 import { Avatar, AvatarFallback } from "../../../components/ui/avatar";
 
 import type { TeacherSession } from "../types/calendar.types";
+import { isSameLocalMonth } from "../services/calendar.service";
 
 interface Props {
   selectedDate: Date | null;
@@ -30,14 +31,7 @@ export default function TeacherSidebar({
 
   const getMonthFiltered = (status?: TeacherSession["status"]) => {
     return allSessions.filter((s) => {
-      const d = new Date(s.date);
-
-      const sameMonth =
-        d.getMonth() === currentMonth.getMonth() &&
-        d.getFullYear() === currentMonth.getFullYear();
-
-      if (!sameMonth) return false;
-
+      if (!isSameLocalMonth(s.date, currentMonth)) return false;
       return status ? s.status === status : true;
     });
   };

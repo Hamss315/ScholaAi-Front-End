@@ -3,6 +3,7 @@ import { Card } from "../../../components/ui/card";
 import { Button } from "../../../components/ui/button";
 
 import type { TeacherSession } from "../types/calendar.types";
+import { getSessionsForDate } from "../services/calendar.service";
 
 interface Props {
   currentMonth: Date;
@@ -21,14 +22,6 @@ export default function TeacherCalendarGrid({
   previousMonth,
   nextMonth,
 }: Props) {
-  const formatDateKey = (date: Date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
-  };
-
-
   const monthNames = [
     "January","February","March","April","May","June",
     "July","August","September","October","November","December"
@@ -47,11 +40,6 @@ export default function TeacherCalendarGrid({
       daysInMonth: lastDay.getDate(),
       startingDayOfWeek: firstDay.getDay(),
     };
-  };
-
-  const getSessionsForDate = (date: Date) => {
-    const dateString = formatDateKey(date);
-    return sessions.filter((s) => s.date === dateString);
   };
 
   const { daysInMonth, startingDayOfWeek } = getDaysInMonth(currentMonth);
@@ -102,7 +90,7 @@ export default function TeacherCalendarGrid({
             day
           );
 
-          const daySessions = getSessionsForDate(date);
+          const daySessions = getSessionsForDate(date, sessions);
 
           const isSelected =
             selectedDate?.toDateString() === date.toDateString();

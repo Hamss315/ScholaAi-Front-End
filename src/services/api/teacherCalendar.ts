@@ -1,7 +1,12 @@
 import api from "../api";
 import {
   deriveSessionStatus,
+  dedupeSessionRecords,
+  formatSessionTime,
+  getScheduledAt,
+  getSessionId,
   isRejectedSession,
+  toLocalDateKey,
 } from "../../features/calendar/services/calendar.service";
 import type { TeacherSession } from "../../features/calendar/types/calendar.types";
 
@@ -11,24 +16,24 @@ export const getTeacherCalendar = async () => {
 };
 
 function mapTeacherRequest(req: Record<string, unknown>): TeacherSession | null {
-  const preferredDate = String(req.preferredDate ?? req.PreferredDate ?? "");
-  if (!preferredDate) return null;
+  const scheduledAt = getScheduledAt(req);
+  if (!scheduledAt) return null;
 
-  const sessionId = req.sessionId ?? req.SessionId;
+  const sessionId = getSessionId(req);
   if (sessionId == null) return null;
+
+  const dateKey = toLocalDateKey(scheduledAt);
+  if (!dateKey) return null;
 
   const focusScore = req.focusScore ?? req.FocusScore;
   const duration = String(req.duration ?? req.Duration ?? "1 hour");
 
   return {
-    id: Number(sessionId),
-    date: preferredDate.split("T")[0],
+    id: sessionId,
+    date: dateKey,
     student: String(req.studentName ?? req.StudentName ?? "Assigned Student"),
     subject: String(req.subject ?? req.Subject ?? "Subject"),
-    time: new Date(preferredDate).toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    }),
+    time: formatSessionTime(scheduledAt),
     duration,
     status: deriveSessionStatus(req),
     focusScore: focusScore != null ? Number(focusScore) : undefined,
@@ -40,7 +45,7 @@ export const getTeacherSessions = async (): Promise<TeacherSession[]> => {
     const data = await getTeacherCalendar();
     const requests = Array.isArray(data) ? data : [];
 
-    return requests
+    return dedupeSessionRecords(requests)
       .filter((req) => !isRejectedSession(req))
       .map(mapTeacherRequest)
       .filter((session): session is TeacherSession => session !== null);
