@@ -13,14 +13,13 @@ export default function CalendarHeader() {
 
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
+              <Button variant="ghost" onClick={() => navigate(-1)}>
+              <ArrowLeft className="w-4 h-4" /></Button>
               <Brain className="w-8 h-8" style={{ color: "#8B5CF6" }} />
               <span className="text-2xl" style={{ color: "#1E3A8A" }}>
                 ScholaAi
               </span>
             </div>
-
-            <Button variant="ghost" onClick={() => navigate(-1)}>
-              <ArrowLeft className="w-4 h-4 mr-2" />Back</Button>
           </div>
 
           <div className="flex items-center gap-4">
