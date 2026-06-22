@@ -178,7 +178,6 @@ export default function TeacherDashboardPage() {
             {activeSessions.length > 0 && (
               <ActiveSessions
                 sessions={activeSessions}
-                onSessionEnded={handleSessionEnded}
               />
             )}
 

@@ -85,13 +85,6 @@ function ChatPageWrapper() {
 
   return (
     <ChatPage
-      onNavigate={(page) => {
-        if (page === "chats-list") {
-          navigate("/chats");
-        } else {
-          navigate("/");
-        }
-      }}
       userRole={user?.role || "student"}
       selectedChat={selectedChat}
       currentUserId={user?.userId || ""}

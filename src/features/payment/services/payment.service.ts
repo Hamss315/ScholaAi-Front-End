@@ -45,9 +45,9 @@ export const paymentService = {
     const sessions = await dashboardApi.getUpcomingSessions();
     return sessions.map(s => ({
       id: s.id,
-      teacher: s.teacher,
-      subject: s.subject,
-      date: s.time, // Map 'time' to 'date'
+      teacher: s.teacherName,
+      subject: s.subjectName,
+      date: s.scheduledAt,
       price: 45 // Default rate since price is not stored in DB model yet
     }));
   },
