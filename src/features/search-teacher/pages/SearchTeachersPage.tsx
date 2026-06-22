@@ -7,6 +7,7 @@ import FiltersPanel from "../components/FiltersPanel";
 import TeachersGrid from "../components/TeachersGrid";
 
 import { searchTeachers } from "../../../services/api/searchTeachers";
+import { useSubjects } from "../../../hooks/useSubjects";
 import type { Teacher } from "../types/teacher.types";
 
 export default function SearchTeachersPage() {
@@ -17,6 +18,8 @@ export default function SearchTeachersPage() {
   const [subject, setSubject] = useState("all");
   const [keyword, setKeyword] = useState("");
   const [showFilters, setShowFilters] = useState(false);
+
+  const { subjectNames } = useSubjects();
 
   // Fetch from backend whenever name, subject, or keyword changes
   useEffect(() => {
@@ -69,6 +72,7 @@ export default function SearchTeachersPage() {
             keyword={keyword}
             setKeyword={setKeyword}
             clearFilters={clearFilters}
+            subjects={subjectNames}
           />
         )}
 
@@ -84,4 +88,4 @@ export default function SearchTeachersPage() {
       </div>
     </div>
   );
-}
+}

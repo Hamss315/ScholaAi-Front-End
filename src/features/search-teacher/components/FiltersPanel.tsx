@@ -9,7 +9,6 @@ import {
   SelectValue,
 } from "../../../components/ui/select";
 import { Button } from "../../../components/ui/button";
-import { TEACHER_SUBJECTS } from "../../onboarding/constants/onboarding.constants";
 import { BookOpen, Tag, User } from "lucide-react";
 
 interface FiltersPanelProps {
@@ -20,6 +19,8 @@ interface FiltersPanelProps {
   keyword: string;
   setKeyword: (keyword: string) => void;
   clearFilters: () => void;
+  /** Subject names fetched from the API. Falls back to empty list while loading. */
+  subjects: string[];
 }
 
 export default function FiltersPanel({
@@ -30,6 +31,7 @@ export default function FiltersPanel({
   keyword,
   setKeyword,
   clearFilters,
+  subjects,
 }: FiltersPanelProps) {
   return (
     <div className="mb-6 animate-in fade-in slide-in-from-top-2 duration-200">
@@ -69,7 +71,7 @@ export default function FiltersPanel({
 
             <SelectContent className="max-h-[250px] overflow-y-auto">
               <SelectItem value="all">All Subjects</SelectItem>
-              {TEACHER_SUBJECTS.map((s: string) => (
+              {subjects.map((s: string) => (
                 <SelectItem key={s} value={s}>
                   {s}
                 </SelectItem>

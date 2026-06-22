@@ -19,7 +19,7 @@ import {
   changeTeacherPassword,
 } from "../services/teacherProfile.service";
 import type { UpdateTeacherProfileDto } from "../services/teacherProfile.service";
-import { getAllRatings } from "../../../utils/ratingService";
+import { getTeacherRatings } from "../../../services/api/rating";
 
 export default function TeacherProfilePage() {
   const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -104,7 +104,7 @@ export default function TeacherProfilePage() {
           firstName: data.firstName ?? "",
           lastName: data.lastName ?? "",
           email: data.email ?? "",
-          phone: data.phone ?? "", 
+          phone: data.phone ?? "",
           bio: data.description ?? "", // backend → frontend mapping
           location: "", // will work if backend adds it later
         });
@@ -149,39 +149,47 @@ export default function TeacherProfilePage() {
   const [reviewsList, setReviewsList] = useState<TeacherReview[]>([]);
 
   useEffect(() => {
-    const allRatings = getAllRatings();
-    const matchedRatings = allRatings.filter(r => 
-      profileData.lastName && r.teacherName.toLowerCase().includes(profileData.lastName.toLowerCase())
-    );
+    const teacherId = localStorage.getItem("userId");
+    if (!teacherId) return;
 
-    const mapped: TeacherReview[] = matchedRatings.map((r) => ({
-      id: r.sessionId,
-      student: r.studentName,
-      rating: r.stars,
-      comment: "",
-      date: r.date
-    }));
+    (async () => {
+      try {
+        const res = await getTeacherRatings(teacherId);
+        const reviews: TeacherReview[] = (res.data ?? []).map((r) => ({
+          id: r.ratingId,
+          // Backend only returns studentId; display a short identifier
+          student: r.studentId
+            ? `Student #${r.studentId.slice(0, 6)}`
+            : "Anonymous",
+          rating: r.ratingValue,
+          comment: r.comment ?? "",
+          date: new Date(r.createdAt).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+          }),
+        }));
 
-    const initialReviews: TeacherReview[] = [
-      { id: 101, student: "Emily Parker", rating: 5, comment: "", date: "Nov 20, 2025" },
-      { id: 102, student: "James Wilson", rating: 5, comment: "", date: "Nov 18, 2025" },
-      { id: 103, student: "Sarah Martinez", rating: 4, comment: "", date: "Nov 15, 2025" },
-    ];
+        setReviewsList(reviews);
 
-    const combined = [...mapped, ...initialReviews];
-    setReviewsList(combined);
+        const total = reviews.length;
+        const avg =
+          total > 0
+            ? Math.round(
+              (reviews.reduce((sum, r) => sum + r.rating, 0) / total) * 10
+            ) / 10
+            : 0;
 
-    const totalReviewsCount = combined.length;
-    const avg = totalReviewsCount > 0 
-      ? Math.round((combined.reduce((sum, r) => sum + r.rating, 0) / totalReviewsCount) * 10) / 10
-      : 0;
-
-    setWorkSummary(prev => ({
-      ...prev,
-      averageRating: avg,
-      totalReviews: totalReviewsCount
-    }));
-  }, [profileData.lastName, profileData.firstName]);
+        setWorkSummary((prev) => ({
+          ...prev,
+          averageRating: avg,
+          totalReviews: total,
+        }));
+      } catch (err) {
+        console.error("Failed to load teacher reviews:", err);
+      }
+    })();
+  }, []);
 
   // ✅ SAVE PROFILE (aligned with backend DTO)
   const handleSaveProfile = async () => {
