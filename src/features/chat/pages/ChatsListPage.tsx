@@ -19,13 +19,16 @@ import { Badge } from "../../../components/ui/badge";
 import ConversationCard from "../components/ConversationCard";
 import { chatApi } from "../services/chatApi";
 import type { ChatConversation, UserRole } from "../types/chat";
+import { getRoleFromToken } from "../../../utils/jwt";
 
 interface ChatsListPageProps {
-  userRole: UserRole | null;
+  userRole?: UserRole | null;
 }
 
-export default function ChatsListPage({ userRole }: ChatsListPageProps) {
+export default function ChatsListPage({ userRole: propRole }: ChatsListPageProps) {
   const navigate = useNavigate();
+  const token = localStorage.getItem("token") || localStorage.getItem("scholaai_token") || "";
+  const userRole = propRole || getRoleFromToken(token) || "student";
 
   const [searchQuery, setSearchQuery] = useState("");
   const [chats, setChats] = useState<ChatConversation[]>([]);
@@ -200,7 +203,7 @@ export default function ChatsListPage({ userRole }: ChatsListPageProps) {
                 conversation={chat}
                 userRole={userRole}
                 onClick={() =>
-                  navigate(`/chat/${chat.id}`, {
+                  navigate(`/chat/${chat.otherUserId}`, {
                     state: { chat },
                   })
                 }

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { Card } from "../../../components/ui/card";
 import TeacherRequestsHeader from "../components/TeacherRequestsHeader";
@@ -8,6 +9,7 @@ import type { SessionRequest } from "../types/session.types";
 import { getTeacherRequests, acceptSessionRequest, rejectSessionRequest } from "../services/session.service";
 
 export default function TeacherSessionRequestsPage() {
+  const navigate = useNavigate();
   const [requests, setRequests] = useState<SessionRequest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
@@ -21,6 +23,7 @@ export default function TeacherSessionRequestsPage() {
         const dDate = new Date(d.preferredDate);
         return {
           id: d.sessionId,
+          studentId: d.studentId,
           studentName: d.studentName || `Student`,
           studentInitials: (d.studentName || "ST").substring(0, 2).toUpperCase(),
           subject: d.subject || `Subject`,
@@ -66,8 +69,27 @@ export default function TeacherSessionRequestsPage() {
   };
 
   const handleMessageStudent = (id: number) => {
-    // Prototype navigation placeholder
-    alert(`Open chat for request #${id} (prototype)`);
+    const req = requests.find((r) => r.id === id);
+    if (req?.studentId) {
+      navigate(`/chat/${req.studentId}`, {
+        state: {
+          chat: {
+            id: "0",
+            otherUserId: req.studentId,
+            otherUserName: req.studentName,
+            otherUserRole: "student",
+            avatar: req.studentInitials,
+            subject: req.subject,
+            lastMessage: "",
+            lastMessageTime: "",
+            unreadCount: 0,
+            online: false,
+          }
+        }
+      });
+    } else {
+      alert("Could not find student profile to message.");
+    }
   };
 
   return (

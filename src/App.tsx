@@ -34,6 +34,7 @@ import PaymentPage from "./features/payment/pages/PaymentPage";
 
 /* Chat */
 import ChatsListPage from "./features/chat/pages/ChatsListPage";
+import ChatPage from "./features/chat/pages/ChatPage";
 
 /* Search */
 import SearchTeachersPage from "./features/search-teacher/pages/SearchTeachersPage";
@@ -102,7 +103,8 @@ export default function App() {
         <Route path="/payment" element={<PaymentPage />} />
 
         {/* CHAT */}
-        <Route path="/chats" element={<ChatsListPage userRole="student" />} />
+        <Route path="/chats" element={<ChatsListPage />} />
+        <Route path="/chat/:chatId" element={<ChatPage />} />
 
         {/* SEARCH */}
         <Route path="/search-teachers" element={<SearchTeachersPage />} />

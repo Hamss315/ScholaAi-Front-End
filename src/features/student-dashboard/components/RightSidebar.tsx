@@ -1,11 +1,32 @@
+import { useEffect, useState } from "react";
 import { Card } from "../../../components/ui/card";
 import { Button } from "../../../components/ui/button";
 import { Progress } from "../../../components/ui/progress";
-import { Calendar, FileText, TrendingUp, Video } from "lucide-react";
+import { Calendar, FileText, TrendingUp } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { paymentService } from "../../payment/services/payment.service";
 
 export default function RightSidebar() {
   const navigate = useNavigate();
+  const [balance, setBalance] = useState<number | null>(null);
+  const [lastCredit, setLastCredit] = useState<number | null>(null);
+  const [lastDebit, setLastDebit] = useState<number | null>(null);
+
+  useEffect(() => {
+    paymentService.getWalletBalance()
+      .then((data) => setBalance(data.balance))
+      .catch((err) => console.error("Failed to load balance:", err));
+
+    paymentService.getTransactions()
+      .then((txs) => {
+        const credit = txs.find((t) => t.type === "credit");
+        if (credit) setLastCredit(credit.amount);
+
+        const debit = txs.find((t) => t.type === "debit");
+        if (debit) setLastDebit(debit.amount);
+      })
+      .catch((err) => console.error("Failed to load transactions:", err));
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -23,7 +44,7 @@ export default function RightSidebar() {
               Available Balance
             </div>
             <div className="text-3xl mb-2">
-              $125.50
+              ${balance !== null ? balance.toFixed(2) : "..."}
             </div>
           </div>
 
@@ -31,12 +52,16 @@ export default function RightSidebar() {
 
             <div className="flex justify-between">
               <span className="text-gray-600">Last Recharge</span>
-              <span className="text-green-600">+$100.00</span>
+              <span className="text-green-600">
+                {lastCredit !== null ? `+$${lastCredit.toFixed(2)}` : "N/A"}
+              </span>
             </div>
 
             <div className="flex justify-between">
               <span className="text-gray-600">Last Session</span>
-              <span className="text-red-600">-$45.00</span>
+              <span className="text-red-600">
+                {lastDebit !== null ? `-$${lastDebit.toFixed(2)}` : "N/A"}
+              </span>
             </div>
 
           </div>

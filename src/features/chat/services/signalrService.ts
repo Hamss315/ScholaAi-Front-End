@@ -8,7 +8,7 @@ class SignalRService {
     if (this.connection) return;
 
     this.connection = new signalR.HubConnectionBuilder()
-      .withUrl("https://your-domain.com/chatHub", {
+      .withUrl("http://localhost:5254/chatHub", {
         accessTokenFactory: () => token,
       })
       .withAutomaticReconnect()

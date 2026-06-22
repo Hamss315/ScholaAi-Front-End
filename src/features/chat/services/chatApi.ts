@@ -1,51 +1,33 @@
+import api from "../../../services/api";
 import type { ChatConversation, ChatMessage } from "../types/chat";
-
-const BASE_URL = "http://localhost:5254/api";
-
-function getAuthHeaders() {
-  const token = localStorage.getItem("token");
-
-  return {
-    "Content-Type": "application/json",
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-  };
-}
+import { getRoleFromToken } from "../../../utils/jwt";
 
 export const chatApi = {
   async getConversations(): Promise<ChatConversation[]> {
-    const response = await fetch(`${BASE_URL}/chat/conversations`, {
-      method: "GET",
-      headers: getAuthHeaders(),
-    });
+    const response = await api.get<any[]>("/chat/conversations");
+    const token = localStorage.getItem("token") || localStorage.getItem("scholaai_token") || "";
+    const userRole = getRoleFromToken(token) || "student";
+    const otherRole = userRole === "teacher" ? "student" : "teacher";
 
-    if (!response.ok) {
-      throw new Error("Failed to fetch conversations");
-    }
-
-    return response.json();
+    return response.data.map((c: any) => ({
+      id: c.otherUserId,
+      otherUserId: c.otherUserId,
+      otherUserName: c.otherUserName,
+      otherUserRole: (c.otherUserRole && c.otherUserRole !== "") ? c.otherUserRole : otherRole,
+      lastMessage: c.lastMessageText || "",
+      lastMessageTime: c.lastMessageTime ? new Date(c.lastMessageTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "",
+      unreadCount: c.unreadCount,
+      online: false,
+      avatar: c.otherUserName ? c.otherUserName.substring(0, 2).toUpperCase() : "U",
+    }));
   },
 
   async getMessages(otherUserId: string): Promise<ChatMessage[]> {
-    const response = await fetch(`${BASE_URL}/chat/messages/${otherUserId}`, {
-      method: "GET",
-      headers: getAuthHeaders(),
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch messages");
-    }
-
-    return response.json();
+    const response = await api.get<ChatMessage[]>(`/chat/history/${otherUserId}`);
+    return response.data;
   },
 
-  async markAsRead(messageId: number): Promise<void> {
-    const response = await fetch(`${BASE_URL}/chat/messages/${messageId}/read`, {
-      method: "PUT",
-      headers: getAuthHeaders(),
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to mark message as read");
-    }
+  async markAsRead(senderId: string): Promise<void> {
+    await api.post(`/chat/read/${senderId}`);
   },
 };

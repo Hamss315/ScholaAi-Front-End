@@ -8,6 +8,7 @@ export interface CreateSessionRequestDto {
 
 export interface TeacherRequestDto {
   sessionId: number;
+  studentId?: string;
   studentName: string;
   subject: string;
   preferredDate: string;

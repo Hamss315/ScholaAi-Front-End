@@ -24,6 +24,7 @@ export type SessionRequestStatus = "pending" | "accepted" | "declined";
 
 export interface SessionRequest {
   id: number;
+  studentId?: string;
   studentName: string;
   studentInitials: string;
   subject: string;
