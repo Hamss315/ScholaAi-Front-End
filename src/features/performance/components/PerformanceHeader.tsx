@@ -15,10 +15,8 @@ export default function PerformanceHeader() {
               <Brain className="w-8 h-8" style={{ color: '#8B5CF6' }} />
               <span className="text-2xl" style={{ color: '#1E3A8A' }}>ScholaAi</span>
             </div>
-            <Button variant="ghost" onClick={() => navigate("/student/dashboard")}>
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Dashboard
-            </Button>
+            <Button variant="ghost" onClick={() => navigate(-1)}>
+              <ArrowLeft className="w-4 h-4 mr-2" />Back</Button>
           </div>
           <div className="flex items-center gap-3">
             <Avatar className="cursor-pointer" onClick={() => navigate("/student/profile")}>

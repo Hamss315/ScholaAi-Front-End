@@ -2,6 +2,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import { Card } from "../../../components/ui/card";
 import type { StudentSession } from "../types/calendar.types";
+import { getSessionsForDate } from "../services/calendar.service";
 
 interface Props {
   currentMonth: Date;
@@ -33,18 +34,6 @@ export default function CalendarGrid({
       daysInMonth: lastDay.getDate(),
       startingDayOfWeek: firstDay.getDay(),
     };
-  };
-
-  const formatDateKey = (date: Date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
-  };
-
-  const getSessionsForDate = (date: Date) => {
-    const dateString = formatDateKey(date);
-    return sessions.filter((s) => s.date === dateString);
   };
 
   const { daysInMonth, startingDayOfWeek } = getDaysInMonth(currentMonth);
@@ -83,7 +72,7 @@ export default function CalendarGrid({
 
         {days.map((day) => {
           const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
-          const daySessions = getSessionsForDate(date);
+          const daySessions = getSessionsForDate(date, sessions);
 
           const isToday = new Date().toDateString() === date.toDateString();
           const isSelected = selectedDate?.toDateString() === date.toDateString();

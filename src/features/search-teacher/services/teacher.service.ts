@@ -4,17 +4,17 @@ export const getTeachers = async (): Promise<Teacher[]> => {
   return [
     {
       userName: "Dr. Sarah Johnson",
-      profilePhotoURL: "",
       subject: "Mathematics",
-      college: "Calculus College",
+      college: "MIT",
       teachingExperience: "10+ years",
+      profilePhotoURL: ""
     },
     {
       userName: "Prof. Michael Chen",
-      profilePhotoURL: "",
       subject: "Physics",
-      college: "Physics University",
+      college: "Stanford",
       teachingExperience: "12+ years",
+      profilePhotoURL: ""
     }
   ];
 };

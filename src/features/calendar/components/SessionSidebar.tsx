@@ -1,10 +1,11 @@
-import { Clock, Video, CheckCircle, Calendar as CalendarIcon } from "lucide-react";
+import { Clock, CheckCircle, Calendar as CalendarIcon } from "lucide-react";
 import { Card } from "../../../components/ui/card";
 import { Button } from "../../../components/ui/button";
 import { Badge } from "../../../components/ui/badge";
 import { useNavigate } from "react-router-dom";
 
 import type { StudentSession } from "../types/calendar.types";
+import { isSameLocalMonth } from "../services/calendar.service";
 
 interface Props {
   selectedDate: Date | null;
@@ -94,22 +95,12 @@ export default function SessionSidebar({
                 </div>
 
                 {/* ACTIONS */}
-                {session.status === "upcoming" && (
-                  <Button
-                    className="w-full mt-3 bg-[#1E3A8A] hover:bg-[#1e3a8a]/90"
-                    size="sm"
-                    onClick={() => navigate(`/session/${session.id}/stream`)}
-                  >
-                    <Video className="w-4 h-4 mr-2" />
-                    Join Session
-                  </Button>
-                )}
-
                 {session.status === "completed" && (
                   <Button
                     variant="outline"
                     className="w-full mt-3"
                     size="sm"
+                    onClick={() => navigate(`/session/${session.id}/notes`)}
                   >
                     View Notes
                   </Button>
@@ -150,13 +141,7 @@ export default function SessionSidebar({
           <div className="flex justify-between">
             <span className="text-gray-600">Total Sessions</span>
             <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100">
-              {allSessions.filter((s) => {
-                const d = new Date(s.date);
-                return (
-                  d.getMonth() === currentMonth.getMonth() &&
-                  d.getFullYear() === currentMonth.getFullYear()
-                );
-              }).length}
+              {allSessions.filter((s) => isSameLocalMonth(s.date, currentMonth)).length}
             </Badge>
           </div>
 
@@ -164,14 +149,9 @@ export default function SessionSidebar({
           <div className="flex justify-between">
             <span className="text-gray-600">Completed</span>
             <Badge className="bg-green-100 text-green-700 hover:bg-green-100">
-              {allSessions.filter((s) => {
-                const d = new Date(s.date);
-                return (
-                  s.status === "completed" &&
-                  d.getMonth() === currentMonth.getMonth() &&
-                  d.getFullYear() === currentMonth.getFullYear()
-                );
-              }).length}
+              {allSessions.filter(
+                (s) => s.status === "completed" && isSameLocalMonth(s.date, currentMonth)
+              ).length}
             </Badge>
           </div>
 
@@ -179,14 +159,9 @@ export default function SessionSidebar({
           <div className="flex justify-between">
             <span className="text-gray-600">Upcoming</span>
             <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100">
-              {allSessions.filter((s) => {
-                const d = new Date(s.date);
-                return (
-                  s.status === "upcoming" &&
-                  d.getMonth() === currentMonth.getMonth() &&
-                  d.getFullYear() === currentMonth.getFullYear()
-                );
-              }).length}
+              {allSessions.filter(
+                (s) => s.status === "upcoming" && isSameLocalMonth(s.date, currentMonth)
+              ).length}
             </Badge>
           </div>
         </div>

@@ -74,7 +74,7 @@ export default function TeacherSessionRequestsPage() {
       navigate(`/chat/${req.studentId}`, {
         state: {
           chat: {
-            id: "0",
+            id: req.studentId,
             otherUserId: req.studentId,
             otherUserName: req.studentName,
             otherUserRole: "student",

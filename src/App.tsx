@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useParams, useLocation, useNavigate } from "react-router-dom";
 
 /* Landing */
 import LandingPage from "./features/landing/pages/LandingPage";
@@ -35,6 +35,8 @@ import PaymentPage from "./features/payment/pages/PaymentPage";
 /* Chat */
 import ChatsListPage from "./features/chat/pages/ChatsListPage";
 import ChatPage from "./features/chat/pages/ChatPage";
+import { useAuth } from "./context/auth-context";
+import type { ChatConversation } from "./features/chat/types/chat";
 
 /* Search */
 import SearchTeachersPage from "./features/search-teacher/pages/SearchTeachersPage";
@@ -56,6 +58,47 @@ import TeacherDashboardPage from "./features/teacher-dashboard/pages/TeacherDash
 
 /* Session */ 
 import SessionStreamPage from "./features/sessions/pages/StreamPage";
+import SessionRecordPage from "./features/sessions/pages/SessionRecordPage";
+import SessionNotesPage from "./features/sessions/pages/SessionNotesPage";
+import AllSessionsPage from "./features/sessions/pages/AllSessionsPage";
+import SessionRatingPage from "./features/sessions/pages/SessionRatingPage";
+
+/* Performance */
+import PerformanceReportPage from "./features/performance/pages/PerformanceReportPage";
+
+function ChatPageWrapper() {
+  const { otherUserId } = useParams<{ otherUserId: string }>();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const stateChat = location.state?.chat as ChatConversation | undefined;
+
+  const selectedChat: ChatConversation = stateChat || {
+    id: otherUserId || "",
+    otherUserId: otherUserId || "",
+    otherUserName: "Chat",
+    otherUserRole: "student",
+    unreadCount: 0,
+    online: false,
+  };
+
+  return (
+    <ChatPage
+      onNavigate={(page) => {
+        if (page === "chats-list") {
+          navigate("/chats");
+        } else {
+          navigate("/");
+        }
+      }}
+      userRole={user?.role || "student"}
+      selectedChat={selectedChat}
+      currentUserId={user?.userId || ""}
+      currentUserName={user?.userName || ""}
+    />
+  );
+}
 
 export default function App() {
   return (
@@ -87,11 +130,17 @@ export default function App() {
         <Route path="/student/dashboard" element={<StudentDashboardPage />} />
         <Route path="/teacher/dashboard" element={<TeacherDashboardPage />} />
 
+        {/* PERFORMANCE */}
+        <Route path="/student/performance" element={<PerformanceReportPage />} />
+
         {/* SCHEDULE */}
         <Route path="/teacher/schedule" element={<TeacherSchedulePage />} />
 
-        {/* CALENDAR */}
+        {/* Student Views */}
         <Route path="/student/calendar" element={<StudentCalendarPage />} />
+        <Route path="/student/sessions" element={<AllSessionsPage />} />
+
+        {/* CALENDAR */}
         <Route path="/teacher/calendar" element={<TeacherCalendarPage />} />
         <Route path="/teacher/payout" element={<TeacherPayoutPage />} />
 
@@ -104,7 +153,7 @@ export default function App() {
 
         {/* CHAT */}
         <Route path="/chats" element={<ChatsListPage />} />
-        <Route path="/chat/:chatId" element={<ChatPage />} />
+        <Route path="/chat/:otherUserId" element={<ChatPageWrapper />} />
 
         {/* SEARCH */}
         <Route path="/search-teachers" element={<SearchTeachersPage />} />
@@ -119,6 +168,10 @@ export default function App() {
 
         {/* SESSION STREAM */}
         <Route path="/session/:sessionId/stream" element={<SessionStreamPage />} />
+        <Route path="/session/:sessionId/record" element={<SessionRecordPage />} />
+        <Route path="/session/:sessionId/notes" element={<SessionNotesPage />} />
+
+        <Route path="/session/:sessionId/rating" element={<SessionRatingPage />} />
 
         {/* FALLBACK */}
         <Route path="*" element={<Navigate to="/" replace />} />

@@ -10,6 +10,7 @@ import TeacherSidebar from "../components/TeacherSidebar";
 
 import type { TeacherSession } from "../types/calendar.types";
 import { getTeacherSessions } from "../../../services/api/teacherCalendar";
+import { getSessionsForDate } from "../services/calendar.service";
 
 export default function TeacherCalendarPage() {
   const navigate = useNavigate();
@@ -30,20 +31,8 @@ export default function TeacherCalendarPage() {
     setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1));
   };
 
-  const formatDateKey = (date: Date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
-  };
-
-  const getSessionsForDate = (date: Date) => {
-    const dateString = formatDateKey(date);
-    return sessions.filter((s) => s.date === dateString);
-  };
-
   const selectedDateSessions = selectedDate
-    ? getSessionsForDate(selectedDate)
+    ? getSessionsForDate(selectedDate, sessions)
     : [];
 
   return (
@@ -55,14 +44,11 @@ export default function TeacherCalendarPage() {
 
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
+              <Button variant="ghost" onClick={() => navigate(-1)}>
+              <ArrowLeft className="w-4 h-4" /></Button>
               <Brain className="w-8 h-8 text-purple-500" />
               <span className="text-2xl text-blue-900">ScholaAi</span>
             </div>
-
-            <Button variant="ghost" onClick={() => navigate("/teacher/dashboard")}>
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Dashboard
-            </Button>
           </div>
 
           <div className="flex items-center gap-4">

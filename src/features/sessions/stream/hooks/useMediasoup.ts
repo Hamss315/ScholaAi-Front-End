@@ -18,6 +18,7 @@ export function useMediasoup() {
     const recvTransportRef = useRef<mediasoupClient.types.Transport | null>(null);
     const screenProducerRef = useRef<mediasoupClient.types.Producer | null>(null);
     const socketRef = useRef<Socket | null>(null);
+    const consumedProducerIds = useRef<Set<string>>(new Set());
 
     const [localStream, setLocalStream] = useState<MediaStream | null>(null);
     const [remoteStreams, setRemoteStreams] = useState<RemoteStream[]>([]);
@@ -50,6 +51,11 @@ export function useMediasoup() {
                 (res: any) => res.error ? errback(new Error(res.error)) : callback({ id: res.id }));
         });
 
+        // ── DEBUG: log ICE/DTLS state transitions ──────────────────────────────
+        transport.on('connectionstatechange', (state) => {
+            console.log('[SEND transport] connectionstatechange:', state);
+        });
+
         sendTransportRef.current = transport;
     }
 
@@ -64,6 +70,17 @@ export function useMediasoup() {
         transport.on('connect', ({ dtlsParameters }, callback, errback) => {
             socket.emit('connectTransport', { transportId: transport.id, dtlsParameters },
                 (res: any) => res.error ? errback(new Error(res.error)) : callback());
+        });
+
+        // ── DEBUG: log ICE/DTLS state transitions ──────────────────────────────
+        transport.on('connectionstatechange', (state) => {
+            console.log('[RECV transport] connectionstatechange:', state);
+        });
+        transport.on('connectionstatechange', (state) => {
+            console.log('[SEND transport] connectionstatechange:', state);
+        });
+        transport.on('connectionstatechange', (state) => {
+            console.log('[RECV transport] connectionstatechange:', state);
         });
 
         recvTransportRef.current = transport;
@@ -103,8 +120,8 @@ export function useMediasoup() {
         if (audioTrack) await transport.produce({ track: audioTrack, appData: { source: 'mic' } });
     }
 
-    async function produceScreen(onStopped?: () => void): Promise<void> {
-        const stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+    async function produceScreen(onStopped?: () => void, existingStream?: MediaStream): Promise<MediaStream> {
+        const stream = existingStream || await navigator.mediaDevices.getDisplayMedia({ video: true });
         const transport = sendTransportRef.current!;
         const videoTrack = stream.getVideoTracks()[0];
         const producer = await transport.produce({ track: videoTrack, appData: { source: 'screen' } });
@@ -114,6 +131,7 @@ export function useMediasoup() {
             stopScreen();
             onStopped?.();
         };
+        return stream;
     }
 
     function stopScreen(): void {
@@ -131,6 +149,13 @@ export function useMediasoup() {
         producerId: string,
         appData?: any
     ): Promise<void> {
+        // Dedup: skip if we already consumed this producer
+        if (consumedProducerIds.current.has(producerId)) {
+            console.log('⏭️ Already consumed, skipping:', producerId);
+            return;
+        }
+        consumedProducerIds.current.add(producerId);
+
         console.log('🎯 consumeProducer START', producerId, appData);
         const device = deviceRef.current!;
         const transport = recvTransportRef.current!;
@@ -191,6 +216,7 @@ export function useMediasoup() {
         stopScreen();
         sendTransportRef.current?.close();
         recvTransportRef.current?.close();
+        consumedProducerIds.current.clear();
         setLocalStream(null);
         setRemoteStreams([]);
     }

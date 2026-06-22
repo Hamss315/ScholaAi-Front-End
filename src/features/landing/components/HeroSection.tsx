@@ -29,16 +29,7 @@ export default function HeroSection({ onJoinClick }: Props) {
 
           <div className="flex flex-col sm:flex-row gap-4">
             <Button size="lg" className="bg-[#1E3A8A] hover:bg-[#1e3a8a]/90" onClick={onJoinClick}>
-              Join as Student
-            </Button>
-
-            <Button
-              size="lg"
-              variant="outline"
-              className="border-[#1E3A8A] text-[#1E3A8A] hover:bg-[#1E3A8A]/10"
-              onClick={onJoinClick}
-            >
-              Join as Teacher
+              Join
             </Button>
           </div>
         </div>

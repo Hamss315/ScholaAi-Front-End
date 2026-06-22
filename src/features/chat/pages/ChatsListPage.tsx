@@ -19,16 +19,16 @@ import { Badge } from "../../../components/ui/badge";
 import ConversationCard from "../components/ConversationCard";
 import { chatApi } from "../services/chatApi";
 import type { ChatConversation, UserRole } from "../types/chat";
-import { getRoleFromToken } from "../../../utils/jwt";
+import { useAuth } from "../../../context/auth-context";
 
 interface ChatsListPageProps {
   userRole?: UserRole | null;
 }
 
-export default function ChatsListPage({ userRole: propRole }: ChatsListPageProps) {
+export default function ChatsListPage({ userRole: propUserRole }: ChatsListPageProps) {
   const navigate = useNavigate();
-  const token = localStorage.getItem("token") || localStorage.getItem("scholaai_token") || "";
-  const userRole = propRole || getRoleFromToken(token) || "student";
+  const { user } = useAuth();
+  const userRole = user?.role || propUserRole || "student";
 
   const [searchQuery, setSearchQuery] = useState("");
   const [chats, setChats] = useState<ChatConversation[]>([]);
@@ -219,7 +219,11 @@ export default function ChatsListPage({ userRole: propRole }: ChatsListPageProps
           {/* CALENDAR */}
           <Card
             className="p-6 hover:shadow-lg transition-shadow cursor-pointer"
-            onClick={() => navigate("/calendar")}
+            onClick={()=>navigate(
+                userRole === "teacher"
+                  ? "/teacher/calendar"
+                  : "/student/calendar"
+              )}
           >
             <div className="flex items-center gap-4">
 
@@ -228,7 +232,7 @@ export default function ChatsListPage({ userRole: propRole }: ChatsListPageProps
               </div>
 
               <div>
-                <h3 className="font-medium text-[#1E3A8A]">
+                <h3 className="font-medium text-[#1E3A8A]" >
                   View Calendar
                 </h3>
                 <p className="text-sm text-gray-600">
@@ -245,8 +249,8 @@ export default function ChatsListPage({ userRole: propRole }: ChatsListPageProps
             onClick={() =>
               navigate(
                 userRole === "teacher"
-                  ? "/session-requests"
-                  : "/request-session"
+                  ? "/teacher/session-requests"
+                  : "/student/request-session"
               )
             }
           >
