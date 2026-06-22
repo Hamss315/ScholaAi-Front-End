@@ -1,4 +1,4 @@
-import { Clock, Video, CheckCircle, Calendar as CalendarIcon } from "lucide-react";
+import { Clock, CheckCircle, Calendar as CalendarIcon } from "lucide-react";
 import { Card } from "../../../components/ui/card";
 import { Button } from "../../../components/ui/button";
 import { Badge } from "../../../components/ui/badge";
@@ -95,22 +95,12 @@ export default function SessionSidebar({
                 </div>
 
                 {/* ACTIONS */}
-                {session.status === "upcoming" && (
-                  <Button
-                    className="w-full mt-3 bg-[#1E3A8A] hover:bg-[#1e3a8a]/90"
-                    size="sm"
-                    onClick={() => navigate(`/session/${session.id}/stream`)}
-                  >
-                    <Video className="w-4 h-4 mr-2" />
-                    Join Session
-                  </Button>
-                )}
-
                 {session.status === "completed" && (
                   <Button
                     variant="outline"
                     className="w-full mt-3"
                     size="sm"
+                    onClick={() => navigate(`/session/${session.id}/notes`)}
                   >
                     View Notes
                   </Button>

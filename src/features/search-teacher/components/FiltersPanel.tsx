@@ -1,5 +1,6 @@
 import { Card } from "../../../components/ui/card";
 import { Label } from "../../../components/ui/label";
+import { Input } from "../../../components/ui/input";
 import {
   Select,
   SelectContent,
@@ -7,41 +8,68 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../../../components/ui/select";
-import { Checkbox } from "../../../components/ui/checkbox";
 import { Button } from "../../../components/ui/button";
+import { TEACHER_SUBJECTS } from "../../onboarding/constants/onboarding.constants";
+import { BookOpen, Tag, User } from "lucide-react";
+
+interface FiltersPanelProps {
+  name: string;
+  setName: (name: string) => void;
+  selectedSubject: string;
+  setSelectedSubject: (subject: string) => void;
+  keyword: string;
+  setKeyword: (keyword: string) => void;
+  clearFilters: () => void;
+}
 
 export default function FiltersPanel({
+  name,
+  setName,
   selectedSubject,
   setSelectedSubject,
-  priceRange,
-  setPriceRange,
-  minRating,
-  setMinRating,
-  availabilityFilters,
-  setAvailabilityFilters,
-  allSubjects,
+  keyword,
+  setKeyword,
   clearFilters,
-}: any) {
+}: FiltersPanelProps) {
   return (
-    <div className="mb-6">
+    <div className="mb-6 animate-in fade-in slide-in-from-top-2 duration-200">
+      {/* GRID ROW */}
+      <div className="grid md:grid-cols-3 gap-6">
 
-      {/* GRID ROW (EXACT FIGMA STRUCTURE) */}
-      <div className="grid md:grid-cols-4 gap-4">
+        {/* TEACHER NAME */}
+        <Card className="p-5 border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center gap-2 mb-3">
+            <User className="w-5 h-5 text-blue-500" />
+            <Label className="text-sm font-semibold text-gray-700">
+              Teacher Name
+            </Label>
+          </div>
+
+          <Input
+            placeholder="Enter teacher's name..."
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="w-full bg-white border-gray-200 hover:border-gray-300 focus:border-blue-500 transition-colors"
+          />
+        </Card>
 
         {/* SUBJECT */}
-        <Card className="p-4">
-          <Label className="text-sm font-medium mb-2 block">
-            Subject
-          </Label>
+        <Card className="p-5 border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center gap-2 mb-3">
+            <BookOpen className="w-5 h-5 text-green-500" />
+            <Label className="text-sm font-semibold text-gray-700">
+              Subject
+            </Label>
+          </div>
 
           <Select value={selectedSubject} onValueChange={setSelectedSubject}>
-            <SelectTrigger className="w-full">
+            <SelectTrigger className="w-full bg-white border-gray-200 hover:border-gray-300 transition-colors">
               <SelectValue placeholder="All Subjects" />
             </SelectTrigger>
 
-            <SelectContent>
+            <SelectContent className="max-h-[250px] overflow-y-auto">
               <SelectItem value="all">All Subjects</SelectItem>
-              {allSubjects.map((s: string) => (
+              {TEACHER_SUBJECTS.map((s: string) => (
                 <SelectItem key={s} value={s}>
                   {s}
                 </SelectItem>
@@ -50,89 +78,30 @@ export default function FiltersPanel({
           </Select>
         </Card>
 
-        {/* PRICE */}
-        <Card className="p-4">
-          <Label className="text-sm font-medium mb-2 block">
-            Price Range
-          </Label>
-
-          <Select value={priceRange} onValueChange={setPriceRange}>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Any Price" />
-            </SelectTrigger>
-
-            <SelectContent>
-              <SelectItem value="all">Any Price</SelectItem>
-              <SelectItem value="low">$0 - $40/hr</SelectItem>
-              <SelectItem value="medium">$41 - $50/hr</SelectItem>
-              <SelectItem value="high">$51+/hr</SelectItem>
-            </SelectContent>
-          </Select>
-        </Card>
-
-        {/* RATING */}
-        <Card className="p-4">
-          <Label className="text-sm font-medium mb-2 block">
-            Minimum Rating
-          </Label>
-
-          <Select value={minRating} onValueChange={setMinRating}>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Any Rating" />
-            </SelectTrigger>
-
-            <SelectContent>
-              <SelectItem value="all">Any Rating</SelectItem>
-              <SelectItem value="4.5">4.5+ ⭐</SelectItem>
-              <SelectItem value="4.7">4.7+ ⭐</SelectItem>
-              <SelectItem value="4.9">4.9+ ⭐</SelectItem>
-            </SelectContent>
-          </Select>
-        </Card>
-
-        {/* AVAILABILITY */}
-        <Card className="p-4">
-          <Label className="text-sm font-medium mb-3 block">
-            Availability
-          </Label>
-
-          <div className="space-y-2">
-
-            {[
-              { key: "morning", label: "Morning (6–12)" },
-              { key: "afternoon", label: "Afternoon (12–5)" },
-              { key: "evening", label: "Evening (5–11)" },
-              { key: "night", label: "Night (11–6)" },
-            ].map((item) => (
-              <div
-                key={item.key}
-                className="flex items-center gap-2"
-              >
-                <Checkbox
-                  checked={availabilityFilters[item.key]}
-                  onCheckedChange={(c) =>
-                    setAvailabilityFilters({
-                      ...availabilityFilters,
-                      [item.key]: !!c,
-                    })
-                  }
-                />
-
-                <Label className="text-sm text-gray-700 cursor-pointer">
-                  {item.label}
-                </Label>
-              </div>
-            ))}
-
+        {/* KEYWORD */}
+        <Card className="p-5 border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center gap-2 mb-3">
+            <Tag className="w-5 h-5 text-purple-500" />
+            <Label className="text-sm font-semibold text-gray-700">
+              Keyword
+            </Label>
           </div>
+
+          <Input
+            placeholder="Search by bio, college, or experience..."
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
+            className="w-full bg-white border-gray-200 hover:border-gray-300 focus:border-blue-500 transition-colors"
+          />
         </Card>
+
       </div>
 
-      {/* CLEAR BUTTON (FULL WIDTH ROW) */}
+      {/* CLEAR BUTTON */}
       <div className="mt-4">
         <Button
           variant="outline"
-          className="w-full"
+          className="w-full border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
           onClick={clearFilters}
         >
           Clear Filters

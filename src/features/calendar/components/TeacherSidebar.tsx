@@ -123,25 +123,14 @@ export default function TeacherSidebar({
                 )}
 
                 {/* ACTIONS */}
-                {session.status === "upcoming" && (
-                  <Button
-                    className="w-full mt-3 bg-blue-500"
-                    size="sm"
-                    onClick={() => navigate(`/session/${session.id}/stream`)}
-                  >
-                    <Video className="w-4 h-4 mr-2" />
-                    Join Session
-                  </Button>
-                )}
-
                 {session.status === "completed" && (
                   <Button
                     variant="outline"
                     className="w-full mt-3"
                     size="sm"
-                    onClick={() => navigate("/teacher/session-analysis")}
+                    onClick={() => navigate(`/session/${session.id}/notes`)}
                   >
-                    View Analysis
+                    View Notes
                   </Button>
                 )}
               </div>
