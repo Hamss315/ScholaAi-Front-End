@@ -1,6 +1,6 @@
 import type { ChatConversation, ChatMessage } from "../types/chat";
 
-const BASE_URL = "http://localhost:5254/api";
+const BASE_URL = `http://${window.location.hostname}:5254/api`;
 
 function getAuthHeaders() {
   const token = localStorage.getItem("token");

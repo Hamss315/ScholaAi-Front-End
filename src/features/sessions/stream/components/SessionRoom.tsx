@@ -137,8 +137,8 @@ export function SessionRoom({ sessionId, sessionDbId, peerId, role, token }: Ses
             // Student: start focus agent on localhost:8000
             if (role === 'viewer') {
                 const token = localStorage.getItem('token') ?? '';
-                // roomId comes from the session data — we use sessionId as a proxy
-                // The agent will use its own stored roomId for SignalR routing
+                // Pass backend_url so the Python agent reports to the correct host (LAN-safe)
+                const backendUrl = `http://${window.location.hostname}:5254`;
                 fetch('http://localhost:8000/focus/start', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -146,6 +146,7 @@ export function SessionRoom({ sessionId, sessionDbId, peerId, role, token }: Ses
                         session_id: sessionDbId,
                         room_id: sessionId,   // mediasoup room ID string
                         token,
+                        backend_url: backendUrl,
                     }),
                 }).catch(() => {
                     // Agent not running — non-fatal, session continues without focus tracking

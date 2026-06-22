@@ -170,7 +170,8 @@ export default function App() {
         <Route path="/session/:sessionId/stream" element={<SessionStreamPage />} />
         <Route path="/session/:sessionId/record" element={<SessionRecordPage />} />
         <Route path="/session/:sessionId/notes" element={<SessionNotesPage />} />
-        <Route path="/session/rating" element={<SessionRatingPage />} />
+
+        <Route path="/session/:sessionId/rating" element={<SessionRatingPage />} />
 
         {/* FALLBACK */}
         <Route path="*" element={<Navigate to="/" replace />} />
