@@ -53,7 +53,7 @@ export default function SessionAnalysisPage() {
   };
 
   const handleBack = () => {
-    navigate("/student/dashboard");
+    navigate(-1);
   };
 
   const handleLogout = () => {

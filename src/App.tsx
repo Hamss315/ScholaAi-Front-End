@@ -66,6 +66,14 @@ import SessionRatingPage from "./features/sessions/pages/SessionRatingPage";
 /* Performance */
 import PerformanceReportPage from "./features/performance/pages/PerformanceReportPage";
 
+/* Admin */
+import AdminPanel from "./features/admin/pages/AdminPanel";
+import AdminUserProfile from "./features/admin/pages/AdminUserProfile";
+import AdminSuspendUser from "./features/admin/pages/AdminSuspendUser";
+import AdminDeleteUser from "./features/admin/pages/AdminDeleteUser";
+import AdminUserPayments from "./features/admin/pages/AdminUserPayments";
+import AdminEditUser from "./features/admin/pages/AdminEditUser";
+
 function ChatPageWrapper() {
   const { otherUserId } = useParams<{ otherUserId: string }>();
   const location = useLocation();
@@ -171,6 +179,14 @@ export default function App() {
         <Route path="/session/:sessionId/record" element={<SessionRecordPage />} />
         <Route path="/session/:sessionId/notes" element={<SessionNotesPage />} />
         <Route path="/session/:sessionId/rating" element={<SessionRatingPage />} />
+
+        {/* ADMIN */}
+        <Route path="/admin/panel" element={<AdminPanel />} />
+        <Route path="/admin/users/:email" element={<AdminUserProfile />} />
+        <Route path="/admin/users/:email/suspend" element={<AdminSuspendUser />} />
+        <Route path="/admin/users/:email/delete" element={<AdminDeleteUser />} />
+        <Route path="/admin/users/:email/payments" element={<AdminUserPayments />} />
+        <Route path="/admin/users/:email/edit" element={<AdminEditUser />} />
 
         {/* FALLBACK */}
         <Route path="*" element={<Navigate to="/" replace />} />
