@@ -40,6 +40,11 @@ export const paymentService = {
     return response.data;
   },
 
+  async requestPayout(amount: number): Promise<{ success: boolean; message: string }> {
+    const response = await api.post("/Payment/payout", { amount });
+    return response.data;
+  },
+
   async getUpcomingSessions(): Promise<{ id: number; teacher: string; subject: string; date: string; price: number }[]> {
     const dashboardApi = await import("../../../services/api/studentDashboard");
     const sessions = await dashboardApi.getUpcomingSessions();

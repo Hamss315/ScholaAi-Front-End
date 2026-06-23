@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate, useParams, useLocation, useNavigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useParams, useLocation } from "react-router-dom";
 
 /* Landing */
 import LandingPage from "./features/landing/pages/LandingPage";
@@ -69,7 +69,6 @@ import PerformanceReportPage from "./features/performance/pages/PerformanceRepor
 function ChatPageWrapper() {
   const { otherUserId } = useParams<{ otherUserId: string }>();
   const location = useLocation();
-  const navigate = useNavigate();
   const { user } = useAuth();
 
   const stateChat = location.state?.chat as ChatConversation | undefined;
