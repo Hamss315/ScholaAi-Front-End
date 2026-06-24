@@ -69,22 +69,26 @@ export default function TeacherSessionRequestsPage() {
   };
 
   const handleMessageStudent = (id: number) => {
-    const request = requests.find((r) => r.id === id);
-    if (request && request.studentId) {
-      navigate(`/chat/${request.studentId}`, {
+    const req = requests.find((r) => r.id === id);
+    if (req?.studentId) {
+      navigate(`/chat/${req.studentId}`, {
         state: {
           chat: {
-            id: request.studentId,
-            otherUserId: request.studentId,
-            otherUserName: request.studentName,
+            id: req.studentId,
+            otherUserId: req.studentId,
+            otherUserName: req.studentName,
             otherUserRole: "student",
+            avatar: req.studentInitials,
+            subject: req.subject,
+            lastMessage: "",
+            lastMessageTime: "",
             unreadCount: 0,
             online: false,
-          },
-        },
+          }
+        }
       });
     } else {
-      alert("Student ID not found for this request.");
+      alert("Could not find student profile to message.");
     }
   };
 
