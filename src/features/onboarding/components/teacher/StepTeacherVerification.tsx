@@ -1,4 +1,4 @@
-import { FileText, Upload, AlertCircle, CheckCircle2, Clock } from "lucide-react";
+import { FileText, Upload, AlertCircle, Clock } from "lucide-react";
 
 import { Button } from "../../../../components/ui/button";
 import { Checkbox } from "../../../../components/ui/checkbox";

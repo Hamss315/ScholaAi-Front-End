@@ -53,6 +53,7 @@ export default function TeacherOnboardingPage() {
   if (!isSuccess && (!payload || payload.role !== "teacher")) return null;
 
   const handleComplete = async (data: TeacherOnboardingData) => {
+    if (!payload) return;
     try {
       // ✅ Build backend DTO (PascalCase is safest for .NET)
       const requestBody = {

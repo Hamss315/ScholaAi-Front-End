@@ -53,6 +53,7 @@ export default function StudentOnboardingPage() {
   if (!isSuccess && (!payload || payload.role !== "student")) return null;
 
   const handleComplete = async (data: StudentOnboardingData) => {
+    if (!payload) return;
     try {
       const requestBody = {
         UserName: data.userName || payload.userName,
