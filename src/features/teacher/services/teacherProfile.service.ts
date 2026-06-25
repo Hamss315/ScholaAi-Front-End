@@ -14,6 +14,7 @@ export interface TeacherProfileDto {
   totalHoursTaught: number;
   averageRate: number;
   totalSessions: number;
+  subjects?: string | string[];
 }
 
 export interface UpdateTeacherProfileDto {

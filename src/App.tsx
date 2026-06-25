@@ -152,7 +152,7 @@ export default function App() {
         <Route path="/payment" element={<PaymentPage />} />
 
         {/* CHAT */}
-        <Route path="/chats" element={<ChatsListPage userRole="student" />} />
+        <Route path="/chats" element={<ChatsListPage />} />
         <Route path="/chat/:otherUserId" element={<ChatPageWrapper />} />
 
         {/* SEARCH */}
