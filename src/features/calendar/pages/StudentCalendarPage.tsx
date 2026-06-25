@@ -7,6 +7,7 @@ import SessionSidebar from "../components/SessionSidebar";
 
 import type { StudentSession } from "../types/calendar.types";
 import { getStudentSessions } from "../../../services/api/studentCalendar";
+import { getSessionsForDate } from "../services/calendar.service";
 
 export default function StudentCalendarPage() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -25,19 +26,9 @@ export default function StudentCalendarPage() {
     setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1));
   };
 
-  const formatDateKey = (date: Date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
-  };
-
-  const selectedSessions =
-    selectedDate
-      ? sessions.filter(
-          (s) => s.date === formatDateKey(selectedDate)
-        )
-      : [];
+  const selectedSessions = selectedDate
+    ? getSessionsForDate(selectedDate, sessions)
+    : [];
 
   return (
     <div className="min-h-screen bg-gray-50">

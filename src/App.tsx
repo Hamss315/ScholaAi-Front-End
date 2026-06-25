@@ -56,7 +56,7 @@ import SessionAnalysisPage from "./features/sessions/pages/SessionAnalysisPage";
 import StudentDashboardPage from "./features/student-dashboard/pages/StudentDashboardPage";
 import TeacherDashboardPage from "./features/teacher-dashboard/pages/TeacherDashboardPage";
 
-/* Session */ 
+/* Session */
 import SessionStreamPage from "./features/sessions/pages/StreamPage";
 import SessionRecordPage from "./features/sessions/pages/SessionRecordPage";
 import SessionNotesPage from "./features/sessions/pages/SessionNotesPage";
@@ -180,6 +180,7 @@ export default function App() {
         <Route path="/session/:sessionId/stream" element={<SessionStreamPage />} />
         <Route path="/session/:sessionId/record" element={<SessionRecordPage />} />
         <Route path="/session/:sessionId/notes" element={<SessionNotesPage />} />
+
         <Route path="/session/:sessionId/rating" element={<SessionRatingPage />} />
 
         {/* ADMIN - public login */}

@@ -18,7 +18,7 @@ export default function SearchBar({
           <div className="relative flex-1">
             <Search className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
             <Input
-              placeholder="Search by name, subject, or keyword..."
+              placeholder="Search by teacher name..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"

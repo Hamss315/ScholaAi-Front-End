@@ -7,6 +7,7 @@ import { Badge } from "../../../components/ui/badge";
 import { Avatar, AvatarFallback } from "../../../components/ui/avatar";
 
 import type { TeacherSession } from "../types/calendar.types";
+import { isSameLocalMonth } from "../services/calendar.service";
 
 interface Props {
   selectedDate: Date | null;
@@ -30,14 +31,7 @@ export default function TeacherSidebar({
 
   const getMonthFiltered = (status?: TeacherSession["status"]) => {
     return allSessions.filter((s) => {
-      const d = new Date(s.date);
-
-      const sameMonth =
-        d.getMonth() === currentMonth.getMonth() &&
-        d.getFullYear() === currentMonth.getFullYear();
-
-      if (!sameMonth) return false;
-
+      if (!isSameLocalMonth(s.date, currentMonth)) return false;
       return status ? s.status === status : true;
     });
   };
@@ -129,25 +123,14 @@ export default function TeacherSidebar({
                 )}
 
                 {/* ACTIONS */}
-                {session.status === "upcoming" && (
-                  <Button
-                    className="w-full mt-3 bg-blue-500"
-                    size="sm"
-                    onClick={() => navigate(`/session/${session.id}/stream`)}
-                  >
-                    <Video className="w-4 h-4 mr-2" />
-                    Join Session
-                  </Button>
-                )}
-
                 {session.status === "completed" && (
                   <Button
                     variant="outline"
                     className="w-full mt-3"
                     size="sm"
-                    onClick={() => navigate("/teacher/session-analysis")}
+                    onClick={() => navigate(`/session/${session.id}/notes`)}
                   >
-                    View Analysis
+                    View Notes
                   </Button>
                 )}
               </div>

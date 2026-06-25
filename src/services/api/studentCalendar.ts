@@ -1,5 +1,14 @@
 import api from "../api";
-import { deriveSessionStatus, isRejectedSession } from "../../features/calendar/services/calendar.service";
+import { getStudentSessions as fetchStudentSessionsList } from "./studentSessions";
+import {
+  deriveSessionStatus,
+  dedupeSessionRecords,
+  formatSessionTime,
+  getScheduledAt,
+  getSessionId,
+  isRejectedSession,
+  toLocalDateKey,
+} from "../../features/calendar/services/calendar.service";
 import type { StudentSession } from "../../features/calendar/types/calendar.types";
 
 export const getStudentCalendar = async () => {
@@ -8,24 +17,38 @@ export const getStudentCalendar = async () => {
 };
 
 function mapStudentRequest(req: Record<string, unknown>): StudentSession | null {
-  const preferredDate = String(req.preferredDate ?? req.PreferredDate ?? "");
-  if (!preferredDate) return null;
+  const scheduledAt = getScheduledAt(req);
+  if (!scheduledAt) return null;
 
-  const sessionId = req.sessionId ?? req.SessionId;
+  const sessionId = getSessionId(req);
   if (sessionId == null) return null;
+
+  const dateKey = toLocalDateKey(scheduledAt);
+  if (!dateKey) return null;
 
   const focusScore = req.focusScore ?? req.FocusScore;
   const duration = String(req.duration ?? req.Duration ?? "1 hour");
 
   return {
-    id: Number(sessionId),
-    date: preferredDate.split("T")[0],
-    teacher: String(req.teacherName ?? req.TeacherName ?? "Assigned Teacher"),
-    subject: String(req.subject ?? req.Subject ?? "Subject"),
-    time: new Date(preferredDate).toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    }),
+    id: sessionId,
+    date: dateKey,
+    teacher: String(
+      req.teacherName ??
+        req.TeacherName ??
+        req.teacher ??
+        req.Teacher ??
+        "Assigned Teacher"
+    ),
+    subject: String(
+      req.subject ??
+        req.Subject ??
+        req.lessonTitle ??
+        req.LessonTitle ??
+        req.subjectName ??
+        req.SubjectName ??
+        "Subject"
+    ),
+    time: formatSessionTime(scheduledAt),
     duration,
     status: deriveSessionStatus(req),
     focusScore: focusScore != null ? Number(focusScore) : undefined,
@@ -34,10 +57,16 @@ function mapStudentRequest(req: Record<string, unknown>): StudentSession | null 
 
 export const getStudentSessions = async (): Promise<StudentSession[]> => {
   try {
-    const data = await getStudentCalendar();
-    const requests = Array.isArray(data) ? data : [];
+    const [requestsData, sessionsData] = await Promise.all([
+      getStudentCalendar().catch(() => []),
+      fetchStudentSessionsList().catch(() => []),
+    ]);
 
-    return requests
+    const requests = Array.isArray(requestsData) ? requestsData : [];
+    const sessions = Array.isArray(sessionsData) ? sessionsData : [];
+    const combined = [...requests, ...sessions];
+
+    return dedupeSessionRecords(combined)
       .filter((req) => !isRejectedSession(req))
       .map(mapStudentRequest)
       .filter((session): session is StudentSession => session !== null);

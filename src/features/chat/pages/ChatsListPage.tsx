@@ -22,13 +22,13 @@ import type { ChatConversation, UserRole } from "../types/chat";
 import { useAuth } from "../../../context/auth-context";
 
 interface ChatsListPageProps {
-  userRole: UserRole | null;
+  userRole?: UserRole | null;
 }
 
 export default function ChatsListPage({ userRole: propUserRole }: ChatsListPageProps) {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const userRole = user?.role || propUserRole;
+  const userRole = user?.role || propUserRole || "student";
 
   const [searchQuery, setSearchQuery] = useState("");
   const [chats, setChats] = useState<ChatConversation[]>([]);
@@ -203,7 +203,7 @@ export default function ChatsListPage({ userRole: propUserRole }: ChatsListPageP
                 conversation={chat}
                 userRole={userRole}
                 onClick={() =>
-                  navigate(`/chat/${chat.id}`, {
+                  navigate(`/chat/${chat.otherUserId}`, {
                     state: { chat },
                   })
                 }
