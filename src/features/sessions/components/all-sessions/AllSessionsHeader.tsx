@@ -1,10 +1,15 @@
 import { Brain, ArrowLeft, LogOut } from "lucide-react";
 import { Button } from "../../../../components/ui/button";
 import { Avatar, AvatarFallback } from "../../../../components/ui/avatar";
+import { useAuth } from "../../../../context/auth-context";
+import { getInitials } from "../../../../utils/utils";
 import { useNavigate } from "react-router-dom";
 
 export default function AllSessionsHeader() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const initials = getInitials(user?.userName) || "JS";
+
   return (
     <header className="bg-white border-b sticky top-0 z-50">
       <div className="container mx-auto px-4 py-4">
@@ -19,7 +24,7 @@ export default function AllSessionsHeader() {
           </div>
           <div className="flex items-center gap-3">
             <Avatar className="cursor-pointer" onClick={() => navigate("/student/profile")}>
-              <AvatarFallback className="bg-[#8B5CF6] text-white">JS</AvatarFallback>
+              <AvatarFallback className="bg-[#8B5CF6] text-white">{initials}</AvatarFallback>
             </Avatar>
             <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
               <LogOut className="w-5 h-5" />

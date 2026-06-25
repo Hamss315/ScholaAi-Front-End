@@ -208,7 +208,7 @@ export default function StudentProfilePage() {
       {/* If your header needs profile data, pass it like this:
           <StudentProfileHeader profileData={profileData} />
           If not, keep it as-is. */}
-      <StudentProfileHeader />
+      <StudentProfileHeader profileData={profileData} />
 
       <main className="container mx-auto px-4 py-8 max-w-6xl">
         <div className="mb-8">

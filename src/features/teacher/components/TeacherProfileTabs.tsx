@@ -23,6 +23,7 @@ import { Button } from "../../../components/ui/button";
 import { Card } from "../../../components/ui/card";
 import { Badge } from "../../../components/ui/badge";
 import { Avatar, AvatarFallback } from "../../../components/ui/avatar";
+import { getInitials } from "../../../utils/utils";
 import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
 import { Switch } from "../../../components/ui/switch";
@@ -344,7 +345,7 @@ export default function TeacherProfileTabs({
               </div>
             </Card>
 
-            <Card className="p-6">
+            {/* <Card className="p-6">
               <div className="flex justify-between items-center mb-6">
                 <div>
                   <h3 className="text-2xl" style={{ color: "#1E3A8A" }}>
@@ -379,7 +380,7 @@ export default function TeacherProfileTabs({
                   </div>
                 ))}
               </div>
-            </Card>
+            </Card> */}
           </div>
         </TabsContent>
 
@@ -447,10 +448,7 @@ export default function TeacherProfileTabs({
                     <div className="flex items-center gap-2">
                       <Avatar className="w-8 h-8">
                         <AvatarFallback className="bg-[#3B82F6] text-white text-sm">
-                          {review.student
-                            .split(" ")
-                            .map((n) => n[0])
-                            .join("")}
+                          {getInitials(review.student) || "ST"}
                         </AvatarFallback>
                       </Avatar>
 
@@ -471,10 +469,6 @@ export default function TeacherProfileTabs({
                 </div>
               ))}
             </div>
-
-            <Button className="w-full mt-6" variant="outline">
-              View All Reviews
-            </Button>
           </Card>
         </TabsContent>
 
@@ -513,23 +507,23 @@ export default function TeacherProfileTabs({
 
                   <div>
                     <Label htmlFor="current-password">Current Password</Label>
-                    <Input id="current-password" type="password" className="mt-1" 
+                    <Input id="current-password" type="password" className="mt-1"
                       value={passwordData.currentPassword}
-                      onChange={(e) => setPasswordData({...passwordData, currentPassword: e.target.value})}
+                      onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
                     />
                   </div>
                   <div>
                     <Label htmlFor="new-password">New Password</Label>
-                    <Input id="new-password" type="password" className="mt-1" 
+                    <Input id="new-password" type="password" className="mt-1"
                       value={passwordData.newPassword}
-                      onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
+                      onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
                     />
                   </div>
                   <div>
                     <Label htmlFor="confirm-password">Confirm New Password</Label>
-                    <Input id="confirm-password" type="password" className="mt-1" 
+                    <Input id="confirm-password" type="password" className="mt-1"
                       value={passwordData.confirmPassword}
-                      onChange={(e) => setPasswordData({...passwordData, confirmPassword: e.target.value})}
+                      onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
                     />
                   </div>
 

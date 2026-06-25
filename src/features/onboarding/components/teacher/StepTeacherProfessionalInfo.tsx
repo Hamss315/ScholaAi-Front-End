@@ -11,7 +11,6 @@ import {
 } from "../../../../components/ui/select";
 
 import {
-  TEACHER_SUBJECTS,
   TEACHER_EXPERIENCE_LEVELS,
 } from "../../constants/onboarding.constants";
 import type { TeacherOnboardingData } from "../../types/onboarding.types";
@@ -19,11 +18,14 @@ import type { TeacherOnboardingData } from "../../types/onboarding.types";
 interface Props {
   formData: TeacherOnboardingData;
   setFormData: React.Dispatch<React.SetStateAction<TeacherOnboardingData>>;
+  /** Subject names fetched from the API */
+  subjects: string[];
 }
 
 export default function StepTeacherProfessionalInfo({
   formData,
   setFormData,
+  subjects,
 }: Props) {
   return (
     <div className="space-y-6">
@@ -39,27 +41,31 @@ export default function StepTeacherProfessionalInfo({
           Subject You Teach * (Select one)
         </Label>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-          {TEACHER_SUBJECTS.map((subject) => (
-            <Badge
-              key={subject}
-              variant={formData.subject === subject ? "default" : "outline"}
-              className={`cursor-pointer text-center justify-center py-2 ${
-                formData.subject === subject
-                  ? "bg-[#3B82F6] hover:bg-[#3B82F6]/90"
-                  : "hover:bg-gray-100"
-              }`}
-              onClick={() =>
-                setFormData((prev) => ({
-                  ...prev,
-                  subject,
-                }))
-              }
-            >
-              {subject}
-            </Badge>
-          ))}
-        </div>
+        {subjects.length === 0 ? (
+          <p className="text-sm text-gray-400">Loading subjects...</p>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+            {subjects.map((subject) => (
+              <Badge
+                key={subject}
+                variant={formData.subject === subject ? "default" : "outline"}
+                className={`cursor-pointer text-center justify-center py-2 ${
+                  formData.subject === subject
+                    ? "bg-[#3B82F6] hover:bg-[#3B82F6]/90"
+                    : "hover:bg-gray-100"
+                }`}
+                onClick={() =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    subject,
+                  }))
+                }
+              >
+                {subject}
+              </Badge>
+            ))}
+          </div>
+        )}
 
         {formData.subject && (
           <p className="text-xs text-gray-500 mt-2">
@@ -98,4 +104,4 @@ export default function StepTeacherProfessionalInfo({
       </div>
     </div>
   );
-}
+}

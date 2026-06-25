@@ -1,4 +1,5 @@
 import axios from "axios";
+import api from "../api";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Dedicated admin axios instance — reads adminToken (NOT the regular user token)
@@ -31,6 +32,23 @@ export const getAdminToken = () => localStorage.getItem(ADMIN_TOKEN_KEY);
 export const clearAdminToken = () => {
   localStorage.removeItem(ADMIN_TOKEN_KEY);
   localStorage.removeItem("adminProfile");
+};
+
+export interface SubjectDto {
+  subjectId: number;
+  name: string;
+  description?: string;
+  teacherCount?: number;
+}
+
+export interface GetSubjectsResponse {
+  success: boolean;
+  data: SubjectDto[];
+}
+
+export const getPublicSubjects = async (): Promise<GetSubjectsResponse> => {
+  const response = await api.get<GetSubjectsResponse>("/Admin/subjects");
+  return response.data;
 };
 
 export const isAdminAuthenticated = () => !!localStorage.getItem(ADMIN_TOKEN_KEY);

@@ -3,9 +3,13 @@ import { Brain, CreditCard, LogOut, MessageSquare, Send, LayoutDashboard, Chevro
 
 import { Button } from "../../../components/ui/button";
 import { Avatar, AvatarFallback } from "../../../components/ui/avatar";
+import { useAuth } from "../../../context/auth-context";
+import { getInitials } from "../../../utils/utils";
 
-export default function StudentProfileHeader() {
+export default function StudentProfileHeader({ profileData }: { profileData?: { firstName?: string; lastName?: string } }) {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const initials = getInitials(user?.userName, profileData?.firstName, profileData?.lastName) || "ST";
 
   return (
     <header className="bg-white border-b sticky top-0 z-50">
@@ -64,9 +68,7 @@ export default function StudentProfileHeader() {
             </Button>
 
             <Avatar className="cursor-pointer" onClick={() => navigate("/student/profile")}>
-              <AvatarFallback className="bg-[#8B5CF6] text-white">JS</AvatarFallback>
-            </Avatar>
-
+              <AvatarFallback className="bg-[#8B5CF6] text-white">{initials}</AvatarFallback>            </Avatar>
             <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
               <LogOut className="w-5 h-5" />
             </Button>

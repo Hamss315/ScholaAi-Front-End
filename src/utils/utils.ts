@@ -14,3 +14,10 @@ export function parseUTCDate(dateStr: string | Date | undefined | null): Date {
   }
   return new Date(dateStr);
 }
+
+export function getInitials(name?: string, firstName?: string, lastName?: string): string {
+  const source = [firstName, lastName].filter(Boolean).join(" ").trim() || (name ?? "").trim();
+  if (!source) return "";
+
+  return source.slice(0, 2).toUpperCase();
+}

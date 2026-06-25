@@ -4,6 +4,7 @@ import TeacherOnboarding from "../components/teacher/TeacherOnboarding";
 
 import api from "../../../services/api";
 import { useRegister } from "../../../context/register-context";
+import { useSubjects } from "../../../hooks/useSubjects";
 import type { TeacherOnboardingData } from "../types/onboarding.types";
 
 function mapAvailabilityToApi(av: Record<string, string[]>) {
@@ -34,19 +35,11 @@ function mapAvailabilityToApi(av: Record<string, string[]>) {
   );
 }
 
-const SUBJECT_MAP: Record<string, number> = {
-  "Mathematics": 1,
-  "Physics": 2,
-  "Computer Science": 3,
-  "English Literature": 4,
-  "Chemistry": 5,
-  "Biology": 6,
-  "History": 7
-};
 
 export default function TeacherOnboardingPage() {
   const navigate = useNavigate();
   const { payload, reset } = useRegister();
+  const { subjectIdMap } = useSubjects();
   const [isSuccess, setIsSuccess] = useState(false);
 
   // ✅ Redirect safely (after render)
@@ -78,7 +71,7 @@ export default function TeacherOnboardingPage() {
         Certificate: "N/A", // Prototype placeholder
         IdNumber: "000000000", // Prototype placeholder
 
-        SubjectId: SUBJECT_MAP[data.subject] || 1,
+        SubjectId: subjectIdMap[data.subject] ?? 1,
         TeachingExperience: data.experience || "0-2",
 
         Availability: mapAvailabilityToApi(data.availability),

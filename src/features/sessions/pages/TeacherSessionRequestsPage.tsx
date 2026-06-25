@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Card } from "../../../components/ui/card";
 import TeacherRequestsHeader from "../components/TeacherRequestsHeader";
 import TeacherRequestsTabs from "../components/TeacherRequestsTabs";
+import { getInitials } from "../../../utils/utils";
 
 import type { SessionRequest } from "../types/session.types";
 import { getTeacherRequests, acceptSessionRequest, rejectSessionRequest } from "../services/session.service";
@@ -25,7 +26,7 @@ export default function TeacherSessionRequestsPage() {
           id: d.sessionId,
           studentId: d.studentId,
           studentName: d.studentName || `Student`,
-          studentInitials: (d.studentName || "ST").substring(0, 2).toUpperCase(),
+          studentInitials: getInitials(d.studentName) || "ST",
           subject: d.subject || `Subject`,
           preferredDate: dDate.toLocaleDateString(),
           preferredTime: dDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
