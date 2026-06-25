@@ -1,63 +1,83 @@
-import { Brain, ArrowLeft, Save } from "lucide-react";
-import { Button } from "../../../components/ui/button";
+import { useParams, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { Card } from "../../../components/ui/card";
-import { Badge } from "../../../components/ui/badge";
-import { Label } from "../../../components/ui/label";
+import { Button } from "../../../components/ui/button";
 import { Input } from "../../../components/ui/input";
 import { Textarea } from "../../../components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
-import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { getUserByEmail, updateUserProfile } from "../../../utils/userDataService";
-import type { UserProfile } from "../../../utils/userDataService";
+import { Loader2, AlertCircle } from "lucide-react";
+import { getUser, editUser } from "../../../services/api/admin";
+import AdminHeader from "../components/AdminHeader";
 
 export default function AdminEditUser() {
-  const { email } = useParams<{ email: string }>();
+  const { userId } = useParams<{ userId: string }>();
   const navigate = useNavigate();
-  const [user, setUser] = useState<UserProfile | null>(null);
-  const [fullName, setFullName] = useState("");
-  const [role, setRole] = useState<"student" | "teacher" | "admin">("student");
-  const [location, setLocation] = useState("");
-  const [phone, setPhone] = useState("");
-  const [bio, setBio] = useState("");
+  const [form, setForm] = useState<any>({});
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (email) {
-      const userData = getUserByEmail(email);
-      if (userData) {
-        setUser(userData);
-        setFullName(userData.fullName);
-        setRole(userData.role);
-        setLocation(userData.location || "");
-        setPhone(userData.phone || "");
-        setBio(userData.bio || "");
+    if (!userId) return;
+    (async () => {
+      try {
+        const data = await getUser(userId);
+        setForm({
+          firstName: data.firstName ?? "",
+          lastName: data.lastName ?? "",
+          userName: data.userName ?? "",
+          phoneNumber: data.phoneNumber ?? "",
+          description: data.description ?? "",
+          // teacher specific fields can be edited here if needed
+        });
+      } catch {
+        setError("Failed to load user.");
+      } finally {
+        setLoading(false);
       }
+    })();
+  }, [userId]);
+
+  const set = (key: string, value: string) =>
+    setForm((prev: any) => ({ ...prev, [key]: value }));
+
+  const handleSave = async () => {
+    if (!userId) return;
+    setSaving(true);
+    try {
+      await editUser(userId, {
+        firstName: form.firstName,
+        lastName: form.lastName,
+        userName: form.userName,
+        phoneNumber: form.phoneNumber,
+        description: form.description,
+      });
+      navigate(`/admin/users/${userId}`);
+    } catch {
+      setError("Failed to save user.");
+    } finally {
+      setSaving(false);
     }
-  }, [email]);
-
-  const handleSave = () => {
-    if (!email || !fullName.trim()) return;
-
-    updateUserProfile(email, {
-      fullName,
-      role,
-      location,
-      phone,
-      bio
-    });
-
-    alert("User profile updated successfully.");
-    navigate(`/admin/users/${email}`);
   };
 
-  if (!user) {
+  if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center bg-white p-8 rounded-xl shadow-md border border-gray-200">
-          <h2 className="text-2xl font-bold mb-4" style={{ color: '#1E3A8A' }}>User not found</h2>
-          <Button onClick={() => navigate("/admin/panel")} className="bg-[#1E3A8A] hover:bg-[#1E3A8A]/90 text-white font-semibold">
-            Back to Admin Panel
-          </Button>
+      <div className="min-h-screen bg-gray-50">
+        <AdminHeader />
+        <div className="flex items-center justify-center py-20 text-gray-400">
+          <Loader2 className="w-8 h-8 animate-spin mr-2" />
+          Loading user…
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <AdminHeader />
+        <div className="flex items-center justify-center py-20 text-red-600">
+          <AlertCircle className="w-6 h-6 mr-2" />
+          {error}
         </div>
       </div>
     );
@@ -65,117 +85,42 @@ export default function AdminEditUser() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button variant="ghost" size="icon" onClick={() => navigate(`/admin/users/${email}`)}>
-                <ArrowLeft className="w-5 h-5" />
-              </Button>
-              <div className="flex items-center gap-2">
-                <Brain className="w-8 h-8" style={{ color: '#8B5CF6' }} />
-                <span className="text-2xl font-bold" style={{ color: '#1E3A8A' }}>ScholaAi</span>
-                <Badge className="ml-2 bg-red-100 text-red-700 hover:bg-red-100 border-none font-semibold">Admin</Badge>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <div className="container mx-auto px-4 py-8 max-w-2xl">
+      <AdminHeader />
+      <div className="container mx-auto px-4 py-8">
         <Card className="p-6 bg-white border border-gray-200 shadow-sm">
-          <h1 className="text-3xl font-bold mb-6" style={{ color: '#1E3A8A' }}>Edit User Details</h1>
-          
-          <div className="space-y-4">
+          <h2 className="text-2xl font-bold mb-4" style={{ color: "#1E3A8A" }}>
+            Edit User
+          </h2>
+          <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
             <div>
-              <Label htmlFor="edit-name" className="text-sm font-semibold text-gray-700">Full Name *</Label>
-              <Input
-                id="edit-name"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                placeholder="John Doe"
-                className="mt-1"
-              />
+              <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+              <Input value={form.firstName} onChange={(e) => set("firstName", e.target.value)} />
             </div>
-
             <div>
-              <Label htmlFor="edit-email" className="text-sm font-semibold text-gray-700">Email (Cannot be modified)</Label>
-              <Input
-                id="edit-email"
-                value={email}
-                disabled
-                className="mt-1 bg-gray-50 cursor-not-allowed"
-              />
+              <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+              <Input value={form.lastName} onChange={(e) => set("lastName", e.target.value)} />
             </div>
-
             <div>
-              <Label htmlFor="edit-role" className="text-sm font-semibold text-gray-700">Role *</Label>
-              <Select
-                value={role.charAt(0).toUpperCase() + role.slice(1)}
-                onValueChange={(val) => setRole(val.toLowerCase() as "student" | "teacher" | "admin")}
-              >
-                <SelectTrigger className="mt-1 w-full bg-white border border-gray-300 rounded-md">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-white border border-gray-200 shadow-md">
-                  <SelectItem value="Student">Student</SelectItem>
-                  <SelectItem value="Teacher">Teacher</SelectItem>
-                  <SelectItem value="Admin">Admin</SelectItem>
-                </SelectContent>
-              </Select>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
+              <Input value={form.userName} onChange={(e) => set("userName", e.target.value)} />
             </div>
-
             <div>
-              <Label htmlFor="edit-location" className="text-sm font-semibold text-gray-700">Location</Label>
-              <Input
-                id="edit-location"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                placeholder="e.g. New York, USA"
-                className="mt-1"
-              />
+              <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+              <Input value={form.phoneNumber} onChange={(e) => set("phoneNumber", e.target.value)} />
             </div>
-
             <div>
-              <Label htmlFor="edit-phone" className="text-sm font-semibold text-gray-700">Phone</Label>
-              <Input
-                id="edit-phone"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="e.g. +1 (555) 123-4567"
-                className="mt-1"
-              />
+              <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+              <Textarea value={form.description} onChange={(e) => set("description", e.target.value)} rows={3} />
             </div>
-
-            <div>
-              <Label htmlFor="edit-bio" className="text-sm font-semibold text-gray-700">Bio</Label>
-              <Textarea
-                id="edit-bio"
-                value={bio}
-                onChange={(e) => setBio(e.target.value)}
-                placeholder="Tell us about this user..."
-                className="mt-1 min-h-[100px]"
-              />
-            </div>
-
-            <div className="flex gap-3 pt-6">
-              <Button 
-                variant="outline" 
-                className="flex-1 hover:bg-gray-50 border-gray-300 font-semibold"
-                onClick={() => navigate(`/admin/users/${email}`)}
-              >
+            <div className="flex gap-3">
+              <Button type="submit" disabled={saving} className="bg-[#1E3A8A] hover:bg-[#1E3A8A]/90 text-white font-medium">
+                {saving ? <><Loader2 className="w-4 h-4 animate-spin mr-2" />Saving…</> : "Save Changes"}
+              </Button>
+              <Button type="button" variant="outline" onClick={() => navigate("/admin/panel")} disabled={saving}>
                 Cancel
               </Button>
-              <Button 
-                className="flex-1 bg-[#1E3A8A] hover:bg-[#1E3A8A]/90 text-white font-semibold"
-                onClick={handleSave}
-              >
-                <Save className="w-4 h-4 mr-2" />
-                Save Changes
-              </Button>
             </div>
-          </div>
+          </form>
         </Card>
       </div>
     </div>

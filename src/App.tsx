@@ -67,12 +67,14 @@ import SessionRatingPage from "./features/sessions/pages/SessionRatingPage";
 import PerformanceReportPage from "./features/performance/pages/PerformanceReportPage";
 
 /* Admin */
+import AdminLoginPage from "./features/admin/pages/AdminLoginPage";
 import AdminPanel from "./features/admin/pages/AdminPanel";
 import AdminUserProfile from "./features/admin/pages/AdminUserProfile";
 import AdminSuspendUser from "./features/admin/pages/AdminSuspendUser";
 import AdminDeleteUser from "./features/admin/pages/AdminDeleteUser";
 import AdminUserPayments from "./features/admin/pages/AdminUserPayments";
 import AdminEditUser from "./features/admin/pages/AdminEditUser";
+import AdminRoute from "./features/admin/components/AdminRoute";
 
 function ChatPageWrapper() {
   const { otherUserId } = useParams<{ otherUserId: string }>();
@@ -180,13 +182,18 @@ export default function App() {
         <Route path="/session/:sessionId/notes" element={<SessionNotesPage />} />
         <Route path="/session/:sessionId/rating" element={<SessionRatingPage />} />
 
-        {/* ADMIN */}
-        <Route path="/admin/panel" element={<AdminPanel />} />
-        <Route path="/admin/users/:email" element={<AdminUserProfile />} />
-        <Route path="/admin/users/:email/suspend" element={<AdminSuspendUser />} />
-        <Route path="/admin/users/:email/delete" element={<AdminDeleteUser />} />
-        <Route path="/admin/users/:email/payments" element={<AdminUserPayments />} />
-        <Route path="/admin/users/:email/edit" element={<AdminEditUser />} />
+        {/* ADMIN - public login */}
+        <Route path="/admin/login" element={<AdminLoginPage />} />
+
+        {/* ADMIN - protected routes */}
+        <Route element={<AdminRoute />}>
+          <Route path="/admin/panel" element={<AdminPanel />} />
+          <Route path="/admin/users/:userId" element={<AdminUserProfile />} />
+          <Route path="/admin/users/:userId/suspend" element={<AdminSuspendUser />} />
+          <Route path="/admin/users/:userId/delete" element={<AdminDeleteUser />} />
+          <Route path="/admin/users/:userId/payments" element={<AdminUserPayments />} />
+          <Route path="/admin/users/:userId/edit" element={<AdminEditUser />} />
+        </Route>
 
         {/* FALLBACK */}
         <Route path="*" element={<Navigate to="/" replace />} />
