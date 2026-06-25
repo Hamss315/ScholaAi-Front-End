@@ -59,6 +59,55 @@ export function SessionRoom({ sessionId, sessionDbId, peerId, role, token }: Ses
         return () => { if (timerRef.current) clearInterval(timerRef.current); };
     }, [joined]);
 
+    // ── Focus frame capture loop (student only) ────────────────────────────────
+    useEffect(() => {
+        if (role !== 'viewer' || !joined || !localStream) return;
+
+        // Create hidden video element to feed the stream
+        const video = document.createElement('video');
+        video.srcObject = localStream;
+        video.muted = true;
+        video.playsInline = true;
+
+        // Hidden canvas to extract frames
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        let isPlaying = false;
+        video.play()
+            .then(() => { isPlaying = true; })
+            .catch(err => console.error('[Focus] Hidden video play failed:', err));
+
+        const interval = setInterval(() => {
+            if (!isPlaying || video.videoWidth === 0 || video.videoHeight === 0) return;
+
+            // Resize to 640x480 for lightweight network payloads
+            const width = 640;
+            const height = 480;
+            canvas.width = width;
+            canvas.height = height;
+
+            if (ctx) {
+                ctx.drawImage(video, 0, 0, width, height);
+                const base64Image = canvas.toDataURL('image/jpeg', 0.6); // 60% quality is perfect balance
+
+                fetch('http://localhost:8000/focus/frame', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ image: base64Image }),
+                }).catch(() => {
+                    // Ignore silent local network errors
+                });
+            }
+        }, 333); // ~3 FPS: lightweight, low CPU, perfect for Mediapipe
+
+        return () => {
+            clearInterval(interval);
+            video.pause();
+            video.srcObject = null;
+        };
+    }, [role, joined, localStream]);
+
     // ── DEBUG Log state ───────────────────────────────────────────────────────
     useEffect(() => {
         console.log('[DEBUG] SessionRoom State:', {
@@ -69,6 +118,22 @@ export function SessionRoom({ sessionId, sessionDbId, peerId, role, token }: Ses
             sessionDbId
         });
     }, [role, joined, localStream, sessionDbId]);
+
+    // ── Prevent accidental page leaves for host ────────────────────────────────
+    useEffect(() => {
+        if (role !== 'host' || !joined) return;
+
+        const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+            e.preventDefault();
+            e.returnValue = 'A recording is in progress. Leaving this page will discard the recording. Are you sure?';
+            return e.returnValue;
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
+    }, [role, joined]);
 
     // ── Auto-start recording (host only) when localStream becomes available ───
     useEffect(() => {

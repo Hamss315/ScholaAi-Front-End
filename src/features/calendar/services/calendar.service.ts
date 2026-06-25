@@ -1,4 +1,4 @@
-import type { SessionStatus, StudentSession } from "../types/calendar.types";
+import type { SessionStatus } from "../types/calendar.types";
 import { parseUTCDate } from "../../../utils/utils";
 
 export const DEFAULT_SESSION_DURATION_MINUTES = 60;

@@ -5,6 +5,45 @@ interface UseRecordingOptions {
     sessionDbId: number;
 }
 
+function getSupportedMimeType(stream: MediaStream): string {
+    const hasVideo = stream.getVideoTracks().length > 0;
+    const hasAudio = stream.getAudioTracks().length > 0;
+
+    let candidates: string[] = [];
+
+    if (hasVideo && hasAudio) {
+        candidates = [
+            'video/webm;codecs=vp9,opus',
+            'video/webm;codecs=vp8,opus',
+            'video/webm',
+            'video/mp4;codecs=avc1,mp4a',
+            'video/mp4'
+        ];
+    } else if (hasVideo) {
+        candidates = [
+            'video/webm;codecs=vp9',
+            'video/webm;codecs=vp8',
+            'video/webm',
+            'video/mp4;codecs=avc1',
+            'video/mp4'
+        ];
+    } else if (hasAudio) {
+        candidates = [
+            'audio/webm;codecs=opus',
+            'audio/webm',
+            'audio/mp4;codecs=mp4a',
+            'audio/mp4'
+        ];
+    }
+
+    for (const candidate of candidates) {
+        if (MediaRecorder.isTypeSupported(candidate)) {
+            return candidate;
+        }
+    }
+    return '';
+}
+
 export function useRecording({ sessionDbId }: UseRecordingOptions) {
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
     const chunksRef = useRef<Blob[]>([]);
@@ -33,25 +72,29 @@ export function useRecording({ sessionDbId }: UseRecordingOptions) {
         }
         chunksRef.current = [];
 
-        const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus')
-            ? 'video/webm;codecs=vp9,opus'
-            : MediaRecorder.isTypeSupported('video/webm;codecs=vp8,opus')
-                ? 'video/webm;codecs=vp8,opus'
-                : 'video/webm';
+        const mimeType = getSupportedMimeType(stream);
+        console.log(`[Recording] Selected MIME type: "${mimeType || 'default'}"`);
 
         try {
-            const recorder = new MediaRecorder(stream, { mimeType });
+            const options = mimeType ? { mimeType } : undefined;
+            const recorder = new MediaRecorder(stream, options);
+            
             recorder.ondataavailable = (e) => {
                 if (e.data && e.data.size > 0) {
                     chunksRef.current.push(e.data);
                 }
             };
+
+            recorder.onerror = (e) => {
+                console.error('[Recording] MediaRecorder encountered an error:', e);
+            };
+
             recorder.start(1000); // chunk every second
             startTimeRef.current = Date.now();
             mediaRecorderRef.current = recorder;
-            console.log('[Recording] ▶️ Started');
+            console.log('[Recording] ▶️ Started successfully');
         } catch (err) {
-            console.error('[Recording] ❌ Failed to start:', err);
+            console.error('[Recording] ❌ Failed to start MediaRecorder:', err);
         }
     }, []);
 
