@@ -4,7 +4,7 @@ import { Avatar, AvatarFallback } from "../../../components/ui/avatar";
 import { Calendar, Clock } from "lucide-react";
 import type { UpcomingSession } from "../types/dashboard.types";
 import { useNavigate } from "react-router-dom";
-import { parseUTCDate } from "../../../utils/utils";
+import { parseUTCDate, getInitials } from "../../../utils/utils";
 
 export default function UpcomingSessions({
   sessions,

@@ -7,6 +7,7 @@ import { useSignalRSession } from '../hooks/useSignalRSession';
 import { useRecording } from '../hooks/useRecording';
 import { pendingRecordingStore } from '../lib/pendingRecordingStore';
 import { endSession, uploadRecording } from '../../../../services/api/teacherSessions';
+import { getSocket } from '../lib/socketClient';
 
 interface SessionRoomProps {
     sessionId: string;
@@ -28,8 +29,15 @@ export function SessionRoom({ sessionId, sessionDbId, peerId, role, token }: Ses
     const [savingMessage, setSavingMessage] = useState('Saving local recording…');
     // Distraction alert received by teacher via SignalR
     const [distractionAlert, setDistractionAlert] = useState<string | null>(null);
+    // Live focus score received from student via socket (teacher view only)
+    const [studentFocusScore, setStudentFocusScore] = useState<number | null>(null);
     const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
     const recordingStartedRef = useRef(false);
+    // Focus alert sound tracking
+    const lastAlertTimeRef = useRef<number>(0);
+    const prevFocusScoreRef = useRef<number | null>(null);
+    // AudioContext must be created during a user gesture (Join click) to bypass browser autoplay policy
+    const audioCtxRef = useRef<AudioContext | null>(null);
 
     const preCapturedScreenStreamRef = useRef<MediaStream | null>(null);
 
@@ -78,6 +86,8 @@ export function SessionRoom({ sessionId, sessionDbId, peerId, role, token }: Ses
             .then(() => { isPlaying = true; })
             .catch(err => console.error('[Focus] Hidden video play failed:', err));
 
+        const focusServerUrl = `http://${window.location.hostname}:8000`;
+
         const interval = setInterval(() => {
             if (!isPlaying || video.videoWidth === 0 || video.videoHeight === 0) return;
 
@@ -91,7 +101,7 @@ export function SessionRoom({ sessionId, sessionDbId, peerId, role, token }: Ses
                 ctx.drawImage(video, 0, 0, width, height);
                 const base64Image = canvas.toDataURL('image/jpeg', 0.6); // 60% quality is perfect balance
 
-                fetch('http://localhost:8000/focus/frame', {
+                fetch(`${focusServerUrl}/focus/frame`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ image: base64Image }),
@@ -118,6 +128,85 @@ export function SessionRoom({ sessionId, sessionDbId, peerId, role, token }: Ses
             sessionDbId
         });
     }, [role, joined, localStream, sessionDbId]);
+
+    // ── Student: poll focus score every 5s and relay to teacher via socket ─────
+    useEffect(() => {
+        if (role !== 'viewer' || !joined) return;
+        const socket = getSocket();
+        const focusServerUrl = `http://${window.location.hostname}:8000`;
+
+        const interval = setInterval(async () => {
+            try {
+                const res = await fetch(`${focusServerUrl}/focus/live`);
+                if (res.ok) {
+                    const data = await res.json();
+                    socket.emit('focusUpdate', { score: data.focus_score ?? 0 });
+                }
+            } catch {
+                // Focus server not reachable — silently ignore
+            }
+        }, 5000);
+
+        return () => clearInterval(interval);
+    }, [role, joined]);
+
+    // ── Teacher: listen for student focus score updates from socket ────────────
+    useEffect(() => {
+        if (role !== 'host') return;
+        const socket = getSocket();
+
+        const handleFocusUpdate = ({ score }: { score: number }) => {
+            setStudentFocusScore(score);
+        };
+
+        socket.on('focusUpdate', handleFocusUpdate);
+        return () => { socket.off('focusUpdate', handleFocusUpdate); };
+    }, [role]);
+
+    // ── Teacher: play beep alert when focus first drops below 50% ─────────────
+    useEffect(() => {
+        if (role !== 'host' || studentFocusScore === null) return;
+
+        const prev = prevFocusScoreRef.current;
+        const now = Date.now();
+        const cooldownMs = 30_000; // don't beep more than once per 30 seconds
+
+        // Only alert when crossing the threshold downward (≥50 → <50)
+        if (
+            studentFocusScore < 50 &&
+            (prev === null || prev >= 50) &&
+            now - lastAlertTimeRef.current > cooldownMs
+        ) {
+            lastAlertTimeRef.current = now;
+            // Play alert using the pre-created AudioContext (created during Join click)
+            try {
+                const ctx = audioCtxRef.current;
+                if (ctx) {
+                    // Resume if browser suspended it (tab switch etc.) — fire and forget
+                    if (ctx.state === 'suspended') void ctx.resume();
+                    // Three rising beeps: 880Hz → 1100Hz → 880Hz
+                    const freqs = [880, 1100, 880];
+                    freqs.forEach((freq, i) => {
+                        const delay = i * 0.28;
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        osc.type = 'sine';
+                        osc.frequency.value = freq;
+                        gain.gain.setValueAtTime(0.4, ctx.currentTime + delay);
+                        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 0.22);
+                        osc.start(ctx.currentTime + delay);
+                        osc.stop(ctx.currentTime + delay + 0.22);
+                    });
+                }
+            } catch {
+                // Audio playback failed — silently ignore
+            }
+        }
+
+        prevFocusScoreRef.current = studentFocusScore;
+    }, [role, studentFocusScore]);
 
     // ── Prevent accidental page leaves for host ────────────────────────────────
     useEffect(() => {
@@ -182,6 +271,11 @@ export function SessionRoom({ sessionId, sessionDbId, peerId, role, token }: Ses
     // ── Join ──────────────────────────────────────────────────────────────────
     async function handleJoin() {
         setLoading(true);
+        // ⚠️  Create AudioContext here — inside a real user gesture (button click).
+        // Browsers block AudioContext created in async effects from socket events.
+        if (role === 'host' && !audioCtxRef.current) {
+            try { audioCtxRef.current = new AudioContext(); } catch { /* unsupported */ }
+        }
         if (role === 'host') {
             try {
                 console.log('[SessionRoom] 🖥 Prompting host for screen share (User Gesture)');
@@ -199,12 +293,13 @@ export function SessionRoom({ sessionId, sessionDbId, peerId, role, token }: Ses
             ]);
             setJoined(true);
 
-            // Student: start focus agent on localhost:8000
+            // Student: start focus agent — use the server's LAN IP (same host serving the app)
             if (role === 'viewer') {
                 const token = localStorage.getItem('token') ?? '';
+                const focusServerUrl = `http://${window.location.hostname}:8000`;
                 // Pass backend_url so the Python agent reports to the correct host (LAN-safe)
                 const backendUrl = `http://${window.location.hostname}:5254`;
-                fetch('http://localhost:8000/focus/start', {
+                fetch(`${focusServerUrl}/focus/start`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -248,7 +343,7 @@ export function SessionRoom({ sessionId, sessionDbId, peerId, role, token }: Ses
 
         // Student: stop focus agent gracefully
         if (role === 'viewer') {
-            fetch('http://localhost:8000/focus/stop', { method: 'POST' }).catch(() => {});
+            fetch(`http://${window.location.hostname}:8000/focus/stop`, { method: 'POST' }).catch(() => {});
         }
 
         leaveSession();
@@ -261,27 +356,51 @@ export function SessionRoom({ sessionId, sessionDbId, peerId, role, token }: Ses
         if (role !== 'host') return;
         setIsSaving(true);
         setSavingMessage('Ending Session & Uploading recording...');
+
+        // ── Step 1: Stop recording & upload ───────────────────────────────────
         try {
             console.log(`[SessionRoom] ⏹ Stopping recording for end of sessionDbId=${sessionDbId}`);
             await stopRecording();
 
             const pending = pendingRecordingStore.get();
-            if (pending && pending.sessionDbId === sessionDbId) {
-                console.log(`[SessionRoom] ⬆️ Uploading recording...`);
+            console.log('[SessionRoom] 📦 Pending store state:', {
+                hasPending: !!pending,
+                pendingSessionDbId: pending?.sessionDbId,
+                currentSessionDbId: sessionDbId,
+                blobSize: pending?.blob?.size,
+                duration: pending?.durationSeconds,
+            });
+
+            // Upload if ANY non-empty blob exists (removed sessionDbId guard that was silently skipping)
+            if (pending && pending.blob && pending.blob.size > 0) {
+                console.log(`[SessionRoom] ⬆️ Uploading recording (${pending.blob.size} bytes, ${pending.durationSeconds}s)...`);
                 await uploadRecording(sessionDbId, pending.blob, pending.durationSeconds);
                 pendingRecordingStore.clear();
                 console.log('[SessionRoom] ✅ Recording uploaded successfully');
             } else {
-                console.warn('[SessionRoom] ⚠️ No active recording found to upload (it might be empty or not started)');
+                console.warn('[SessionRoom] ⚠️ No recording blob found — was recording started?');
             }
         } catch (err) {
             console.error('[SessionRoom] Error during recording stop/upload:', err);
         }
 
+        // ── Step 2: Fetch real focus score from agent, then end session ────────
+        let finalFocusScore = 0;
         try {
-            console.log(`[SessionRoom] 🏁 Marking session as ended in DB`);
-            // FocusScore is already saved live by focus_server.py — pass 0 as fallback
-            await endSession(sessionDbId, 0);
+            const focusServerUrl = `http://${window.location.hostname}:8000`;
+            const res = await fetch(`${focusServerUrl}/focus/stop`, { method: 'POST' });
+            if (res.ok) {
+                const data = await res.json();
+                finalFocusScore = data.focus_score ?? 0;
+                console.log(`[SessionRoom] 🧠 Final focus score from agent: ${finalFocusScore}%`);
+            }
+        } catch {
+            console.warn('[SessionRoom] Focus agent unreachable — using score 0');
+        }
+
+        try {
+            console.log(`[SessionRoom] 🏁 Marking session as ended with focusScore=${finalFocusScore}`);
+            await endSession(sessionDbId, finalFocusScore);
             console.log('[SessionRoom] ✅ Session ended successfully');
         } catch (err) {
             console.error('[SessionRoom] Error ending session:', err);
@@ -471,6 +590,21 @@ export function SessionRoom({ sessionId, sessionDbId, peerId, role, token }: Ses
                             <span className="text-green-400 text-xs font-medium">Sharing Screen</span>
                         </div>
                     )}
+
+                    {/* Live focus score badge — host only, shows once student sends data */}
+                    {role === 'host' && studentFocusScore !== null && (
+                        <div className={`flex items-center gap-2 rounded-xl px-3 py-1.5 border transition-all ${
+                            studentFocusScore < 50
+                                ? 'bg-red-500/20 border-red-500/50 animate-pulse'
+                                : 'bg-green-500/10 border-green-500/30'
+                        }`}>
+                            <span className={`text-xs font-semibold ${
+                                studentFocusScore < 50 ? 'text-red-400' : 'text-green-400'
+                            }`}>
+                                🧠 Focus: {studentFocusScore}%
+                            </span>
+                        </div>
+                    )}
                 </div>
                 <div className="bg-[#1a1d2e] border border-[#2a2d3e] rounded-xl px-3 py-1.5">
                     <span className="text-blue-400 text-xs font-medium capitalize">{role}</span>
@@ -492,6 +626,22 @@ export function SessionRoom({ sessionId, sessionDbId, peerId, role, token }: Ses
                                 <p className="text-[#4b5563] text-xs">Student will appear when they join</p>
                             </div>
                         )}
+
+                        {/* Low focus warning overlay on student video */}
+                        {studentFocusScore !== null && studentFocusScore < 50 && (
+                            <div className="absolute inset-0 rounded-2xl border-4 border-red-500 pointer-events-none">
+                                <div className="absolute top-3 left-1/2 -translate-x-1/2
+                                                bg-red-600/90 backdrop-blur-sm text-white
+                                                rounded-xl px-4 py-2 flex items-center gap-2 shadow-2xl">
+                                    <span className="text-lg animate-bounce">⚠️</span>
+                                    <div>
+                                        <p className="font-bold text-sm">Low Focus Detected</p>
+                                        <p className="text-red-200 text-xs">Student focus: {studentFocusScore}% — below 50%</p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
                         {localStream && (
                             <div className="fixed bottom-16 right-6 w-48 h-32 shadow-2xl rounded-2xl overflow-hidden border-2 border-[#2a2d3e] z-50">
                                 <VideoTile stream={localStream} muted isLocal label="You" className="w-full h-full" />

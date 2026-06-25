@@ -281,7 +281,7 @@ export default function UpcomingClasses({ upcoming, onSessionStarted }: Props) {
                 <div className="flex items-center gap-4">
                   <Avatar>
                     <AvatarFallback className="bg-[#3B82F6] text-white">
-                      {getInitials(session.studentName) || "ST"}
+                      {"ST"}
                     </AvatarFallback>
                   </Avatar>
                   <div>
