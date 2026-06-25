@@ -78,7 +78,7 @@ function ChatPageWrapper() {
     id: otherUserId || "",
     otherUserId: otherUserId || "",
     otherUserName: "Chat",
-    otherUserRole: "student",
+    otherUserRole: user?.role === "student" ? "teacher" : "student",
     unreadCount: 0,
     online: false,
   };

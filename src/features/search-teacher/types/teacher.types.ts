@@ -1,4 +1,7 @@
 export interface Teacher {
+  userId?: string;
+  teacherId?: string;
+  id?: string;
   userName: string;
   subject: string;
   college: string;
