@@ -3,8 +3,13 @@ import { Link } from "react-router-dom";
 import { Button } from "../../../components/ui/button";
 import { Avatar, AvatarFallback } from "../../../components/ui/avatar";
 import { Badge } from "../../../components/ui/badge";
+import { useAuth } from "../../../context/auth-context";
+import { getInitials } from "../../../utils/utils";
 
 export default function DashboardHeader() {
+  const { user } = useAuth();
+  const initials = getInitials(user?.userName) || "DR";
+
   return (
     <header className="bg-white border-b sticky top-0 z-50">
       <div className="container mx-auto px-4 py-4">
@@ -41,7 +46,7 @@ export default function DashboardHeader() {
             </Button>
             <Link to="/teacher/profile">
               <Avatar className="cursor-pointer">
-                <AvatarFallback className="bg-[#8B5CF6] text-white">DR</AvatarFallback>
+                <AvatarFallback className="bg-[#8B5CF6] text-white">{initials}</AvatarFallback>
               </Avatar>
             </Link>
             <Button variant="ghost" size="icon" asChild>

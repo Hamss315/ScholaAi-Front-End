@@ -4,7 +4,7 @@ import { Avatar, AvatarFallback } from "../../../components/ui/avatar";
 import { Calendar, Clock } from "lucide-react";
 import type { UpcomingSession } from "../types/dashboard.types";
 import { useNavigate } from "react-router-dom";
-import { parseUTCDate } from "../../../utils/utils";
+import { parseUTCDate, getInitials } from "../../../utils/utils";
 
 export default function UpcomingSessions({
   sessions,
@@ -76,11 +76,7 @@ export default function UpcomingSessions({
               <div className="flex items-center gap-4">
                 <Avatar>
                   <AvatarFallback className="bg-[#3B82F6] text-white">
-                    {s.teacherName
-                      .split(" ")
-                      .map((n) => n[0])
-                      .join("")
-                      .toUpperCase()}
+                    {getInitials(s.teacherName) || "TS"}
                   </AvatarFallback>
                 </Avatar>
                 <div>

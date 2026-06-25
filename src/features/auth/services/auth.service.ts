@@ -14,6 +14,8 @@ export type LoginResponse = {
   role?: "student" | "teacher" | "admin";
   email?: string;
   userName?: string;
+  firstName?: string;
+  lastName?: string;
 };
 
 export async function loginApi(data: LoginRequest) {

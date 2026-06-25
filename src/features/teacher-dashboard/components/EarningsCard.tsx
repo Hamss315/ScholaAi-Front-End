@@ -7,16 +7,17 @@ interface EarningsCardProps {
   thisWeek: number;
   lastMonth: number;
   thisMonth: number;
+  walletBalance: number;
 }
 
-export default function EarningsCard({ thisWeek, lastMonth, thisMonth }: EarningsCardProps) {
+export default function EarningsCard({ thisWeek, lastMonth, thisMonth, walletBalance }: EarningsCardProps) {
   return (
     <Card className="p-6">
       <h3 className="mb-4" style={{ color: '#1E3A8A' }}>Earnings Summary</h3>
       <div className="space-y-3">
         <div className="flex justify-between items-center">
-          <span className="text-gray-600">Pending Payout</span>
-          <span className="text-xl" style={{ color: '#22C55E' }}>${thisWeek.toFixed(2)}</span>
+          <span className="text-gray-600">Available Balance</span>
+          <span className="text-xl font-bold" style={{ color: '#22C55E' }}>${walletBalance.toFixed(2)}</span>
         </div>
         <div className="flex justify-between items-center">
           <span className="text-gray-600">This Week</span>

@@ -2,12 +2,7 @@ import type { StudentCardDto } from "../services/api/teacherProfile";
 import type { Student } from "../features/my-students/types/students.types";
 
 export function getInitials(name: string): string {
-    return name
-        .split(" ")
-        .filter(Boolean)
-        .slice(0, 2)
-        .map((w) => w[0]?.toUpperCase())
-        .join("");
+    return name.trim().slice(0, 2).toUpperCase();
 }
 
 function formatNextSession(dto: StudentCardDto): string {

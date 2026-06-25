@@ -96,7 +96,7 @@ export default function TeacherSchedulePage() {
             <div className="flex items-center gap-4">
               <Avatar>
                 <AvatarFallback className="bg-[#8B5CF6] text-white">
-                  {teacherProfile?.fullName?.split(' ').map((n: string) => n[0]).join('') || "T"}
+                  {getInitials(teacherProfile?.fullName) || "T"}
                 </AvatarFallback>
               </Avatar>
               <Button variant="ghost" size="icon" onClick={() => navigate("/")}>

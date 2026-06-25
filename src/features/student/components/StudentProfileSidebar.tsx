@@ -3,6 +3,7 @@ import { Badge } from "../../../components/ui/badge";
 import { Avatar, AvatarFallback } from "../../../components/ui/avatar";
 import { Button } from "../../../components/ui/button";
 import { Separator } from "../../../components/ui/separator";
+import { getInitials } from "../../../utils/utils";
 import { useNavigate } from "react-router-dom";
 
 type Props = {
@@ -31,12 +32,14 @@ export default function StudentProfileSidebar({
 }: Props) {
   const navigate = useNavigate();
 
+  const initials = getInitials(undefined, profileData.firstName, profileData.lastName) || "ST";
+
   return (
     <aside className="md:col-span-1">
       <Card className="p-6">
         <div className="flex flex-col items-center text-center">
           <Avatar className="w-24 h-24 mb-4">
-            <AvatarFallback className="bg-[#8B5CF6] text-white text-3xl">JS</AvatarFallback>
+            <AvatarFallback className="bg-[#8B5CF6] text-white text-3xl">{initials}</AvatarFallback>
           </Avatar>
 
           <h2 className="text-2xl mb-1" style={{ color: "#1E3A8A" }}>

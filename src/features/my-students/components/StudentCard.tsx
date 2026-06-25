@@ -32,13 +32,7 @@ export default function StudentCard({ student, variant }: Props) {
           </Avatar>
 
           <div className="flex-1">
-            <div
-              className="cursor-pointer hover:underline text-[#1E3A8A] mb-1"
-              onClick={() => navigate(`/student/profile/${student.id}`)}
-            >
               {student.name}
-            </div>
-
             <div className="text-sm text-gray-600 mb-2">{student.subject}</div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3">
@@ -94,21 +88,6 @@ export default function StudentCard({ student, variant }: Props) {
             <MessageSquare className="w-4 h-4 mr-2" />
             Message
           </Button>
-
-          {variant === "active" && (
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() =>
-                navigate(`/session-analysis/${student.id}`, {
-                  state: { studentId: student.id, studentName: student.name },
-                })
-              }
-            >
-              <TrendingUp className="w-4 h-4 mr-2" />
-              View Progress
-            </Button>
-          )}
         </div>
       </div>
     </div>

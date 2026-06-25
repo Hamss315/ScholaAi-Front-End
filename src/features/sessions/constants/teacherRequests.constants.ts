@@ -3,6 +3,7 @@ import type { SessionRequest } from "../types/session.types";
 export const TEACHER_DEMO_REQUESTS: SessionRequest[] = [
   {
     id: 1,
+    studentId: "1",
     studentName: "Emily Parker",
     studentInitials: "EP",
     subject: "Mathematics",
@@ -16,6 +17,7 @@ export const TEACHER_DEMO_REQUESTS: SessionRequest[] = [
   },
   {
     id: 2,
+    studentId: "2",
     studentName: "James Wilson",
     studentInitials: "JW",
     subject: "Mathematics",
@@ -29,6 +31,7 @@ export const TEACHER_DEMO_REQUESTS: SessionRequest[] = [
   },
   {
     id: 3,
+    studentId: "3",
     studentName: "Sarah Martinez",
     studentInitials: "SM",
     subject: "Mathematics",
@@ -41,6 +44,7 @@ export const TEACHER_DEMO_REQUESTS: SessionRequest[] = [
   },
   {
     id: 4,
+    studentId: "4",
     studentName: "David Lee",
     studentInitials: "DL",
     subject: "Mathematics",

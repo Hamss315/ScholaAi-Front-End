@@ -88,6 +88,7 @@ import { Button } from "../../../components/ui/button";
 import { Avatar, AvatarFallback } from "../../../components/ui/avatar";
 import { Badge } from "../../../components/ui/badge";
 import { Video } from "lucide-react";
+import { getInitials } from "../../../utils/utils";
 import type { ActiveSession } from "../types/dashboard.types";
 import { useNavigate } from "react-router-dom";
 
@@ -133,11 +134,7 @@ export default function StudentActiveSessions({
             <div className="flex items-center gap-3">
               <Avatar>
                 <AvatarFallback className="bg-[#22C55E] text-white">
-                  {s.teacherName
-                    .split(" ")
-                    .map((n) => n[0])
-                    .join("")
-                    .toUpperCase()}
+                  {getInitials(s.teacherName) || "TS"}
                 </AvatarFallback>
               </Avatar>
               <div>
