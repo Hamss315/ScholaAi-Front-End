@@ -91,10 +91,7 @@ export default function TeacherSidebar({
                 <div className="flex items-center gap-3 mb-3">
                   <Avatar>
                     <AvatarFallback className="bg-blue-500 text-white">
-                      {session.student
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")}
+                      {getInitials(session.student) || "ST"}
                     </AvatarFallback>
                   </Avatar>
 

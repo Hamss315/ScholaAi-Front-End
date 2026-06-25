@@ -1,11 +1,15 @@
 import { Brain, ArrowLeft, LogOut } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import { Avatar, AvatarFallback } from "../../../components/ui/avatar";
+import { useAuth } from "../../../context/auth-context";
+import { getInitials } from "../../../utils/utils";
 
 import { useNavigate } from "react-router-dom";
 
 export default function TeacherRequestsHeader() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const initials = getInitials(user?.userName) || "DR";
 
   return (
     <header className="bg-white border-b sticky top-0 z-50">
@@ -24,7 +28,7 @@ export default function TeacherRequestsHeader() {
 
           <div className="flex items-center gap-4">
             <Avatar>
-              <AvatarFallback className="bg-[#8B5CF6] text-white">DR</AvatarFallback>
+              <AvatarFallback className="bg-[#8B5CF6] text-white">{initials}</AvatarFallback>
             </Avatar>
 
             <Button variant="ghost" size="icon" onClick={() => navigate("/")}>

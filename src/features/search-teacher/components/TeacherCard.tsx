@@ -5,13 +5,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "../../../components/ui/avat
 import { Button } from "../../../components/ui/button";
 import type { Teacher } from "../types/teacher.types";
 import { useNavigate } from "react-router-dom";
+import { getInitials } from "../../../utils/utils";
 
 export default function TeacherCard({ teacher }: { teacher: Teacher }) {
   const navigate = useNavigate();
 
-  const initials = teacher.userName
-    ? teacher.userName.substring(0, 2).toUpperCase()
-    : "T";
+  const initials = getInitials(teacher.userName) || "T";
 
   return (
     <Card className="p-6 hover:shadow-lg transition-shadow">

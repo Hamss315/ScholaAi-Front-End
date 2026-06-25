@@ -15,6 +15,7 @@ import StepTeacherReview from "./StepTeacherReview";
 import type { TeacherOnboardingData } from "../../types/onboarding.types";
 
 import { useRegister } from "../../../../context/register-context";
+import { useSubjects } from "../../../../hooks/useSubjects";
 
 interface Props {
   onComplete: (data: TeacherOnboardingData) => void;
@@ -24,6 +25,7 @@ const TOTAL_STEPS = 6;
 
 export default function TeacherOnboarding({ onComplete }: Props) {
   const { payload } = useRegister();
+  const { subjectNames } = useSubjects();
 
   const [currentStep, setCurrentStep] = useState(1);
 
@@ -171,7 +173,11 @@ export default function TeacherOnboarding({ onComplete }: Props) {
           )}
 
           {currentStep === 2 && (
-            <StepTeacherProfessionalInfo formData={formData} setFormData={setFormData} />
+            <StepTeacherProfessionalInfo
+              formData={formData}
+              setFormData={setFormData}
+              subjects={subjectNames}
+            />
           )}
 
           {currentStep === 3 && (

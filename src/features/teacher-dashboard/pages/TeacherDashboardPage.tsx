@@ -21,6 +21,7 @@ const STORAGE_KEY = "teacher_upcoming_sessions";
 
 const EMPTY: TeacherDashboardOverview = {
   teacherName: "Teacher",
+  walletBalance: 0,
   todayEarnings: 0,
   thisMonthEarnings: 0,
   avgRating: 0,
@@ -29,6 +30,7 @@ const EMPTY: TeacherDashboardOverview = {
   upcomingClasses: [],
   recentSessions: [],
   todayOverview: { sessionsToday: 0, hoursTaught: 0, avgFocusScore: 0 },
+  availableDays: [],
 };
 
 // ─── localStorage helpers ────────────────────────────────────────────────────
@@ -140,9 +142,9 @@ export default function TeacherDashboardPage() {
   }, []);
 
   /** Teacher pressed End — remove from active */
-  const handleSessionEnded = useCallback((sessionId: number) => {
-    setActiveSessions((prev) => prev.filter((s) => s.id !== sessionId));
-  }, []);
+  // const handleSessionEnded = useCallback((sessionId: number) => {
+  //   setActiveSessions((prev) => prev.filter((s) => s.id !== sessionId));
+  // }, []);
 
   const avgFocusScore =
     overview.recentSessions.length > 0
@@ -178,7 +180,6 @@ export default function TeacherDashboardPage() {
             {activeSessions.length > 0 && (
               <ActiveSessions
                 sessions={activeSessions}
-                onSessionEnded={handleSessionEnded}
               />
             )}
 
@@ -198,11 +199,12 @@ export default function TeacherDashboardPage() {
 
           {/* Right Column */}
           <div className="space-y-6">
-            <CalendarCard availableDays={[]} />
+            <CalendarCard availableDays={overview.availableDays} />
             <EarningsCard
               thisWeek={overview.earningsSummary.thisWeek}
               lastMonth={overview.earningsSummary.lastMonth}
               thisMonth={overview.thisMonthEarnings}
+              walletBalance={overview.walletBalance}
             />
             <TodayOverview
               sessionsToday={overview.todayOverview.sessionsToday}

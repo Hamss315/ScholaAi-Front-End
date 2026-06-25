@@ -2,9 +2,13 @@ import { Brain, ArrowLeft, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../../../components/ui/button";
 import { Avatar, AvatarFallback } from "../../../components/ui/avatar";
+import { useAuth } from "../../../context/auth-context";
+import { getInitials } from "../../../utils/utils";
 
 export default function CalendarHeader() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const initials = getInitials(user?.userName) || "JS";
 
   return (
     <header className="bg-white border-b sticky top-0 z-50">
@@ -25,7 +29,7 @@ export default function CalendarHeader() {
           <div className="flex items-center gap-4">
             <Avatar>
               <AvatarFallback className="bg-[#8B5CF6] text-white">
-                JS
+                {initials}
               </AvatarFallback>
             </Avatar>
 

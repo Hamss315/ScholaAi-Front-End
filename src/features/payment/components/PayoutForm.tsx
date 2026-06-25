@@ -4,6 +4,7 @@ import { Button } from "../../../components/ui/button";
 import { Card } from "../../../components/ui/card";
 import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
+import { paymentService } from "../services/payment.service";
 import { Alert, AlertDescription } from "../../../components/ui/alert";
 import {
   Select,
@@ -26,10 +27,26 @@ export default function PayoutForm({
 }: PayoutFormProps) {
   const [payoutMethod, setPayoutMethod] = useState("bank");
   const [amount, setAmount] = useState<string>(availableBalance.toString());
+  const [submitting, setSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
-  const handleRequestPayout = (e: React.FormEvent) => {
+  React.useEffect(() => {
+    setAmount(availableBalance.toString());
+  }, [availableBalance]);
+
+  const handleRequestPayout = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmitSuccess();
+    if (parsedAmount <= 0) return;
+    setSubmitting(true);
+    setErrorMsg("");
+    try {
+      await paymentService.requestPayout(parsedAmount);
+      onSubmitSuccess();
+    } catch (err: any) {
+      setErrorMsg(err?.response?.data?.message || err?.message || "Failed to request payout.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const parsedAmount = parseFloat(amount) || 0;
@@ -233,14 +250,31 @@ export default function PayoutForm({
           </div>
         )}
 
+        {/* Status Alerts */}
+        {errorMsg && (
+          <div className="flex items-center gap-2 p-4 bg-red-50 border border-red-100 text-red-700 rounded-xl text-sm">
+            <span>{errorMsg}</span>
+          </div>
+        )}
+
         {/* Submit */}
         <div className="pt-4">
           <Button
             type="submit"
+            disabled={submitting || parsedAmount < minimumPayout || parsedAmount > availableBalance}
             className="w-full bg-[#22C55E] hover:bg-[#22C55E]/90 h-12 text-lg text-white font-medium"
           >
-            <DollarSign className="w-5 h-5 mr-2" />
-            Request Payout of ${parsedAmount.toFixed(2)}
+            {submitting ? (
+              <span className="flex items-center justify-center gap-2">
+                <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                Processing...
+              </span>
+            ) : (
+              <>
+                <DollarSign className="w-5 h-5 mr-2" />
+                Request Payout of ${parsedAmount.toFixed(2)}
+              </>
+            )}
           </Button>
           <p className="text-xs text-center text-gray-500 mt-3">
             Processing time: 3-5 business days for bank transfers

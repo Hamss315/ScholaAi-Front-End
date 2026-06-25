@@ -49,11 +49,7 @@ export default function RecentSessions({
               <div className="flex items-center gap-3 mb-3">
                 <Avatar className="w-9 h-9">
                   <AvatarFallback className="bg-[#3B82F6] text-white text-sm">
-                    {s.studentName
-                      .split(" ")
-                      .map((n) => n[0])
-                      .join("")
-                      .toUpperCase()}
+                    {"ST"}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
@@ -70,9 +66,8 @@ export default function RecentSessions({
                 <span className="text-sm text-gray-600">Student Focus:</span>
                 <Progress value={s.studentFocusScore} className="flex-1" />
                 <span
-                  className={`text-sm font-medium ${
-                    s.studentFocusScore >= 90 ? "text-green-500" : "text-blue-500"
-                  }`}
+                  className={`text-sm font-medium ${s.studentFocusScore >= 90 ? "text-green-500" : "text-blue-500"
+                    }`}
                 >
                   {s.studentFocusScore}%
                 </span>

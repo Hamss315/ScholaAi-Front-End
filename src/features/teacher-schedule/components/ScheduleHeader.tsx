@@ -2,6 +2,8 @@ import { Brain, ArrowLeft, LogOut } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import { Avatar, AvatarFallback } from "../../../components/ui/avatar";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../../context/auth-context";
+import { getInitials } from "../../../utils/utils";
 
 interface Props {
   fullName?: string;
@@ -9,6 +11,8 @@ interface Props {
 
 export default function ScheduleHeader({ fullName }: Props) {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const initials = getInitials(fullName || user?.userName) || "T";
 
   return (
     <header className="bg-white border-b sticky top-0 z-50">
@@ -37,10 +41,7 @@ export default function ScheduleHeader({ fullName }: Props) {
           <div className="flex items-center gap-3">
             <Avatar>
               <AvatarFallback className="bg-[#8B5CF6] text-white">
-                {fullName
-                  ?.split(" ")
-                  .map(n => n[0])
-                  .join("") || "T"}
+                {initials}
               </AvatarFallback>
             </Avatar>
 

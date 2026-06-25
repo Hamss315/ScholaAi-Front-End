@@ -17,7 +17,7 @@ export default function LandingPage() {
       <FeaturesSection />
       <HowItWorksSection />
       <PricingSection onGetStarted={() => navigate("/login")} />
-      <LandingFooter onTestResetPassword={() => navigate("/reset-password/new")} />
+      <LandingFooter />
     </div>
   );
 }

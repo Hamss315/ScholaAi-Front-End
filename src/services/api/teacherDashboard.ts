@@ -13,6 +13,7 @@ export interface TodayOverview {
 
 export interface TeacherDashboardOverview {
   teacherName: string;
+  walletBalance: number;
   todayEarnings: number;
   thisMonthEarnings: number;
   avgRating: number;
@@ -24,6 +25,7 @@ export interface TeacherDashboardOverview {
   upcomingClasses: UpcomingClass[];
   recentSessions: RecentSession[];
   todayOverview: TodayOverview;
+  availableDays: number[];
 }
 
 export const getTeacherDashboard = async () => {
@@ -68,6 +70,7 @@ export const getTeacherDashboardOverview = async (): Promise<TeacherDashboardOve
 
     return {
       teacherName: data?.teacherName ?? data?.TeacherName ?? "Teacher",
+      walletBalance: Number(data?.walletBalance ?? data?.WalletBalance ?? 0),
       todayEarnings: Number(data?.todayEarnings ?? 0),
       thisMonthEarnings: Number(data?.thisMonthEarnings ?? 0),
       avgRating: Number(data?.avgRating ?? 0),
@@ -78,6 +81,7 @@ export const getTeacherDashboardOverview = async (): Promise<TeacherDashboardOve
       activeSessions,
       upcomingClasses,
       recentSessions,
+      availableDays: data?.availableDays ?? data?.AvailableDays ?? [],
       todayOverview: {
         sessionsToday: Number(rawOverview?.sessionsToday ?? rawOverview?.SessionsToday ?? 0),
         hoursTaught: Number(rawOverview?.hoursTaught ?? rawOverview?.HoursTaught ?? 0),
@@ -88,6 +92,7 @@ export const getTeacherDashboardOverview = async (): Promise<TeacherDashboardOve
     console.error("Failed to fetch teacher dashboard", error);
     return {
       teacherName: "Teacher",
+      walletBalance: 0,
       todayEarnings: 0,
       thisMonthEarnings: 0,
       avgRating: 0,
@@ -95,6 +100,7 @@ export const getTeacherDashboardOverview = async (): Promise<TeacherDashboardOve
       activeSessions: [],
       upcomingClasses: [],
       recentSessions: [],
+      availableDays: [],
       todayOverview: { sessionsToday: 0, hoursTaught: 0, avgFocusScore: 0 },
     };
   }

@@ -2,9 +2,13 @@ import { Brain, ArrowLeft, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../../../components/ui/button";
 import { Avatar, AvatarFallback } from "../../../components/ui/avatar";
+import { useAuth } from "../../../context/auth-context";
+import { getInitials } from "../../../utils/utils";
 
 export default function RequestSessionHeader() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const initials = getInitials(user?.userName) || "ST";
 
   return (
     <header className="bg-white border-b sticky top-0 z-50">
@@ -22,7 +26,7 @@ export default function RequestSessionHeader() {
 
           <div className="flex items-center gap-4">
             <Avatar>
-              <AvatarFallback className="bg-purple-500 text-white">ST</AvatarFallback>
+              <AvatarFallback className="bg-purple-500 text-white">{initials}</AvatarFallback>
             </Avatar>
 
             <Button variant="ghost" size="icon" onClick={() => navigate("/")}>

@@ -3,8 +3,15 @@ import { Button } from "../../../components/ui/button";
 import { Avatar, AvatarFallback } from "../../../components/ui/avatar";
 import { useNavigate } from "react-router-dom";
 
-export default function TeacherProfileHeader() {
+import { useAuth } from "../../../context/auth-context";
+import { getInitials } from "../../../utils/utils";
+
+export default function TeacherProfileHeader({ profileData }: { profileData?: { firstName?: string; lastName?: string } }) {
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const initials = getInitials(user?.userName, profileData?.firstName, profileData?.lastName) || "SR";
+
   return (
     <header className="bg-white border-b sticky top-0 z-50">
       <div className="container mx-auto px-4 py-4">
@@ -59,7 +66,7 @@ export default function TeacherProfileHeader() {
             </Button>
 
             <Avatar className="cursor-pointer">
-              <AvatarFallback className="bg-[#8B5CF6] text-white">SR</AvatarFallback>
+              <AvatarFallback className="bg-[#8B5CF6] text-white">{initials}</AvatarFallback>
             </Avatar>
 
             <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
