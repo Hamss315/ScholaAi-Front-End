@@ -8,10 +8,14 @@ import {
 } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import { Avatar, AvatarFallback } from "../../../components/ui/avatar";
+import { useAuth } from "../../../context/auth-context";
+import { getInitials } from "../../../utils/utils";
 import { useNavigate } from "react-router-dom";
 
 export default function DashboardHeader() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const initials = getInitials(user?.userName, user?.firstName, user?.lastName) || "ST";
 
   return (
     <header className="bg-white border-b sticky top-0 z-50">
@@ -51,7 +55,7 @@ export default function DashboardHeader() {
             onClick={() => navigate("/student/profile")}
           >
             <AvatarFallback className="bg-[#8B5CF6] text-white">
-              JS
+              {initials}
             </AvatarFallback>
           </Avatar>
 

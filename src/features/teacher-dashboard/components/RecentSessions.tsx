@@ -49,11 +49,7 @@ export default function RecentSessions({
               <div className="flex items-center gap-3 mb-3">
                 <Avatar className="w-9 h-9">
                   <AvatarFallback className="bg-[#3B82F6] text-white text-sm">
-                    {s.studentName
-                      .split(" ")
-                      .map((n) => n[0])
-                      .join("")
-                      .toUpperCase()}
+                    {getInitials(s.studentName) || "ST"}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1">

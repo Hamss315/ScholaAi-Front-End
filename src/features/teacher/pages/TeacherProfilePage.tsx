@@ -126,15 +126,16 @@ export default function TeacherProfilePage() {
           specializations: data.certificate ?? "",
         });
 
-        setWorkSummary({
+        setWorkSummary((prev) => ({
+          ...prev,
           totalHoursTaught: data.totalHoursTaught ?? 0,
           totalEarnings: "$0",
           thisMonthEarnings: "$0",
-          averageRating: data.averageRate ?? 0,
-          totalReviews: 0,
+          averageRating: data.averageRate ?? prev.averageRating,
+          totalReviews: data.totalRatings ?? prev.totalReviews,
           completedSessions: data.totalSessions ?? 0,
           activeStudents: 0,
-        });
+        }));
       } catch (err: any) {
         console.error(err);
         setError("Failed to load teacher profile.");
@@ -152,13 +153,27 @@ export default function TeacherProfilePage() {
     const teacherId = localStorage.getItem("userId");
     if (!teacherId) return;
 
+    console.log("Fetching ratings for teacherId:", teacherId);
+
     (async () => {
       try {
         const res = await getTeacherRatings(teacherId);
-        const reviews: TeacherReview[] = (res.data ?? []).map((r) => ({
+        console.log("Ratings API response:", res);
+
+        // Support two common response shapes:
+        // 1) { success, totalRatings, data: RatingDto[] }
+        // 2) RatingDto[] (backend returns array directly)
+        const dataArray: any[] = Array.isArray(res)
+          ? res
+          : Array.isArray(res?.data)
+          ? res.data
+          : [];
+
+        const reviews: TeacherReview[] = (dataArray ?? []).map((r) => ({
           id: r.ratingId,
-          // Backend only returns studentId; display a short identifier
-          student: r.studentId
+          student: r.studentName
+            ? r.studentName
+            : r.studentId
             ? `Student #${r.studentId.slice(0, 6)}`
             : "Anonymous",
           rating: r.ratingValue,
@@ -175,9 +190,7 @@ export default function TeacherProfilePage() {
         const total = reviews.length;
         const avg =
           total > 0
-            ? Math.round(
-              (reviews.reduce((sum, r) => sum + r.rating, 0) / total) * 10
-            ) / 10
+            ? Math.round((reviews.reduce((sum, r) => sum + r.rating, 0) / total) * 10) / 10
             : 0;
 
         setWorkSummary((prev) => ({
@@ -280,7 +293,7 @@ export default function TeacherProfilePage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <TeacherProfileHeader />
+      <TeacherProfileHeader profileData={profileData} />
 
       <main className="container mx-auto px-4 py-8 max-w-7xl">
         <div className="mb-8">

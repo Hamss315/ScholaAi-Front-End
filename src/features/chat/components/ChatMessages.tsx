@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import type { ChatMessage } from "../types/chat";
 import MessageBubble from "./MessageBubble";
+import { getInitials } from "../../../utils/utils";
 
 interface ChatMessagesProps {
   messages: ChatMessage[];
@@ -20,17 +21,6 @@ export default function ChatMessages({
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
-
-  const getInitials = (name: string) => {
-    return name
-      .trim()
-      .split(" ")
-      .filter(Boolean)
-      .map((part) => part[0])
-      .join("")
-      .slice(0, 2)
-      .toUpperCase();
-  };
 
   if (messages.length === 0) {
     return (

@@ -20,11 +20,7 @@ interface SessionInfoCardProps {
 
 export default function SessionInfoCard({ sessionData }: SessionInfoCardProps) {
   const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((part) => part[0])
-      .join("")
-      .toUpperCase();
+    return name.trim().slice(0, 2).toUpperCase();
   };
 
   return (

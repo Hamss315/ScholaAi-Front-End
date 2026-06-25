@@ -19,6 +19,7 @@ import { Badge } from "../../../components/ui/badge";
 import { Card } from "../../../components/ui/card";
 import { Button } from "../../../components/ui/button";
 import { Slider } from "../../../components/ui/slider";
+import { getInitials } from "../../../utils/utils";
 import { getSessionById } from "../../../services/api/studentSessions";
 
 function formatTime(seconds: number) {
@@ -295,7 +296,7 @@ export default function SessionRecordPage() {
           <div className="flex gap-8">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-[#3B82F6] flex items-center justify-center text-white font-semibold text-sm">
-                {session.studentName?.split(" ").map((n: string) => n[0]).join("").toUpperCase() || "S"}
+                {getInitials(session.studentName) || "S"}
               </div>
               <div>
                 <div style={{ color: "#1E3A8A" }}>{session.studentName || "Student"}</div>
@@ -304,7 +305,7 @@ export default function SessionRecordPage() {
             </div>
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-[#8B5CF6] flex items-center justify-center text-white font-semibold text-sm">
-                {session.teacherName?.split(" ").map((n: string) => n[0]).join("").toUpperCase() || "T"}
+                {getInitials(session.teacherName) || "T"}
               </div>
               <div>
                 <div style={{ color: "#1E3A8A" }}>{session.teacherName || "Teacher"}</div>

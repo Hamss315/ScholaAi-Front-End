@@ -76,11 +76,7 @@ export default function UpcomingSessions({
               <div className="flex items-center gap-4">
                 <Avatar>
                   <AvatarFallback className="bg-[#3B82F6] text-white">
-                    {s.teacherName
-                      .split(" ")
-                      .map((n) => n[0])
-                      .join("")
-                      .toUpperCase()}
+                    {getInitials(s.teacherName) || "TS"}
                   </AvatarFallback>
                 </Avatar>
                 <div>

@@ -4,6 +4,7 @@ import { Card } from "../../../components/ui/card";
 import { Button } from "../../../components/ui/button";
 import { Badge } from "../../../components/ui/badge";
 import { Avatar, AvatarFallback } from "../../../components/ui/avatar";
+import { getInitials } from "../../../utils/utils";
 import type { ActiveSession } from "../types/dashboard.types";
 
 export default function ActiveSessions({
@@ -47,11 +48,7 @@ export default function ActiveSessions({
               <div className="flex items-center gap-3">
                 <Avatar>
                   <AvatarFallback className="bg-[#22C55E] text-white">
-                    {session.studentName
-                      .split(" ")
-                      .map((n) => n[0])
-                      .join("")
-                      .toUpperCase()}
+                    {getInitials(session.studentName) || "ST"}
                   </AvatarFallback>
                 </Avatar>
                 <div>

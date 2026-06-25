@@ -1,6 +1,7 @@
 import api from "../../../services/api";
 import type { ChatConversation, ChatMessage } from "../types/chat";
 import { getRoleFromToken } from "../../../utils/jwt";
+import { getInitials } from "../../../utils/utils";
 
 export const chatApi = {
   async getConversations(): Promise<ChatConversation[]> {
@@ -18,7 +19,7 @@ export const chatApi = {
       lastMessageTime: c.lastMessageTime ? new Date(c.lastMessageTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "",
       unreadCount: c.unreadCount,
       online: false,
-      avatar: c.otherUserName ? c.otherUserName.substring(0, 2).toUpperCase() : "U",
+      avatar: getInitials(c.otherUserName) || "U",
     }));
   },
 

@@ -5,6 +5,7 @@ export interface RatingDto {
   sessionId: number;
   teacherId: string;
   studentId?: string;
+  studentName?: string;
   ratingValue: number;
   comment?: string;
   createdAt: string;
