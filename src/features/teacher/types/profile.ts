@@ -16,6 +16,7 @@ export type TeacherProfessionalData = {
   experience: string;
   education: string;
   specializations: string;
+  hourlyRate?: string;
 };
 
 export type TeacherCertification = {

@@ -1,29 +1,59 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Brain, Wallet, ArrowLeft } from "lucide-react";
+import { Brain, Wallet, ArrowLeft, Loader2 } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 
 import WalletCard from "../components/WalletCard";
 import RechargeForm from "../components/RechargeForm";
 import TransactionList from "../components/TransactionList";
 import UpcomingSessions from "../components/UpcomingSessions";
+import { paymentService, type TransactionInfo } from "../services/payment.service";
 
 export default function PaymentPage() {
   const navigate = useNavigate();
 
-  const [walletBalance, setWalletBalance] = useState(125.5);
+  const [walletBalance, setWalletBalance] = useState(0);
+  const [transactions, setTransactions] = useState<TransactionInfo[]>([]);
+  const [upcomingSessions, setUpcomingSessions] = useState<{ id: number; teacher: string; subject: string; date: string; price: number }[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const recentTransactions = [
-    { id: 1, type: "credit", amount: 100, description: "Wallet Recharge", date: "Feb 5, 2026", balance: 225.5 },
-    { id: 2, type: "debit", amount: 45, description: "Session with Dr. Sarah Johnson - Mathematics", date: "Feb 4, 2026", balance: 125.5 },
-    { id: 3, type: "debit", amount: 30, description: "Session with Prof. Michael Chen - Physics", date: "Feb 3, 2026", balance: 170.5 },
-    { id: 4, type: "credit", amount: 50, description: "Wallet Recharge", date: "Feb 1, 2026", balance: 200.5 },
-  ];
+  const loadWalletData = async (showSpinner: boolean) => {
+    try {
+      if (showSpinner) setLoading(true);
+      setError("");
+      
+      const [walletRes, transactionsRes, upcomingRes] = await Promise.all([
+        paymentService.getWalletBalance(),
+        paymentService.getTransactions(),
+        paymentService.getUpcomingSessions(),
+      ]);
+      
+      setWalletBalance(walletRes.balance);
+      setTransactions(transactionsRes);
+      setUpcomingSessions(upcomingRes);
+    } catch (err: any) {
+      console.error(err);
+      setError("Failed to load wallet data. Please check your connection.");
+    } finally {
+      if (showSpinner) setLoading(false);
+    }
+  };
 
-  const upcomingSessions = [
-    { id: 1, teacher: "Dr. Sarah Johnson", subject: "Mathematics", date: "Feb 7, 2026", price: 45 },
-    { id: 2, teacher: "Prof. Emily Carter", subject: "Chemistry", date: "Feb 9, 2026", price: 40 },
-  ];
+  useEffect(() => {
+    loadWalletData(true);
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="w-10 h-10 animate-spin text-purple-600" />
+          <p className="text-gray-500 font-medium">Loading Wallet details...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
@@ -54,13 +84,19 @@ export default function PaymentPage() {
             <p className="text-xl text-gray-600">Manage your balance and view transaction history</p>
           </div>
 
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-100 text-red-700 rounded-xl text-sm flex items-center gap-2 animate-shake">
+              {error}
+            </div>
+          )}
+
           <WalletCard balance={walletBalance} />
 
           <div className="grid lg:grid-cols-3 gap-8">
 
             <div className="lg:col-span-2 space-y-6">
-              <RechargeForm setWalletBalance={setWalletBalance} />
-              <TransactionList transactions={recentTransactions} />
+              <RechargeForm onRechargeSuccess={() => loadWalletData(false)} />
+              <TransactionList transactions={transactions} />
             </div>
 
             <UpcomingSessions sessions={upcomingSessions} />

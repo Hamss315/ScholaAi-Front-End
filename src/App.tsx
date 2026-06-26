@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate, useParams, useLocation, useNavigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useParams, useLocation } from "react-router-dom";
 
 /* Landing */
 import LandingPage from "./features/landing/pages/LandingPage";
@@ -69,7 +69,6 @@ import PerformanceReportPage from "./features/performance/pages/PerformanceRepor
 function ChatPageWrapper() {
   const { otherUserId } = useParams<{ otherUserId: string }>();
   const location = useLocation();
-  const navigate = useNavigate();
   const { user } = useAuth();
 
   const stateChat = location.state?.chat as ChatConversation | undefined;
@@ -85,13 +84,6 @@ function ChatPageWrapper() {
 
   return (
     <ChatPage
-      onNavigate={(page) => {
-        if (page === "chats-list") {
-          navigate("/chats");
-        } else {
-          navigate("/");
-        }
-      }}
       userRole={user?.role || "student"}
       selectedChat={selectedChat}
       currentUserId={user?.userId || ""}
@@ -152,7 +144,7 @@ export default function App() {
         <Route path="/payment" element={<PaymentPage />} />
 
         {/* CHAT */}
-        <Route path="/chats" element={<ChatsListPage userRole="student" />} />
+        <Route path="/chats" element={<ChatsListPage />} />
         <Route path="/chat/:otherUserId" element={<ChatPageWrapper />} />
 
         {/* SEARCH */}

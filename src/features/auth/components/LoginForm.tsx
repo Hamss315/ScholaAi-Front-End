@@ -46,7 +46,9 @@ export default function LoginForm() {
         userId,
         role,
         email: res.email ?? email,
-        userName: res.userName,
+        userName: res.userName ?? res.email ?? email,
+        firstName: res.firstName,
+        lastName: res.lastName,
       });
 
     // Match your previous behavior (but with routes)

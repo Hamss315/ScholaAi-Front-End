@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { Brain, ArrowLeft, LogOut } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import { Card } from "../../../components/ui/card";
@@ -12,28 +13,72 @@ import { chatApi } from "../services/chatApi";
 import { signalrService } from "../services/signalrService";
 import { useChatConnection } from "../hooks/useChatConnection";
 import type { ChatConversation, ChatMessage, UserRole } from "../types/chat";
+import { getUserIdFromToken, getRoleFromToken } from "../../../utils/jwt";
 
 interface ChatPageProps {
-  onNavigate: (page: string, params?: any) => void;
-  userRole: UserRole | null;
+  userRole?: UserRole | null;
   selectedChat?: ChatConversation;
-  currentUserId: string;
-  currentUserName: string;
+  currentUserId?: string;
+  currentUserName?: string;
 }
 
 export default function ChatPage({
-  onNavigate,
-  userRole,
-  selectedChat,
-  currentUserId,
-  currentUserName,
+  userRole: propUserRole,
+  selectedChat: propSelectedChat,
+  currentUserId: propUserId,
+  currentUserName: propUserName,
 }: ChatPageProps) {
+  const { chatId } = useParams<{ chatId: string }>();
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const [showMannerAlert, setShowMannerAlert] = useState(true);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const token = localStorage.getItem("token") || "";
+  const [selectedChat, setSelectedChat] = useState<ChatConversation | undefined>(
+    propSelectedChat || location.state?.chat
+  );
+
+  const token = localStorage.getItem("token") || localStorage.getItem("scholaai_token") || "";
   const { isConnected, isReconnecting } = useChatConnection(token);
+
+  const currentUserId = propUserId || localStorage.getItem("userId") || getUserIdFromToken(token) || "";
+  const currentUserName = propUserName || localStorage.getItem("userName") || "User";
+  const userRole = propUserRole || getRoleFromToken(token) || "student";
+
+  // Resolve selectedChat metadata dynamically if page is directly loaded/refreshed
+  useEffect(() => {
+    const resolveChatMetadata = async () => {
+      if (selectedChat || !chatId) return;
+
+      try {
+        const conversations = await chatApi.getConversations();
+        const found = conversations.find(c => c.otherUserId === chatId);
+        if (found) {
+          setSelectedChat(found);
+        } else {
+          // Fallback metadata if conversation is new/empty
+          setSelectedChat({
+            id: "0",
+            otherUserId: chatId,
+            otherUserName: "Chat Partner",
+            otherUserRole: userRole === "teacher" ? "student" : "teacher",
+            avatar: "U",
+            subject: "",
+            lastMessage: "",
+            lastMessageTime: "",
+            unreadCount: 0,
+            online: false,
+          });
+        }
+      } catch (err) {
+        console.error("Failed to load chat conversation metadata:", err);
+      }
+    };
+
+    resolveChatMetadata();
+  }, [chatId, selectedChat, userRole]);
 
   useEffect(() => {
     const loadMessages = async () => {
@@ -78,6 +123,12 @@ export default function ChatPage({
 
         return [...prev, message];
       });
+
+      if (message.senderId === selectedChat.otherUserId) {
+        chatApi.markAsRead(selectedChat.otherUserId).catch((err) => {
+          console.error("Failed to mark incoming message as read:", err);
+        });
+      }
     };
 
     signalrService.onReceiveMessage(handleIncomingMessage);
@@ -108,7 +159,7 @@ export default function ChatPage({
                 <span className="text-2xl text-[#1E3A8A]">ScholaAi</span>
               </div>
 
-              <Button variant="ghost" onClick={() => onNavigate("chats-list")}>
+              <Button variant="ghost" onClick={() => navigate("/chats")}>
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to Messages
               </Button>
@@ -135,7 +186,7 @@ export default function ChatPage({
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => onNavigate("landing")}
+                onClick={() => navigate("/")}
               >
                 <LogOut className="w-5 h-5" />
               </Button>
