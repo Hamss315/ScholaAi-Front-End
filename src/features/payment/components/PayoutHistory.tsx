@@ -37,7 +37,7 @@ export default function PayoutHistory({ history }: PayoutHistoryProps) {
                     payout.status === "Completed" ? "bg-green-500" : "bg-yellow-500"
                   }`}
                 ></div>
-                <span className="text-sm font-semibold">${payout.amount}</span>
+                <span className="text-sm font-semibold">{payout.amount} EGP</span>
               </div>
               <div className="text-xs text-gray-500 mt-1">{payout.date}</div>
             </div>

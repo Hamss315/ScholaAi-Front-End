@@ -21,15 +21,15 @@ export default function EarningsSummary({
       <div className="space-y-3">
         <div className="flex justify-between">
           <span className="text-gray-600">This Week</span>
-          <span className="font-semibold">${week.toLocaleString()}</span>
+          <span className="font-semibold">{week.toLocaleString()} EGP</span>
         </div>
         <div className="flex justify-between">
           <span className="text-gray-600">This Month</span>
-          <span className="font-semibold">${month.toLocaleString()}</span>
+          <span className="font-semibold">{month.toLocaleString()} EGP</span>
         </div>
         <div className="flex justify-between">
           <span className="text-gray-600">Last Month</span>
-          <span className="font-semibold">${lastMonth.toLocaleString()}</span>
+          <span className="font-semibold">{lastMonth.toLocaleString()} EGP</span>
         </div>
         <div className="pt-3 border-t">
           <div className="flex justify-between items-center">
@@ -38,7 +38,7 @@ export default function EarningsSummary({
               style={{ color: "#1E3A8A" }}
               className="text-lg font-bold"
             >
-              ${lifetime.toLocaleString()}
+              {lifetime.toLocaleString()} EGP
             </span>
           </div>
         </div>

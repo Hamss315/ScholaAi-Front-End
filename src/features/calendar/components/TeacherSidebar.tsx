@@ -5,6 +5,7 @@ import { Card } from "../../../components/ui/card";
 import { Button } from "../../../components/ui/button";
 import { Badge } from "../../../components/ui/badge";
 import { Avatar, AvatarFallback } from "../../../components/ui/avatar";
+import { getInitials } from "../../../utils/utils";
 
 import type { TeacherSession } from "../types/calendar.types";
 import { isSameLocalMonth } from "../services/calendar.service";

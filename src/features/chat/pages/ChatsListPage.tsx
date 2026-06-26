@@ -20,6 +20,7 @@ import ConversationCard from "../components/ConversationCard";
 import { chatApi } from "../services/chatApi";
 import type { ChatConversation, UserRole } from "../types/chat";
 import { useAuth } from "../../../context/auth-context";
+import { getInitials } from "../../../utils/utils";
 
 interface ChatsListPageProps {
   userRole?: UserRole | null;
@@ -29,6 +30,7 @@ export default function ChatsListPage({ userRole: propUserRole }: ChatsListPageP
   const navigate = useNavigate();
   const { user } = useAuth();
   const userRole = user?.role || propUserRole || "student";
+  const initials = getInitials(user?.userName, user?.firstName, user?.lastName) || (userRole === "teacher" ? "T" : "S");
 
   const [searchQuery, setSearchQuery] = useState("");
   const [chats, setChats] = useState<ChatConversation[]>([]);
@@ -101,7 +103,7 @@ export default function ChatsListPage({ userRole: propUserRole }: ChatsListPageP
                       : "bg-[#3B82F6] text-white"
                   }
                 >
-                  {userRole === "teacher" ? "T" : "S"}
+                  {initials}
                 </AvatarFallback>
               </Avatar>
 

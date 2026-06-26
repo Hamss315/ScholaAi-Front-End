@@ -8,7 +8,7 @@ import { getInitials } from "../../../utils/utils";
 export default function RequestSessionHeader() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const initials = getInitials(user?.userName) || "ST";
+  const initials = getInitials(user?.userName, user?.firstName, user?.lastName) || "ST";
 
   return (
     <header className="bg-white border-b sticky top-0 z-50">

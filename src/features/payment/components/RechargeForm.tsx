@@ -29,10 +29,10 @@ function RechargeFormInner({ onRechargeSuccess }: { onRechargeSuccess: () => voi
   const [successMsg, setSuccessMsg] = useState("");
 
   const quickAmounts = [
-    { value: 25, label: "$25" },
-    { value: 50, label: "$50" },
-    { value: 100, label: "$100" },
-    { value: 200, label: "$200" },
+    { value: 25, label: "25 EGP" },
+    { value: 50, label: "50 EGP" },
+    { value: 100, label: "100 EGP" },
+    { value: 200, label: "200 EGP" },
   ];
 
   const amount = selectedAmount ?? (customAmount ? parseFloat(customAmount) : 0);
@@ -77,7 +77,7 @@ function RechargeFormInner({ onRechargeSuccess }: { onRechargeSuccess: () => voi
       } else if (result.paymentIntent && result.paymentIntent.status === "succeeded") {
         // 3. Inform backend to credit wallet directly for local testing
         await paymentService.confirmAndCreditTest(amount);
-        setSuccessMsg(`Successfully recharged $${amount.toFixed(2)}!`);
+        setSuccessMsg(`Successfully recharged ${amount.toFixed(2)} EGP!`);
         onRechargeSuccess();
         setCustomAmount("");
         setSelectedAmount(50);
@@ -151,14 +151,14 @@ function RechargeFormInner({ onRechargeSuccess }: { onRechargeSuccess: () => voi
 
         {/* Custom Amount */}
         <div>
-          <Label className="text-gray-700 font-medium">Custom Amount (USD)</Label>
+          <Label className="text-gray-700 font-medium">Custom Amount (EGP)</Label>
           <div className="relative mt-2">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold">
-              $
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-gray-400 font-bold">
+              EGP
             </span>
             <Input
               type="number"
-              className="pl-8 h-12 text-lg border-gray-200 focus:border-purple-500 focus:ring-purple-200 rounded-xl"
+              className="pl-12 h-12 text-lg border-gray-200 focus:border-purple-500 focus:ring-purple-200 rounded-xl"
               placeholder="0.00"
               value={customAmount}
               onChange={(e) => {
@@ -232,7 +232,7 @@ function RechargeFormInner({ onRechargeSuccess }: { onRechargeSuccess: () => voi
               Processing Recharge...
             </div>
           ) : (
-            `Recharge $${amount.toFixed(2)}`
+            `Recharge ${amount.toFixed(2)} EGP`
           )}
         </Button>
       </form>

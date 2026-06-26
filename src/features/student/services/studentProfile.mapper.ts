@@ -40,13 +40,13 @@ export function mapStudentProfileDto(dto: StudentProfileDto): {
       balance: dto.walletBalance ?? 0,
       lastTopUp: new Date(), // backend doesn't return this yet
       status: "Active",
-      currency: "USD",
+      currency: "EGP",
     },
 
     paymentHistory: (dto.paymentHistory ?? []).map((p, index) => ({
       id: p.id ?? index,
       date: p.date ?? "-",
-      amount: p.amount ? `$${p.amount}` : "-",
+      amount: p.amount ? `${p.amount} EGP` : "-",
       plan: "Session Package",
       status: p.status ?? "Completed",
     })),

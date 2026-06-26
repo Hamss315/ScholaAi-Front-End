@@ -4,6 +4,7 @@ import { Badge } from "../../../../components/ui/badge";
 import { Avatar, AvatarFallback } from "../../../../components/ui/avatar";
 import { Progress } from "../../../../components/ui/progress";
 import { sessionData } from "../../data/notesData";
+import { getInitials } from "../../../../utils/utils";
 
 export default function NotesAnalysis() {
   return (
@@ -44,7 +45,7 @@ export default function NotesAnalysis() {
               <div className="text-sm text-gray-600 mb-1">Teacher</div>
               <div className="flex items-center gap-2">
                 <Avatar className="w-8 h-8">
-                  <AvatarFallback className="bg-[#8B5CF6] text-white">SJ</AvatarFallback>
+                  <AvatarFallback className="bg-[#8B5CF6] text-white">{getInitials(sessionData.teacherName)}</AvatarFallback>
                 </Avatar>
                 <span className="text-gray-700">{sessionData.teacherName}</span>
               </div>

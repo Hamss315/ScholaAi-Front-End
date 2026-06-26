@@ -4,6 +4,7 @@ import { Button } from "../../../components/ui/button";
 import { Card } from "../../../components/ui/card";
 import { Avatar, AvatarFallback } from "../../../components/ui/avatar";
 import { setRating } from "../../../utils/ratingService";
+import { getInitials } from "../../../utils/utils";
 import { useNavigate } from "react-router-dom";
 
 // Mock: session that just ended
@@ -89,7 +90,7 @@ export default function SessionRatingPage() {
               <div className="flex flex-col items-center mb-8">
                 <Avatar className="w-20 h-20 mb-3 shadow-md">
                   <AvatarFallback className="bg-[#8B5CF6] text-white text-2xl font-bold">
-                    {TEACHER.initials}
+                    {getInitials(TEACHER.name) || TEACHER.initials}
                   </AvatarFallback>
                 </Avatar>
                 <h2 className="text-2xl font-bold mb-1" style={{ color: '#1E3A8A' }}>{TEACHER.name}</h2>

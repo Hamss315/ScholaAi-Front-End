@@ -23,7 +23,7 @@ export default function StatsGrid({
           <span className="text-gray-600">Wallet Balance</span>
           <Clock className="w-5 h-5 text-gray-400" />
         </div>
-        <div className="text-3xl font-semibold text-[#1E3A8A]">${walletBalance.toFixed(2)}</div>
+        <div className="text-3xl font-semibold text-[#1E3A8A]">{walletBalance.toFixed(2)} EGP</div>
         <Badge className="bg-green-100 text-green-700 mt-2 hover:bg-green-100">Active</Badge>
       </Card>
 

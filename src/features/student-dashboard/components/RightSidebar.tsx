@@ -34,7 +34,7 @@ export default function RightSidebar({
               Available Balance
             </div>
             <div className="text-3xl mb-2">
-              ${walletBalance.toFixed(2)}
+              {walletBalance.toFixed(2)} EGP
             </div>
           </div>
 
@@ -43,14 +43,14 @@ export default function RightSidebar({
             <div className="flex justify-between">
               <span className="text-gray-600">Last Recharge</span>
               <span className="text-green-600">
-                +${walletSummary.lastRechargeAmount.toFixed(2)}
+                +{walletSummary.lastRechargeAmount.toFixed(2)} EGP
               </span>
             </div>
 
             <div className="flex justify-between">
               <span className="text-gray-600">Last Session</span>
               <span className="text-red-600">
-                -${Math.abs(walletSummary.lastSessionAmount).toFixed(2)}
+                -{Math.abs(walletSummary.lastSessionAmount).toFixed(2)} EGP
               </span>
             </div>
 

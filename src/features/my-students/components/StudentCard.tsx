@@ -1,6 +1,6 @@
 import { Avatar, AvatarFallback } from "../../../components/ui/avatar";
 import { Button } from "../../../components/ui/button";
-import { Calendar, MessageSquare, TrendingUp } from "lucide-react";
+import { Calendar, MessageSquare } from "lucide-react";
 import type { Student } from "../types/students.types";
 import { useNavigate } from "react-router-dom";
 

@@ -2,6 +2,8 @@ import { useNavigate } from "react-router-dom";
 import { Brain, ArrowLeft, TrendingUp, Download, LogOut } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import { Avatar, AvatarFallback } from "../../../components/ui/avatar";
+import { useAuth } from "../../../context/auth-context";
+import { getInitials } from "../../../utils/utils";
 
 import SessionInfoCard from "../components/SessionInfoCard";
 import SessionStats from "../components/SessionStats";
@@ -12,6 +14,9 @@ import NextSessionSchedule from "../components/NextSessionSchedule";
 
 export default function SessionAnalysisPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const initials = getInitials(user?.userName, user?.firstName, user?.lastName) || "SJ";
+
 
   // Mock session data
   const sessionData = {
@@ -87,7 +92,7 @@ export default function SessionAnalysisPage() {
               </Button>
               <Avatar>
                 <AvatarFallback className="bg-[#8B5CF6] text-white">
-                  SJ
+                  {initials}
                 </AvatarFallback>
               </Avatar>
               <Button variant="ghost" size="icon" onClick={handleLogout}>

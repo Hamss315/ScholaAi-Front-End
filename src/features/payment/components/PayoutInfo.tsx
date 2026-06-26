@@ -8,7 +8,7 @@ export default function PayoutInfo() {
           <strong>How payouts work:</strong>
         </p>
         <ul className="list-disc list-inside space-y-2 text-xs text-gray-600">
-          <li>Minimum payout amount: $50</li>
+          <li>Minimum payout amount: 50 EGP</li>
           <li>Request anytime you have available balance</li>
           <li>Bank transfers are free (ACH)</li>
           <li>Funds typically arrive in 3-5 business days</li>

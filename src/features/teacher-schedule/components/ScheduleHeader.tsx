@@ -12,7 +12,9 @@ interface Props {
 export default function ScheduleHeader({ fullName }: Props) {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const initials = getInitials(fullName || user?.userName) || "T";
+  const initials = fullName
+    ? getInitials(fullName)
+    : (getInitials(user?.userName, user?.firstName, user?.lastName) || "T");
 
   return (
     <header className="bg-white border-b sticky top-0 z-50">

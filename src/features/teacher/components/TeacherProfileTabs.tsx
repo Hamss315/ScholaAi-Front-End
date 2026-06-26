@@ -4,30 +4,20 @@ import {
   Phone,
   BookOpen,
   Clock,
-  DollarSign,
+  Banknote,
   GraduationCap,
   Edit,
-  Lock,
   Save,
   X,
-  Upload,
-  FileText,
-  Bell,
-  Inbox,
-  CalendarIcon,
   Star,
-  Award,
 } from "lucide-react";
 
 import { Button } from "../../../components/ui/button";
 import { Card } from "../../../components/ui/card";
-import { Badge } from "../../../components/ui/badge";
 import { Avatar, AvatarFallback } from "../../../components/ui/avatar";
 import { getInitials } from "../../../utils/utils";
 import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
-import { Switch } from "../../../components/ui/switch";
-import { Separator } from "../../../components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui/tabs";
 import { Textarea } from "../../../components/ui/textarea";
 import { Progress } from "../../../components/ui/progress";
@@ -85,26 +75,17 @@ export default function TeacherProfileTabs({
   setProfileData,
   professionalData,
   setProfessionalData,
-  certifications,
+  certifications: _certifications,
   workSummary,
   recentReviews,
-  notifications,
-  setNotifications,
   isEditingProfile,
   setIsEditingProfile,
   isEditingProfessional,
   setIsEditingProfessional,
-  isChangingPassword,
-  setIsChangingPassword,
-  passwordData,
-  setPasswordData,
-  passwordError,
-  passwordSuccess,
   profileError,
   profileSuccess,
   onSaveProfile,
   onSaveProfessional,
-  onChangePassword,
 }: Props) {
   const totalReviewsCount = recentReviews.length;
   const starCounts = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
@@ -121,11 +102,10 @@ export default function TeacherProfileTabs({
   return (
     <div className="md:col-span-2 font-sans">
       <Tabs defaultValue="profile" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="professional">Professional</TabsTrigger>
           <TabsTrigger value="reviews">Reviews</TabsTrigger>
-          <TabsTrigger value="settings">Settings</TabsTrigger>
         </TabsList>
 
         {/* Profile Tab */}
@@ -307,9 +287,9 @@ export default function TeacherProfileTabs({
                 </div>
 
                 <div>
-                  <Label htmlFor="hourlyRate">Hourly Rate</Label>
+                  <Label htmlFor="hourlyRate">Hourly Rate (EGP)</Label>
                   <div className="flex items-center gap-2 mt-1">
-                    <DollarSign className="w-4 h-4 text-gray-400 shrink-0" />
+                    <Banknote className="w-4 h-4 text-gray-400 shrink-0" />
                     <Input
                       id="hourlyRate"
                       value={professionalData.hourlyRate}
@@ -344,43 +324,6 @@ export default function TeacherProfileTabs({
                 </div>
               </div>
             </Card>
-
-            {/* <Card className="p-6">
-              <div className="flex justify-between items-center mb-6">
-                <div>
-                  <h3 className="text-2xl" style={{ color: "#1E3A8A" }}>
-                    Certifications & Qualifications
-                  </h3>
-                  <p className="text-sm text-gray-600">Showcase your credentials to students</p>
-                </div>
-
-                <Button style={{ backgroundColor: "#8B5CF6" }}>
-                  <Upload className="w-4 h-4 mr-2 shrink-0" />
-                  Add Certificate
-                </Button>
-              </div>
-
-              <div className="space-y-3">
-                {certifications.map((cert) => (
-                  <div key={cert.id} className="p-4 border rounded-lg hover:bg-gray-50 transition-colors">
-                    <div className="flex items-start justify-between">
-                      <div className="flex gap-3">
-                        <Award className="w-5 h-5 mt-1 shrink-0" style={{ color: "#8B5CF6" }} />
-                        <div>
-                          <p className="font-semibold" style={{ color: "#1E3A8A" }}>
-                            {cert.name}
-                          </p>
-                          <p className="text-sm text-gray-600">{cert.issuer}</p>
-                          <p className="text-sm text-gray-500">Issued: {cert.year}</p>
-                        </div>
-                      </div>
-
-                      <Badge className="bg-green-100 text-green-700 hover:bg-green-100">Verified</Badge>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </Card> */}
           </div>
         </TabsContent>
 
@@ -470,148 +413,6 @@ export default function TeacherProfileTabs({
               ))}
             </div>
           </Card>
-        </TabsContent>
-
-        {/* Settings Tab */}
-        <TabsContent value="settings">
-          <div className="space-y-6">
-            <Card className="p-6">
-              <div className="flex justify-between items-center mb-6">
-                <div>
-                  <h3 className="text-2xl" style={{ color: "#1E3A8A" }}>
-                    Security
-                  </h3>
-                  <p className="text-sm text-gray-600">Manage your password and security settings</p>
-                </div>
-
-                {!isChangingPassword && (
-                  <Button onClick={() => setIsChangingPassword(true)} style={{ backgroundColor: "#3B82F6" }}>
-                    <Lock className="w-4 h-4 mr-2 shrink-0" />
-                    Change Password
-                  </Button>
-                )}
-              </div>
-
-              {isChangingPassword && (
-                <div className="space-y-4 mb-6 p-4 bg-gray-50 rounded-lg">
-                  {passwordError && (
-                    <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded p-2">
-                      {passwordError}
-                    </p>
-                  )}
-                  {passwordSuccess && (
-                    <p className="text-sm text-green-600 bg-green-50 border border-green-200 rounded p-2">
-                      {passwordSuccess}
-                    </p>
-                  )}
-
-                  <div>
-                    <Label htmlFor="current-password">Current Password</Label>
-                    <Input id="current-password" type="password" className="mt-1"
-                      value={passwordData.currentPassword}
-                      onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="new-password">New Password</Label>
-                    <Input id="new-password" type="password" className="mt-1"
-                      value={passwordData.newPassword}
-                      onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="confirm-password">Confirm New Password</Label>
-                    <Input id="confirm-password" type="password" className="mt-1"
-                      value={passwordData.confirmPassword}
-                      onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
-                    />
-                  </div>
-
-                  <div className="flex gap-2">
-                    <Button onClick={onChangePassword} style={{ backgroundColor: "#22C55E" }}>
-                      Update Password
-                    </Button>
-                    <Button variant="outline" onClick={() => setIsChangingPassword(false)}>
-                      Cancel
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </Card>
-
-            <Card className="p-6">
-              <div className="mb-6">
-                <h3 className="text-2xl mb-2" style={{ color: "#1E3A8A" }}>
-                  Notifications
-                </h3>
-                <p className="text-sm text-gray-600">Choose what updates you'd like to receive</p>
-              </div>
-
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Bell className="w-5 h-5 text-gray-400 shrink-0" />
-                    <div>
-                      <p>Email Notifications</p>
-                      <p className="text-sm text-gray-600">Receive email updates about your account</p>
-                    </div>
-                  </div>
-                  <Switch
-                    checked={notifications.emailNotifications}
-                    onCheckedChange={(checked) => setNotifications({ ...notifications, emailNotifications: checked })}
-                  />
-                </div>
-
-                <Separator />
-
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <CalendarIcon className="w-5 h-5 text-gray-400 shrink-0" />
-                    <div>
-                      <p>Session Reminders</p>
-                      <p className="text-sm text-gray-600">Get reminded before your sessions start</p>
-                    </div>
-                  </div>
-                  <Switch
-                    checked={notifications.sessionReminders}
-                    onCheckedChange={(checked) => setNotifications({ ...notifications, sessionReminders: checked })}
-                  />
-                </div>
-
-                <Separator />
-
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Inbox className="w-5 h-5 text-gray-400 shrink-0" />
-                    <div>
-                      <p>Student Requests</p>
-                      <p className="text-sm text-gray-600">Get notified of new session requests</p>
-                    </div>
-                  </div>
-                  <Switch
-                    checked={notifications.studentRequests}
-                    onCheckedChange={(checked) => setNotifications({ ...notifications, studentRequests: checked })}
-                  />
-                </div>
-
-                <Separator />
-
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <FileText className="w-5 h-5 text-gray-400 shrink-0" />
-                    <div>
-                      <p>Weekly Reports</p>
-                      <p className="text-sm text-gray-600">Get weekly teaching performance reports</p>
-                    </div>
-                  </div>
-                  <Switch
-                    checked={notifications.weeklyReports}
-                    onCheckedChange={(checked) => setNotifications({ ...notifications, weeklyReports: checked })}
-                  />
-                </div>
-              </div>
-            </Card>
-          </div>
         </TabsContent>
       </Tabs>
     </div>

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { DollarSign, Building2, CreditCard } from "lucide-react";
+import { Banknote, Building2, CreditCard } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import { Card } from "../../../components/ui/card";
 import { Input } from "../../../components/ui/input";
@@ -60,10 +60,10 @@ export default function PayoutForm({
       <form onSubmit={handleRequestPayout} className="space-y-6">
         {/* Payout Amount */}
         <div>
-          <Label htmlFor="amount">Payout Amount (USD)</Label>
+          <Label htmlFor="amount">Payout Amount (EGP)</Label>
           <div className="relative mt-2">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
-              $
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-gray-500 font-semibold">
+              EGP
             </span>
             <Input
               id="amount"
@@ -73,13 +73,12 @@ export default function PayoutForm({
               max={availableBalance}
               min={minimumPayout}
               step="0.01"
-              className="pl-7"
+              className="pl-12"
               required
             />
           </div>
           <p className="text-xs text-gray-500 mt-1">
-            Minimum payout: ${minimumPayout.toFixed(2)} | Maximum: $
-            {availableBalance.toFixed(2)}
+            Minimum payout: {minimumPayout.toFixed(2)} EGP | Maximum: {availableBalance.toFixed(2)} EGP
           </p>
         </div>
 
@@ -191,8 +190,7 @@ export default function PayoutForm({
 
             <Alert className="border-blue-200 bg-blue-50">
               <AlertDescription className="text-sm text-blue-800">
-                PayPal charges a 2% processing fee. You'll receive $
-                {(parsedAmount * 0.98).toFixed(2)} after fees.
+                PayPal charges a 2% processing fee. You'll receive {(parsedAmount * 0.98).toFixed(2)} EGP after fees.
               </AlertDescription>
             </Alert>
           </div>
@@ -243,8 +241,8 @@ export default function PayoutForm({
 
             <Alert className="border-yellow-200 bg-yellow-50">
               <AlertDescription className="text-sm text-yellow-800">
-                Wire transfers incur a $25 fee and take 5-7 business days. Only
-                recommended for amounts over $1,000.
+                Wire transfers incur a 25 EGP fee and take 5-7 business days. Only
+                recommended for amounts over 1,000 EGP.
               </AlertDescription>
             </Alert>
           </div>
@@ -271,8 +269,8 @@ export default function PayoutForm({
               </span>
             ) : (
               <>
-                <DollarSign className="w-5 h-5 mr-2" />
-                Request Payout of ${parsedAmount.toFixed(2)}
+                <Banknote className="w-5 h-5 mr-2" />
+                Request Payout of {parsedAmount.toFixed(2)} EGP
               </>
             )}
           </Button>

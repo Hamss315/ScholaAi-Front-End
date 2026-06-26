@@ -8,7 +8,7 @@ import { getInitials } from "../../../utils/utils";
 export default function CalendarHeader() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const initials = getInitials(user?.userName) || "JS";
+  const initials = getInitials(user?.userName, user?.firstName, user?.lastName) || "JS";
 
   return (
     <header className="bg-white border-b sticky top-0 z-50">

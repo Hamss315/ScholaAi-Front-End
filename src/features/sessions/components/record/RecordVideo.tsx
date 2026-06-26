@@ -4,6 +4,7 @@ import { Card } from "../../../../components/ui/card";
 import { Avatar, AvatarFallback } from "../../../../components/ui/avatar";
 import { Slider } from "../../../../components/ui/slider";
 import { sessionData, formatTime } from "../../data/recordData";
+import { getInitials } from "../../../../utils/utils";
 
 export default function RecordVideo() {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -35,7 +36,7 @@ export default function RecordVideo() {
           <div className="flex-1 flex flex-col items-center justify-center border-r border-gray-700 bg-gray-800">
             <Avatar className="w-20 h-20 mb-3">
               <AvatarFallback className="bg-[#3B82F6] text-white text-2xl">
-                {sessionData.studentInitials}
+                {getInitials(sessionData.studentName) || sessionData.studentInitials}
               </AvatarFallback>
             </Avatar>
             <span className="text-white text-sm opacity-75">{sessionData.studentName}</span>
@@ -45,7 +46,7 @@ export default function RecordVideo() {
           <div className="flex-1 flex flex-col items-center justify-center bg-gray-800">
             <Avatar className="w-20 h-20 mb-3">
               <AvatarFallback className="bg-[#8B5CF6] text-white text-2xl">
-                {sessionData.teacherInitials}
+                {getInitials(sessionData.teacherName) || sessionData.teacherInitials}
               </AvatarFallback>
             </Avatar>
             <span className="text-white text-sm opacity-75">{sessionData.teacherName}</span>

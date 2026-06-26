@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import api from "../services/api";
 
 type AuthRole = "student" | "teacher" | "admin";
 
@@ -35,6 +36,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (savedToken) setToken(savedToken);
     if (savedUser) setUser(JSON.parse(savedUser));
   }, []);
+
+  useEffect(() => {
+    if (!token || !user || !user.userId) return;
+
+    const syncProfile = async () => {
+      try {
+        const endpoint = user.role === "teacher" ? `/teacherProfile/${user.userId}` : `/studentProfile/${user.userId}`;
+        const res = await api.get(endpoint);
+        const data = res.data;
+        if (data) {
+          const apiFirstName = data.firstName ?? "";
+          const apiLastName = data.lastName ?? "";
+          const currentFirstName = user.firstName ?? "";
+          const currentLastName = user.lastName ?? "";
+
+          if (apiFirstName !== currentFirstName || apiLastName !== currentLastName) {
+            const updatedUser = {
+              ...user,
+              firstName: apiFirstName || undefined,
+              lastName: apiLastName || undefined,
+            };
+            setUser(updatedUser);
+            localStorage.setItem(USER_KEY, JSON.stringify(updatedUser));
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load user profile in AuthProvider:", err);
+      }
+    };
+
+    syncProfile();
+  }, [token, user?.userId, user?.role]);
 
   const login = (newToken: string, newUser: AuthUser) => {
     setToken(newToken);

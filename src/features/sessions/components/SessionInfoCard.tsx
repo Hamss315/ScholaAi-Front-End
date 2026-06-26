@@ -2,6 +2,7 @@ import { BookOpen, Calendar, GraduationCap } from "lucide-react";
 import { Card } from "../../../components/ui/card";
 import { Badge } from "../../../components/ui/badge";
 import { Avatar, AvatarFallback } from "../../../components/ui/avatar";
+import { getInitials } from "../../../utils/utils";
 
 interface SessionData {
   lessonTitle: string;
@@ -19,9 +20,7 @@ interface SessionInfoCardProps {
 }
 
 export default function SessionInfoCard({ sessionData }: SessionInfoCardProps) {
-  const getInitials = (name: string) => {
-    return name.trim().slice(0, 2).toUpperCase();
-  };
+
 
   return (
     <Card className="p-6 mb-6">

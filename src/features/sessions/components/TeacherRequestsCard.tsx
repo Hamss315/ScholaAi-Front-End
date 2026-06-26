@@ -3,6 +3,7 @@ import { Button } from "../../../components/ui/button";
 import { Card } from "../../../components/ui/card";
 import { Badge } from "../../../components/ui/badge";
 import { Avatar, AvatarFallback } from "../../../components/ui/avatar";
+import { getInitials } from "../../../utils/utils";
 
 import type { SessionRequest } from "../types/session.types";
 
@@ -27,7 +28,7 @@ export default function TeacherRequestCard({ request, onAccept, onDecline, onMes
         <div className="flex items-start gap-4">
           <Avatar className="w-12 h-12">
             <AvatarFallback className="bg-[#3B82F6] text-white">
-              {request.studentInitials}
+              {getInitials(request.studentName) || request.studentInitials}
             </AvatarFallback>
           </Avatar>
 
