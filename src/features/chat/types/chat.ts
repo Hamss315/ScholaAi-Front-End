@@ -11,6 +11,7 @@ export interface ChatConversation {
   unreadCount: number;
   online: boolean;
   avatar?: string;
+  activeSessionId?: number;
 }
 
 export interface ChatMessage {

@@ -32,6 +32,7 @@ export const chatApi = {
       lastMessage: c.lastMessageText,
       lastMessageTime: c.lastMessageTime ? new Date(c.lastMessageTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "",
       online: false,
+      activeSessionId: c.activeSessionId,
     }));
   },
 
