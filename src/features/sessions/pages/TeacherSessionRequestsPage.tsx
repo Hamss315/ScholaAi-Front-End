@@ -19,7 +19,7 @@ export default function TeacherSessionRequestsPage() {
     try {
       setIsLoading(true);
       const data = await getTeacherRequests();
-      
+
       const mapped: SessionRequest[] = data.map((d) => {
         const dDate = new Date(d.preferredDate);
         return {

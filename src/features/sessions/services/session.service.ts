@@ -3,6 +3,7 @@ import api from "../../../services/api";
 export interface CreateSessionRequestDto {
   subjectId: number;
   preferredDate: string;
+  duration: number;
   description?: string;
 }
 
@@ -12,6 +13,7 @@ export interface TeacherRequestDto {
   studentName: string;
   subject: string;
   preferredDate: string;
+  duration: number;
   description?: string;
   isAccepted: boolean;
 }

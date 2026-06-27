@@ -18,8 +18,8 @@ export default function TeacherRequestCard({ request, onAccept, onDecline, onMes
     request.status === "pending"
       ? "bg-yellow-100 text-yellow-700 hover:bg-yellow-100"
       : request.status === "accepted"
-      ? "bg-green-100 text-green-700 hover:bg-green-100"
-      : "bg-gray-100 text-gray-700 hover:bg-gray-100";
+        ? "bg-green-100 text-green-700 hover:bg-green-100"
+        : "bg-gray-100 text-gray-700 hover:bg-gray-100";
 
   return (
     <Card className="p-6 hover:shadow-lg transition-shadow">
@@ -58,7 +58,7 @@ export default function TeacherRequestCard({ request, onAccept, onDecline, onMes
           <Clock className="w-4 h-4 text-gray-400" />
           <span className="text-sm">Time:</span>
           <span className="font-medium">
-            {request.preferredTime} ({request.duration})
+            {request.preferredTime}
           </span>
         </div>
       </div>
