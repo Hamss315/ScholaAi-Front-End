@@ -15,9 +15,20 @@ import {
   BarChart,
   Bar,
 } from "recharts";
-import { focusTrendData, radarData, barData, SUBJECT_COLORS } from "../data/performanceData";
+import { SUBJECT_COLORS } from "../data/performanceData";
 
-export default function ChartsSection() {
+interface ChartsSectionProps {
+  focusTrendData: any[];
+  radarData: any[];
+  barData: any[];
+}
+
+export default function ChartsSection({
+  focusTrendData,
+  radarData,
+  barData,
+}: ChartsSectionProps) {
+
   return (
     <>
       {/* Charts Row */}

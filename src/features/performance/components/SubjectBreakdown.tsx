@@ -2,9 +2,24 @@ import { BookOpen, Clock } from "lucide-react";
 import { Card } from "../../../components/ui/card";
 import { Badge } from "../../../components/ui/badge";
 import { Progress } from "../../../components/ui/progress";
-import { subjectStats, focusColor } from "../data/performanceData";
+import { focusColor } from "../data/performanceData";
 
-export default function SubjectBreakdown() {
+interface SubjectBreakdownProps {
+  subjectStats: Array<{
+    subject: string;
+    sessions: number;
+    avgFocus: number;
+    avgPositive: number;
+    hoursLearned: string;
+    trend: string;
+    trendUp: boolean;
+    color: string;
+    badgeClass: string;
+  }>;
+}
+
+export default function SubjectBreakdown({ subjectStats }: SubjectBreakdownProps) {
+
   return (
     <>
       <div className="mb-4 flex items-center gap-2">
