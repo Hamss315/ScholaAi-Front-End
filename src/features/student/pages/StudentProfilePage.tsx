@@ -73,12 +73,12 @@ export default function StudentProfilePage() {
     weeklyReports: true,
   });
 
-  const subscriptionData: SubscriptionData = {
+  const [subscriptionData, setSubscriptionData] = useState<SubscriptionData>({
     balance: 0,
     lastTopUp: new Date(),
     status: "Active",
     currency: "USD",
-  };
+  });
 
   const [paymentHistory, setPaymentHistory] = useState<PaymentItem[]>([]);
   const [sessionStats, setSessionStats] = useState<SessionStats>({
@@ -104,6 +104,7 @@ export default function StudentProfilePage() {
 
         setProfileData(mapped.profileData);
         setSessionStats(mapped.sessionStats);
+        setSubscriptionData(mapped.subscriptionData);
         setPaymentHistory(mapped.paymentHistory);
       } catch (e: any) {
         console.error(e?.response?.data || e?.message);

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Calendar, Clock, BookOpen, Send } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -9,33 +9,15 @@ import { Label } from "../../../components/ui/label";
 import { Textarea } from "../../../components/ui/textarea";
 
 import { createSessionRequest } from "../services/session.service";
-
-const SUBJECTS = [
-  "Mathematics",
-  "Physics",
-  "Chemistry",
-  "Biology",
-  "English",
-  "History",
-  "Computer Science",
-  "Economics",
-];
-
-const SUBJECT_MAP: Record<string, number> = {
-  "Mathematics": 1,
-  "Physics": 2,
-  "Chemistry": 3,
-  "Biology": 4,
-  "English": 5,
-  "History": 6,
-  "Computer Science": 7,
-  "Economics": 8,
-};
+import { getSubjects, type SubjectDto } from "../../../services/api/admin";
 
 export default function RequestSessionForm() {
   const navigate = useNavigate();
 
-  const [subject, setSubject] = useState("");
+  const [subjects, setSubjects] = useState<SubjectDto[]>([]);
+  const [subjectsLoading, setSubjectsLoading] = useState(true);
+
+  const [subjectId, setSubjectId] = useState<number | "">("");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [duration, setDuration] = useState("1");
@@ -45,12 +27,20 @@ export default function RequestSessionForm() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  // Fetch subjects from backend on mount
+  useEffect(() => {
+    getSubjects()
+      .then((res) => setSubjects(res.data ?? []))
+      .catch(() => setSubjects([]))
+      .finally(() => setSubjectsLoading(false));
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setSuccess("");
 
-    if (!subject || !date || !time) {
+    if (!subjectId || !date || !time) {
       setError("Please fill all required fields.");
       return;
     }
@@ -58,30 +48,27 @@ export default function RequestSessionForm() {
     try {
       setIsLoading(true);
 
-      const subjectId = SUBJECT_MAP[subject];
-      if (!subjectId) {
-        throw new Error("Invalid subject selected.");
-      }
-
-      // Combine date and time to ISO string
       const preferredDate = new Date(`${date}T${time}`).toISOString();
 
       await createSessionRequest({
-        subjectId,
+        subjectId: subjectId as number,
         preferredDate,
+        duration: parseFloat(duration),
         description: notes,
       });
 
       setSuccess("Session request sent successfully!");
-      
-      // Wait briefly before redirecting
+
       setTimeout(() => {
         navigate("/student/profile");
       }, 1500);
-
     } catch (err: any) {
       console.error("API Error:", err?.response?.data || err?.message);
-      setError(err?.response?.data?.message || err?.message || "Failed to create session request.");
+      setError(
+        err?.response?.data?.message ||
+        err?.message ||
+        "Failed to create session request."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -107,15 +94,20 @@ export default function RequestSessionForm() {
           <div className="relative mt-1">
             <BookOpen className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             <select
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
+              value={subjectId}
+              onChange={(e) =>
+                setSubjectId(e.target.value ? Number(e.target.value) : "")
+              }
               className="w-full pl-10 pr-3 py-2 border rounded-lg"
               required
+              disabled={subjectsLoading}
             >
-              <option value="">Select subject</option>
-              {SUBJECTS.map((s) => (
-                <option key={s} value={s}>
-                  {s}
+              <option value="">
+                {subjectsLoading ? "Loading subjects..." : "Select subject"}
+              </option>
+              {subjects.map((s) => (
+                <option key={s.subjectId} value={s.subjectId}>
+                  {s.name}
                 </option>
               ))}
             </select>
@@ -180,10 +172,19 @@ export default function RequestSessionForm() {
 
         {/* Actions */}
         <div className="flex gap-3">
-          <Button type="button" variant="outline" onClick={() => navigate("/student/profile")} disabled={isLoading}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => navigate("/student/profile")}
+            disabled={isLoading}
+          >
             Cancel
           </Button>
-          <Button type="submit" className="bg-[#1E3A8A]" disabled={isLoading}>
+          <Button
+            type="submit"
+            className="bg-[#1E3A8A]"
+            disabled={isLoading || subjectsLoading}
+          >
             <Send className="w-4 h-4 mr-2" />
             {isLoading ? "Sending..." : "Send Request"}
           </Button>

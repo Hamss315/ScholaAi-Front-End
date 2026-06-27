@@ -19,7 +19,11 @@ export const chatApi = {
       lastMessageTime: c.lastMessageTime ? new Date(c.lastMessageTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "",
       unreadCount: c.unreadCount,
       online: false,
+
+      activeSessionId: c.activeSessionId,
+
       avatar: getInitials(c.otherUserName) || "U",
+
     }));
   },
 
