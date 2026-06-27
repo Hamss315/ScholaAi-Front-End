@@ -1,4 +1,4 @@
-import { Clock, MessageSquare, GraduationCap } from "lucide-react";
+import { Clock, MessageSquare, GraduationCap, Star } from "lucide-react";
 import { Card } from "../../../components/ui/card";
 import { Badge } from "../../../components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "../../../components/ui/avatar";
@@ -30,9 +30,30 @@ export default function TeacherCard({ teacher }: { teacher: Teacher }) {
             {teacher.userName}
           </h3>
 
-          <div className="flex items-center gap-2 text-sm text-gray-600">
+          <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
             <GraduationCap className="w-4 h-4" />
             {teacher.college || "University"}
+          </div>
+
+          <div className="flex items-center gap-1.5 text-sm">
+            <div className="flex items-center">
+              {[1, 2, 3, 4, 5].map((s) => (
+                <Star
+                  key={s}
+                  className="w-3.5 h-3.5"
+                  style={{
+                    fill: s <= (teacher.rating || 0) ? "#FACC15" : "transparent",
+                    color: s <= (teacher.rating || 0) ? "#FACC15" : "#D1D5DB",
+                  }}
+                />
+              ))}
+            </div>
+            <span className="font-semibold text-gray-700">
+              {teacher.rating ? teacher.rating.toFixed(1) : "0.0"}
+            </span>
+            <span className="text-gray-400">
+              ({teacher.totalRatings || 0} {teacher.totalRatings === 1 ? "rating" : "ratings"})
+            </span>
           </div>
         </div>
       </div>

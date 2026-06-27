@@ -7,4 +7,6 @@ export interface Teacher {
   college: string;
   teachingExperience: string;
   profilePhotoURL?: string;
+  rating?: number;
+  totalRatings?: number;
 }
