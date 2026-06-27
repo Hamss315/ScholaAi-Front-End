@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   Brain,
   ArrowLeft,
@@ -20,7 +20,11 @@ import ConversationCard from "../components/ConversationCard";
 import { chatApi } from "../services/chatApi";
 import type { ChatConversation, UserRole } from "../types/chat";
 import { useAuth } from "../../../context/auth-context";
+
 import { getInitials } from "../../../utils/utils";
+
+import api from "../../../services/api";
+
 
 interface ChatsListPageProps {
   userRole?: UserRole | null;
@@ -36,20 +40,22 @@ export default function ChatsListPage({ userRole: propUserRole }: ChatsListPageP
   const [chats, setChats] = useState<ChatConversation[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const loadChats = async () => {
-      try {
-        const data = await chatApi.getConversations();
-        setChats(data);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadChats();
+  const loadChats = useCallback(async () => {
+    try {
+      const data = await chatApi.getConversations();
+      setChats(data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    loadChats();
+    const interval = setInterval(loadChats, 5000); // poll every 5 seconds
+    return () => clearInterval(interval);
+  }, [loadChats]);
 
   const filteredChats = chats.filter((chat) =>
     chat.otherUserName.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -60,6 +66,29 @@ export default function ChatsListPage({ userRole: propUserRole }: ChatsListPageP
     (sum, chat) => sum + chat.unreadCount,
     0
   );
+
+  const handleStartSession = async (chat: ChatConversation) => {
+    const userId = localStorage.getItem("userId") || user?.id || "";
+    const token = localStorage.getItem("token") || localStorage.getItem("scholaai_token") || "test";
+
+    if (chat.activeSessionId) {
+      // If there is an active session, join directly
+      const role = userRole === "teacher" ? "host" : "viewer";
+      navigate(`/session/${chat.activeSessionId}/stream?role=${role}&peerId=${userId}&token=${token}`);
+      return;
+    }
+
+    // Otherwise, start a new session (only teachers can do this)
+    try {
+      await api.post(`/teacherSessions/start-by-student/${chat.otherUserId}`);
+      // Refresh the chats list so the button changes to "Join Session"
+      await loadChats();
+    } catch (err: any) {
+      const errorMsg = err?.response?.data?.message || err?.message || "An unexpected error occurred.";
+      alert(`Failed to start session: ${errorMsg}`);
+      console.error("Start session error:", errorMsg);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -209,6 +238,7 @@ export default function ChatsListPage({ userRole: propUserRole }: ChatsListPageP
                     state: { chat },
                   })
                 }
+                onStartSession={() => handleStartSession(chat)}
               />
             ))
           )}

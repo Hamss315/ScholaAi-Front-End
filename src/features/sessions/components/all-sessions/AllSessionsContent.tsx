@@ -27,13 +27,14 @@ import {
   SelectValue,
 } from "../../../../components/ui/select";
 import { useNavigate } from "react-router-dom";
-import { subjects, focusColor, subjectColor } from "../../data/allSessionsData";
+import { focusColor, subjectColor } from "../../data/allSessionsData";
 import { getStudentSessions } from "../../../../services/api/studentSessions";
 import {
   createRating,
   updateRating,
   deleteRating as deleteRatingApi,
 } from "../../../../services/api/rating";
+
 
 // ─── Star display (read-only) ─────────────────────────────────────────────────
 function StarDisplay({ stars }: { stars: number }) {
@@ -115,7 +116,12 @@ function InlineRatingEditor({
 }
 
 // ─── Main content ─────────────────────────────────────────────────────────────
-export default function AllSessionsContent() {
+interface Props {
+  subjects: string[];
+  onSessionsLoaded: (sessions: any[]) => void;
+}
+
+export default function AllSessionsContent({ subjects, onSessionsLoaded }: Props) {
   const navigate = useNavigate();
 
   const [sessions, setSessions] = useState<any[]>([]);
@@ -132,6 +138,7 @@ export default function AllSessionsContent() {
         setLoading(true);
         const data = await getStudentSessions();
         setSessions(data);
+        onSessionsLoaded(data);
       } catch (err) {
         console.error("Failed to load sessions:", err);
       } finally {

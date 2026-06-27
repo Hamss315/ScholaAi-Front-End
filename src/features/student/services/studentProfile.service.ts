@@ -21,6 +21,7 @@ export type StudentProfileDto = {
   averageFocusScore: number;
   sessionsThisMonth: number;
   walletBalance: number | null;
+  lastTopUp: string | null;
   paymentHistory: PaymentHistoryItem[];
 };
 

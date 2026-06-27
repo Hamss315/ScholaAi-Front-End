@@ -96,6 +96,7 @@ export default function StudentProfilePage() {
 
         setProfileData(mapped.profileData);
         setSessionStats(mapped.sessionStats);
+        setSubscriptionData(mapped.subscriptionData);
         setPaymentHistory(mapped.paymentHistory);
       } catch (e: any) {
         console.error(e?.response?.data || e?.message);

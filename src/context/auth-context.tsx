@@ -83,6 +83,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
+    localStorage.removeItem("token");
+    localStorage.removeItem("userId");
   };
 
   const value = useMemo(

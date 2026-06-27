@@ -12,6 +12,7 @@ export interface TeacherRequestDto {
   studentName: string;
   subject: string;
   preferredDate: string;
+  duration: number;
   description?: string;
   isAccepted: boolean;
 }

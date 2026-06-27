@@ -38,7 +38,7 @@ export function mapStudentProfileDto(dto: StudentProfileDto): {
 
     subscriptionData: {
       balance: dto.walletBalance ?? 0,
-      lastTopUp: new Date(), // backend doesn't return this yet
+      lastTopUp: dto.lastTopUp ? new Date(dto.lastTopUp) : new Date(),
       status: "Active",
       currency: "EGP",
     },
