@@ -52,7 +52,23 @@ export default function TeacherCard({ teacher }: { teacher: Teacher }) {
 
       <Button
         className="w-full bg-[#8B5CF6] hover:bg-[#8B5CF6]/90 font-semibold flex items-center justify-center gap-2"
-        onClick={() => navigate(`/chat/${teacher.teacherId}`)}
+        onClick={() =>
+          navigate(`/chat/${teacher.teacherId}`, {
+            state: {
+              chat: {
+                id: teacher.teacherId,
+                otherUserId: teacher.teacherId,
+                otherUserName: teacher.userName,
+                otherUserRole: "teacher",
+                subject: teacher.subject,
+                lastMessage: "",
+                lastMessageTime: "",
+                unreadCount: 0,
+                online: false,
+              },
+            },
+          })
+        }
       >
         <MessageSquare className="w-4 h-4" />
         Chat with Teacher
