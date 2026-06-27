@@ -20,7 +20,6 @@ export default function RequestSessionForm() {
   const [subjectId, setSubjectId] = useState<number | "">("");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
-  const [duration, setDuration] = useState("1");
   const [notes, setNotes] = useState("");
 
   const [isLoading, setIsLoading] = useState(false);
@@ -53,7 +52,6 @@ export default function RequestSessionForm() {
       await createSessionRequest({
         subjectId: subjectId as number,
         preferredDate,
-        duration: parseFloat(duration),
         description: notes,
       });
 
@@ -142,21 +140,6 @@ export default function RequestSessionForm() {
               required
             />
           </div>
-        </div>
-
-        {/* Duration */}
-        <div>
-          <Label>Duration *</Label>
-          <select
-            value={duration}
-            onChange={(e) => setDuration(e.target.value)}
-            className="w-full mt-1 px-3 py-2 border rounded-lg"
-          >
-            <option value="0.5">30 minutes</option>
-            <option value="1">1 hour</option>
-            <option value="1.5">1.5 hours</option>
-            <option value="2">2 hours</option>
-          </select>
         </div>
 
         {/* Notes */}
