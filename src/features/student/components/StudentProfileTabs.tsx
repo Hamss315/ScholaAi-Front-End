@@ -79,9 +79,16 @@ export default function StudentProfileTabs({
   setProfileData,
   isEditingProfile,
   setIsEditingProfile,
+  isChangingPassword,
+  setIsChangingPassword,
   paymentHistory,
   sessionStats,
   onSaveProfile,
+  onChangePassword,
+  passwordData,
+  setPasswordData,
+  passwordError,
+  passwordSuccess,
   profileError,
   profileSuccess,
 }: StudentProfileTabsProps) {
@@ -216,6 +223,93 @@ export default function StudentProfileTabs({
                   disabled={!isEditingProfile}
                   className="mt-1"
                 />
+              </div>
+
+              {/* Password Section */}
+              <div className="mt-8 pt-6 border-t border-gray-100">
+                <h4 className="text-lg font-medium mb-4" style={{ color: "#1E3A8A" }}>
+                  Security & Password
+                </h4>
+
+                {passwordSuccess && (
+                  <div className="flex items-center gap-2 text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg px-4 py-3 mb-4">
+                    <span>✓</span> {passwordSuccess}
+                  </div>
+                )}
+                {passwordError && (
+                  <div className="flex items-center gap-2 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-4 py-3 mb-4">
+                    <span>✕</span> {passwordError}
+                  </div>
+                )}
+
+                {!isChangingPassword ? (
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsChangingPassword(true)}
+                    className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                  >
+                    Change Password
+                  </Button>
+                ) : (
+                  <div className="space-y-4 max-w-md">
+                    <div>
+                      <Label htmlFor="currentPassword">Current Password</Label>
+                      <Input
+                        id="currentPassword"
+                        type="password"
+                        value={passwordData.currentPassword}
+                        onChange={(e) =>
+                          setPasswordData((p) => ({ ...p, currentPassword: e.target.value }))
+                        }
+                        className="mt-1"
+                        placeholder="Enter current password"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="newPassword">New Password</Label>
+                      <Input
+                        id="newPassword"
+                        type="password"
+                        value={passwordData.newPassword}
+                        onChange={(e) =>
+                          setPasswordData((p) => ({ ...p, newPassword: e.target.value }))
+                        }
+                        className="mt-1"
+                        placeholder="Enter new password"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                      <Input
+                        id="confirmPassword"
+                        type="password"
+                        value={passwordData.confirmPassword}
+                        onChange={(e) =>
+                          setPasswordData((p) => ({ ...p, confirmPassword: e.target.value }))
+                        }
+                        className="mt-1"
+                        placeholder="Confirm new password"
+                      />
+                    </div>
+
+                    <div className="flex gap-2 pt-2">
+                      <Button onClick={onChangePassword} style={{ backgroundColor: "#3B82F6" }}>
+                        Update Password
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setIsChangingPassword(false);
+                          setPasswordData({ currentPassword: "", newPassword: "", confirmPassword: "" });
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </Card>

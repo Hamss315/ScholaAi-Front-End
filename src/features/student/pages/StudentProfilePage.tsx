@@ -65,12 +65,12 @@ export default function StudentProfilePage() {
     sessionDuration: "",
   });
 
-  const subscriptionData: SubscriptionData = {
+  const [subscriptionData, setSubscriptionData] = useState<SubscriptionData>({
     balance: 0,
     lastTopUp: new Date(),
     status: "Active",
     currency: "EGP",
-  };
+  });
 
   const [paymentHistory, setPaymentHistory] = useState<PaymentItem[]>([]);
   const [sessionStats, setSessionStats] = useState<SessionStats>({

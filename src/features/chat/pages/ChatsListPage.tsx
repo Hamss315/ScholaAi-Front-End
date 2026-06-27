@@ -68,7 +68,7 @@ export default function ChatsListPage({ userRole: propUserRole }: ChatsListPageP
   );
 
   const handleStartSession = async (chat: ChatConversation) => {
-    const userId = localStorage.getItem("userId") || user?.id || "";
+    const userId = localStorage.getItem("userId") || user?.userId || "";
     const token = localStorage.getItem("token") || localStorage.getItem("scholaai_token") || "test";
 
     if (chat.activeSessionId) {

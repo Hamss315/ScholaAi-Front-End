@@ -149,7 +149,7 @@ export function deriveSessionStatus(
 
 export function getScheduledAt(req: Record<string, unknown>): string {
   return String(
-    req.preferredDate ?? req.PreferredDate ?? req.scheduledAt ?? req.ScheduledAt ?? ""
+    req.preferredDate ?? req.PreferredDate ?? req.scheduledAt ?? req.ScheduledAt ?? req.date ?? req.Date ?? ""
   );
 }
 
