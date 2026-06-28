@@ -1,9 +1,7 @@
 import type { StudentCardDto } from "../services/api/teacherProfile";
 import type { Student } from "../features/my-students/types/students.types";
+import { getInitials } from "./utils";
 
-export function getInitials(name: string): string {
-    return name.trim().slice(0, 2).toUpperCase();
-}
 
 function formatNextSession(dto: StudentCardDto): string {
     if (!dto.nextSessionDate) return "Not scheduled";

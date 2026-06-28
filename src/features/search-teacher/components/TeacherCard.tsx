@@ -1,17 +1,17 @@
-import { Clock, MessageSquare, GraduationCap } from "lucide-react";
+import { Clock, MessageSquare, GraduationCap, Star } from "lucide-react";
 import { Card } from "../../../components/ui/card";
 import { Badge } from "../../../components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "../../../components/ui/avatar";
 import { Button } from "../../../components/ui/button";
+import { getInitials } from "../../../utils/utils";
 import type { Teacher } from "../types/teacher.types";
 import { useNavigate } from "react-router-dom";
-import { getInitials } from "../../../utils/utils";
 
 export default function TeacherCard({ teacher }: { teacher: Teacher }) {
   const navigate = useNavigate();
 
   const initials = getInitials(teacher.userName) || "T";
-
+ 
   return (
     <Card className="p-6 hover:shadow-lg transition-shadow">
 
@@ -30,9 +30,30 @@ export default function TeacherCard({ teacher }: { teacher: Teacher }) {
             {teacher.userName}
           </h3>
 
-          <div className="flex items-center gap-2 text-sm text-gray-600">
+          <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
             <GraduationCap className="w-4 h-4" />
             {teacher.college || "University"}
+          </div>
+
+          <div className="flex items-center gap-1.5 text-sm">
+            <div className="flex items-center">
+              {[1, 2, 3, 4, 5].map((s) => (
+                <Star
+                  key={s}
+                  className="w-3.5 h-3.5"
+                  style={{
+                    fill: s <= (teacher.rating || 0) ? "#FACC15" : "transparent",
+                    color: s <= (teacher.rating || 0) ? "#FACC15" : "#D1D5DB",
+                  }}
+                />
+              ))}
+            </div>
+            <span className="font-semibold text-gray-700">
+              {teacher.rating ? teacher.rating.toFixed(1) : "0.0"}
+            </span>
+            <span className="text-gray-400">
+              ({teacher.totalRatings || 0} {teacher.totalRatings === 1 ? "rating" : "ratings"})
+            </span>
           </div>
         </div>
       </div>
@@ -44,34 +65,37 @@ export default function TeacherCard({ teacher }: { teacher: Teacher }) {
       </div>
 
       <div className="border-t pt-4 mb-4 flex justify-between text-sm text-gray-600">
-        <div className="flex-grow flex items-center gap-1">
+        <div className="flex items-center gap-1">
           <Clock className="w-4 h-4" />
           {teacher.teachingExperience || "N/A"} experience
         </div>
       </div>
 
       <Button
-        className="w-full bg-[#8B5CF6] hover:bg-[#8B5CF6]/90 font-semibold flex items-center justify-center gap-2"
-        onClick={() =>
-          navigate(`/chat/${teacher.teacherId}`, {
+        className="w-full bg-[#3B82F6]"
+        onClick={() => {
+          const tId = teacher.teacherId || teacher.userId || teacher.id;
+          if (!tId) {
+            console.warn("Teacher ID not found for teacher:", teacher);
+            return;
+          }
+          navigate(`/chat/${tId}`, {
             state: {
               chat: {
-                id: teacher.teacherId,
-                otherUserId: teacher.teacherId,
+                id: tId,
+                otherUserId: tId,
                 otherUserName: teacher.userName,
                 otherUserRole: "teacher",
                 subject: teacher.subject,
-                lastMessage: "",
-                lastMessageTime: "",
                 unreadCount: 0,
                 online: false,
               },
             },
-          })
-        }
+          });
+        }}
       >
-        <MessageSquare className="w-4 h-4" />
-        Chat with Teacher
+        <MessageSquare className="w-4 h-4 mr-2" />
+        Chat
       </Button>
 
     </Card>

@@ -16,8 +16,24 @@ export function parseUTCDate(dateStr: string | Date | undefined | null): Date {
 }
 
 export function getInitials(name?: string, firstName?: string, lastName?: string): string {
-  const source = [firstName, lastName].filter(Boolean).join(" ").trim() || (name ?? "").trim();
-  if (!source) return "";
+  const fName = (firstName ?? "").trim();
+  const lName = (lastName ?? "").trim();
+  if (fName || lName) {
+    const firstInitial = fName ? fName.charAt(0) : "";
+    const lastInitial = lName ? lName.charAt(0) : "";
+    return (firstInitial + lastInitial).toUpperCase();
+  }
 
-  return source.slice(0, 2).toUpperCase();
+  const cleanName = (name ?? "")
+    .trim()
+    .replace(/^(dr|prof|mr|mrs|ms)\.?\s+/i, "");
+  if (!cleanName) return "";
+
+  const parts = cleanName.split(/\s+/);
+  if (parts.length >= 2) {
+    return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+  }
+
+  return cleanName.slice(0, 2).toUpperCase();
 }
+

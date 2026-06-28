@@ -8,24 +8,26 @@ import { Label } from "../../../components/ui/label";
 import RoleSelector from "./RoleSelector";
 
 import { useRegister } from "../../../context/register-context";
+import api from "../../../services/api";
 
 type UserRole = "student" | "teacher";
 
 export default function RegisterForm() {
   const navigate = useNavigate();
-  const { setPayload } = useRegister();
+  const { payload, setPayload } = useRegister();
 
-  const [role, setRole] = useState<UserRole>("student");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [userName, setUserName] = useState("");
-  const [email, setEmail] = useState("");
+  const [role, setRole] = useState<UserRole>(payload?.role ?? "student");
+  const [firstName, setFirstName] = useState(payload?.firstName ?? "");
+  const [lastName, setLastName] = useState(payload?.lastName ?? "");
+  const [userName, setUserName] = useState(payload?.userName ?? "");
+  const [email, setEmail] = useState(payload?.email ?? "");
 
-  const [phone, setPhone] = useState("");
+  const [phone, setPhone] = useState(payload?.phone ?? "");
 
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [password, setPassword] = useState(payload?.password ?? "");
+  const [confirmPassword, setConfirmPassword] = useState(payload?.confirmPassword ?? "");
   const [passwordError, setPasswordError] = useState("");
+  const [isChecking, setIsChecking] = useState(false);
 
   const canSubmit = useMemo(() => {
     if (
@@ -42,7 +44,7 @@ export default function RegisterForm() {
     return password === confirmPassword;
   }, [firstName, lastName, userName, email, phone, password, confirmPassword]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (password !== confirmPassword) {
@@ -50,10 +52,100 @@ export default function RegisterForm() {
       return;
     }
 
-    // ✅ Save the common registration fields into context
-    // Remaining fields will be completed in onboarding (grade, availability, gender, profilePhotoURL...)
+    const hasCapital = /[A-Z]/.test(password);
+    const hasSpecial = /[@_]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+
+    if (!hasCapital || !hasSpecial || !hasNumber) {
+      const errorMsg = "Password must contain at least one capital letter, one number, and one special character (such as @ or _).";
+      setPasswordError(errorMsg);
+      alert(errorMsg);
+      return;
+    }
+
+    setIsChecking(true);
+
+    try {
+      if (role === "student") {
+        await api.post("/account/register/Student", {
+          UserName: userName,
+          Email: email,
+          Password: "invalidpassword",
+          ConfirmPassword: "invalidpassword",
+          FirstName: firstName,
+          LastName: lastName,
+          Phone: phone,
+          Gender: 0,
+          Grade: 1,
+          Availability: [{ Day: 1, TimeSlot: 1 }],
+        });
+      } else {
+        await api.post("/account/register/Teacher", {
+          UserName: userName,
+          Email: email,
+          Password: "invalidpassword",
+          ConfirmPassword: "invalidpassword",
+          FirstName: firstName,
+          LastName: lastName,
+          Phone: phone,
+          Gender: 0,
+          College: "N/A",
+          Certificate: "N/A",
+          IdNumber: "000000000",
+          SubjectId: 1,
+          TeachingExperience: "0-2",
+          Availability: [{ Day: 1, TimeSlot: 1 }],
+          OpenForImmediate: false,
+        });
+      }
+
+      console.warn("Dry-run registration succeeded unexpectedly.");
+    } catch (err: any) {
+      const resData = err?.response?.data;
+      let errorText = "";
+      if (resData?.errors) {
+        errorText = Object.values(resData.errors).flat().join(" ");
+      } else if (resData?.message) {
+        errorText = resData.message;
+      } else if (typeof resData === "string") {
+        errorText = resData;
+      } else {
+        errorText = err.message || "";
+      }
+
+      const lowerError = errorText.toLowerCase();
+
+      if (lowerError.includes("email is already registered") || (lowerError.includes("email") && lowerError.includes("in use"))) {
+        alert("Email is already registered.");
+        setIsChecking(false);
+        return;
+      }
+      if (lowerError.includes("username") && (lowerError.includes("taken") || lowerError.includes("already"))) {
+        alert("Username is already taken.");
+        setIsChecking(false);
+        return;
+      }
+
+      const isPasswordPolicyError = 
+        lowerError.includes("password") || 
+        lowerError.includes("digit") || 
+        lowerError.includes("uppercase") || 
+        lowerError.includes("lowercase") || 
+        lowerError.includes("alphanumeric") ||
+        lowerError.includes("non-alphanumeric");
+
+      if (!isPasswordPolicyError) {
+        alert(errorText || "Registration check failed.");
+        setIsChecking(false);
+        return;
+      }
+    }
+
+    setIsChecking(false);
+
+    // Save the common registration fields into context
     setPayload({
-      role: role, // your context is for student/teacher; keep admin flow separate
+      role: role,
       userName,
       profilePhotoURL: "",
       firstName,
@@ -176,6 +268,9 @@ export default function RegisterForm() {
             }}
           />
         </div>
+        <p className="text-xs text-gray-500 mt-1">
+          Must contain at least one capital letter, one number, and one special character (such as @ or _).
+        </p>
       </div>
 
       {/* Confirm Password */}
@@ -228,9 +323,9 @@ export default function RegisterForm() {
       <Button
         type="submit"
         className="w-full bg-[#1E3A8A] hover:bg-[#1e3a8a]/90"
-        disabled={!canSubmit}
+        disabled={!canSubmit || isChecking}
       >
-        Continue
+        {isChecking ? "Checking availability..." : "Continue"}
       </Button>
 
       {/* Login */}

@@ -18,6 +18,7 @@ import { Badge } from "../../../../components/ui/badge";
 import { Avatar, AvatarFallback } from "../../../../components/ui/avatar";
 import { Progress } from "../../../../components/ui/progress";
 import { Input } from "../../../../components/ui/input";
+import { getInitials } from "../../../../utils/utils";
 import {
   Select,
   SelectContent,
@@ -253,7 +254,7 @@ export default function AllSessionsContent({ subjects, onSessionsLoaded }: Props
                 <div className="flex items-start gap-4">
                   <Avatar className="w-12 h-12 shrink-0 mt-0.5">
                     <AvatarFallback className="bg-[#3B82F6] text-white">
-                      {session.teacherInitials}
+                      {getInitials(session.teacher) || session.teacherInitials}
                     </AvatarFallback>
                   </Avatar>
 
@@ -273,7 +274,7 @@ export default function AllSessionsContent({ subjects, onSessionsLoaded }: Props
                       <span className="flex items-center gap-1">
                         <Avatar className="w-4 h-4">
                           <AvatarFallback className="text-[10px] bg-gray-200">
-                            {session.teacherInitials}
+                            {getInitials(session.teacher) || session.teacherInitials}
                           </AvatarFallback>
                         </Avatar>
                         {session.teacher}

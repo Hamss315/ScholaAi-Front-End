@@ -171,7 +171,7 @@ import { Clock, Loader2 } from "lucide-react";
 import type { UpcomingClass } from "../types/dashboard.types";
 import { Link } from "react-router-dom";
 import api from "../../../services/api";
-import { parseUTCDate } from "../../../utils/utils";
+import { parseUTCDate, getInitials } from "../../../utils/utils";
 
 interface Props {
   upcoming: UpcomingClass[];
@@ -281,7 +281,7 @@ export default function UpcomingClasses({ upcoming, onSessionStarted }: Props) {
                 <div className="flex items-center gap-4">
                   <Avatar>
                     <AvatarFallback className="bg-[#3B82F6] text-white">
-                      {"ST"}
+                      {getInitials(session.studentName) || "ST"}
                     </AvatarFallback>
                   </Avatar>
                   <div>

@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 
 import { Button } from "../../../components/ui/button";
 import { Avatar, AvatarFallback } from "../../../components/ui/avatar";
+import { useAuth } from "../../../context/auth-context";
+import { getInitials } from "../../../utils/utils";
 
 import TeacherCalendarGrid from "../components/TeacherCalendarGrid";
 import TeacherSidebar from "../components/TeacherSidebar";
@@ -14,6 +16,9 @@ import { getSessionsForDate } from "../services/calendar.service";
 
 export default function TeacherCalendarPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const initials = getInitials(user?.userName, user?.firstName, user?.lastName) || "DR";
+
 
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -53,7 +58,7 @@ export default function TeacherCalendarPage() {
 
           <div className="flex items-center gap-4">
             <Avatar>
-              <AvatarFallback className="bg-purple-500 text-white">DR</AvatarFallback>
+              <AvatarFallback className="bg-purple-500 text-white">{initials}</AvatarFallback>
             </Avatar>
 
             <Button variant="ghost" size="icon" onClick={() => navigate("/")}>

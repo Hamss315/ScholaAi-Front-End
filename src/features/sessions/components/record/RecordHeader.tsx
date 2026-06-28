@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 export default function RecordHeader() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const initials = getInitials(user?.userName) || "JS";
+  const initials = getInitials(user?.userName, user?.firstName, user?.lastName) || "JS";
 
   return (
     <header className="bg-white border-b sticky top-0 z-50">
@@ -28,7 +28,7 @@ export default function RecordHeader() {
             <Avatar className="cursor-pointer" onClick={() => navigate("/student/profile")}>
               <AvatarFallback className="bg-[#8B5CF6] text-white">{initials}</AvatarFallback>
             </Avatar>
-            <Button variant="ghost" size="icon" onClick={() => navigate("/")>
+            <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
               <LogOut className="w-5 h-5" />
             </Button>
           </div>

@@ -8,7 +8,7 @@ export default function WalletCard({ balance }: { balance: number }) {
       <div className="flex items-center justify-between">
         <div>
           <p className="text-blue-100 mb-2">Available Balance</p>
-          <div className="text-5xl mb-4">${balance.toFixed(2)}</div>
+          <div className="text-5xl mb-4">{balance.toFixed(2)} EGP</div>
           <Badge className="bg-white/20 text-white">Active</Badge>
         </div>
 

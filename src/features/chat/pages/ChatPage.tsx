@@ -14,12 +14,15 @@ import { signalrService } from "../services/signalrService";
 import { useChatConnection } from "../hooks/useChatConnection";
 import type { ChatConversation, ChatMessage, UserRole } from "../types/chat";
 import { getUserIdFromToken, getRoleFromToken } from "../../../utils/jwt";
+import { useAuth } from "../../../context/auth-context";
+import { getInitials } from "../../../utils/utils";
 
 interface ChatPageProps {
   userRole?: UserRole | null;
   selectedChat?: ChatConversation;
   currentUserId?: string;
   currentUserName?: string;
+  onNavigate?: (page: string) => void;
 }
 
 export default function ChatPage({
@@ -27,10 +30,13 @@ export default function ChatPage({
   selectedChat: propSelectedChat,
   currentUserId: propUserId,
   currentUserName: propUserName,
+  onNavigate,
 }: ChatPageProps) {
   const { chatId } = useParams<{ chatId: string }>();
   const location = useLocation();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const initials = getInitials(user?.userName, user?.firstName, user?.lastName) || (propUserRole || getRoleFromToken(localStorage.getItem("token") || localStorage.getItem("scholaai_token") || "") === "teacher" ? "T" : "S");
 
   const [showMannerAlert, setShowMannerAlert] = useState(true);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -159,7 +165,16 @@ export default function ChatPage({
                 <span className="text-2xl text-[#1E3A8A]">ScholaAi</span>
               </div>
 
-              <Button variant="ghost" onClick={() => navigate("/chats")}>
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  if (onNavigate) {
+                    onNavigate("chats-list");
+                  } else {
+                    navigate("/chats");
+                  }
+                }}
+              >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to Messages
               </Button>
@@ -179,14 +194,20 @@ export default function ChatPage({
                       : "bg-[#3B82F6] text-white"
                   }
                 >
-                  {userRole === "teacher" ? "T" : "S"}
+                  {initials}
                 </AvatarFallback>
               </Avatar>
 
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => navigate("/")}
+                onClick={() => {
+                  if (onNavigate) {
+                    onNavigate("home");
+                  } else {
+                    navigate("/");
+                  }
+                }}
               >
                 <LogOut className="w-5 h-5" />
               </Button>

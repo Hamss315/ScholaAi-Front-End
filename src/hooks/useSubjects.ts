@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getSubjects } from "../services/api/admin";
+import { getPublicSubjects } from "../services/api/admin";
 import type { SubjectDto } from "../services/api/admin";
 
 // Module-level cache so we only fetch once per page session
@@ -30,7 +30,7 @@ export function useSubjects(): UseSubjectsResult {
 
     (async () => {
       try {
-        const res = await getSubjects();
+        const res = await getPublicSubjects();
         if (!cancelled) {
           cachedSubjects = res.data ?? [];
           setSubjects(cachedSubjects);

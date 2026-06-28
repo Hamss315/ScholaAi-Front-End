@@ -8,7 +8,7 @@ import { getInitials } from "../../../utils/utils";
 
 export default function DashboardHeader() {
   const { user } = useAuth();
-  const initials = getInitials(user?.userName) || "DR";
+  const initials = getInitials(user?.userName, user?.firstName, user?.lastName) || "DR";
 
   return (
     <header className="bg-white border-b sticky top-0 z-50">

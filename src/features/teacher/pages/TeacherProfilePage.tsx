@@ -61,8 +61,8 @@ export default function TeacherProfilePage() {
 
   const [workSummary, setWorkSummary] = useState<TeacherWorkSummary>({
     totalHoursTaught: 0,
-    totalEarnings: "$0",
-    thisMonthEarnings: "$0",
+    totalEarnings: "0 EGP",
+    thisMonthEarnings: "0 EGP",
     averageRating: 0,
     totalReviews: 0,
     completedSessions: 0,
@@ -129,8 +129,8 @@ export default function TeacherProfilePage() {
         setWorkSummary((prev) => ({
           ...prev,
           totalHoursTaught: data.totalHoursTaught ?? 0,
-          totalEarnings: "$0",
-          thisMonthEarnings: "$0",
+          totalEarnings: "0 EGP",
+          thisMonthEarnings: "0 EGP",
           averageRating: data.averageRate ?? prev.averageRating,
           totalReviews: data.totalRatings ?? prev.totalReviews,
           completedSessions: data.totalSessions ?? 0,
@@ -225,7 +225,16 @@ export default function TeacherProfilePage() {
       setProfileSuccess("Profile updated successfully!");
       setIsEditingProfile(false);
     } catch (e: any) {
-      setProfileError(e?.response?.data?.message || e.message || "Failed to update profile.");
+      const data = e?.response?.data;
+      if (typeof data === "string") {
+        setProfileError(data);
+      } else if (data?.errors) {
+        // ASP.NET ModelState errors: { errors: { fieldName: ["error msg"] } }
+        const messages = Object.values(data.errors).flat().join(" • ");
+        setProfileError(messages as string);
+      } else {
+        setProfileError(data?.message || e.message || "Failed to update profile.");
+      }
     }
   };
 

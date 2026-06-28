@@ -1,5 +1,5 @@
 import { Card } from "../../../components/ui/card";
-import { DollarSign, TrendingUp, Users } from "lucide-react";
+import { Banknote, TrendingUp, Users } from "lucide-react";
 
 interface DashboardStatsProps {
   todayEarnings: number;
@@ -19,9 +19,9 @@ export default function DashboardStats({
       <Card className="p-6">
         <div className="flex items-center justify-between mb-2">
           <span className="text-gray-600">Today's Earnings</span>
-          <DollarSign className="w-5 h-5 text-gray-400" />
+          <Banknote className="w-5 h-5 text-gray-400" />
         </div>
-        <div className="text-3xl mb-1" style={{ color: '#22C55E' }}>${todayEarnings.toFixed(2)}</div>
+        <div className="text-3xl mb-1" style={{ color: '#22C55E' }}>{todayEarnings.toFixed(2)} EGP</div>
         <span className="text-sm text-gray-500">From today's sessions</span>
       </Card>
 
@@ -30,7 +30,7 @@ export default function DashboardStats({
           <span className="text-gray-600">This Month</span>
           <TrendingUp className="w-5 h-5 text-gray-400" />
         </div>
-        <div className="text-3xl mb-1" style={{ color: '#1E3A8A' }}>${thisMonthEarnings.toFixed(2)}</div>
+        <div className="text-3xl mb-1" style={{ color: '#1E3A8A' }}>{thisMonthEarnings.toFixed(2)} EGP</div>
         <span className="text-sm text-gray-500">Current month earnings</span>
       </Card>
 

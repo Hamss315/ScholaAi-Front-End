@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Brain, DollarSign, ArrowLeft, CheckCircle } from "lucide-react";
+import { Brain, Banknote, ArrowLeft, CheckCircle } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import { Badge } from "../../../components/ui/badge";
 import { Alert, AlertDescription } from "../../../components/ui/alert";
@@ -113,7 +113,7 @@ export default function TeacherPayoutPage() {
           {/* Page Header */}
           <div className="text-center mb-12">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-50 mb-4">
-              <DollarSign className="w-10 h-10 text-green-600" />
+              <Banknote className="w-10 h-10 text-green-600" />
             </div>
             <h1 className="text-4xl font-bold mb-4" style={{ color: "#1E3A8A" }}>
               Request Payout

@@ -56,7 +56,7 @@ import SessionAnalysisPage from "./features/sessions/pages/SessionAnalysisPage";
 import StudentDashboardPage from "./features/student-dashboard/pages/StudentDashboardPage";
 import TeacherDashboardPage from "./features/teacher-dashboard/pages/TeacherDashboardPage";
 
-/* Session */ 
+/* Session */
 import SessionStreamPage from "./features/sessions/pages/StreamPage";
 import SessionRecordPage from "./features/sessions/pages/SessionRecordPage";
 import SessionNotesPage from "./features/sessions/pages/SessionNotesPage";
@@ -65,6 +65,16 @@ import SessionRatingPage from "./features/sessions/pages/SessionRatingPage";
 
 /* Performance */
 import PerformanceReportPage from "./features/performance/pages/PerformanceReportPage";
+
+/* Admin */
+import AdminLoginPage from "./features/admin/pages/AdminLoginPage";
+import AdminPanel from "./features/admin/pages/AdminPanel";
+import AdminUserProfile from "./features/admin/pages/AdminUserProfile";
+import AdminSuspendUser from "./features/admin/pages/AdminSuspendUser";
+import AdminDeleteUser from "./features/admin/pages/AdminDeleteUser";
+import AdminUserPayments from "./features/admin/pages/AdminUserPayments";
+import AdminEditUser from "./features/admin/pages/AdminEditUser";
+import AdminRoute from "./features/admin/components/AdminRoute";
 
 function ChatPageWrapper() {
   const { otherUserId } = useParams<{ otherUserId: string }>();
@@ -77,7 +87,7 @@ function ChatPageWrapper() {
     id: otherUserId || "",
     otherUserId: otherUserId || "",
     otherUserName: "Chat",
-    otherUserRole: "student",
+    otherUserRole: user?.role === "student" ? "teacher" : "student",
     unreadCount: 0,
     online: false,
   };
@@ -144,7 +154,7 @@ export default function App() {
         <Route path="/payment" element={<PaymentPage />} />
 
         {/* CHAT */}
-        <Route path="/chats" element={<ChatsListPage />} />
+        <Route path="/chats" element={<ChatsListPage userRole="student" />} />
         <Route path="/chat/:otherUserId" element={<ChatPageWrapper />} />
 
         {/* SEARCH */}
@@ -164,6 +174,19 @@ export default function App() {
         <Route path="/session/:sessionId/notes" element={<SessionNotesPage />} />
 
         <Route path="/session/:sessionId/rating" element={<SessionRatingPage />} />
+
+        {/* ADMIN - public login */}
+        <Route path="/admin/login" element={<AdminLoginPage />} />
+
+        {/* ADMIN - protected routes */}
+        <Route element={<AdminRoute />}>
+          <Route path="/admin/panel" element={<AdminPanel />} />
+          <Route path="/admin/users/:userId" element={<AdminUserProfile />} />
+          <Route path="/admin/users/:userId/suspend" element={<AdminSuspendUser />} />
+          <Route path="/admin/users/:userId/delete" element={<AdminDeleteUser />} />
+          <Route path="/admin/users/:userId/payments" element={<AdminUserPayments />} />
+          <Route path="/admin/users/:userId/edit" element={<AdminEditUser />} />
+        </Route>
 
         {/* FALLBACK */}
         <Route path="*" element={<Navigate to="/" replace />} />

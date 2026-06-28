@@ -6,7 +6,6 @@ import StudentProfileTabs from "../components/StudentProfileTabs";
 
 import type {
   ProfileData,
-  NotificationsSettings,
   SubscriptionData,
   PaymentItem,
   SessionStats,
@@ -66,18 +65,11 @@ export default function StudentProfilePage() {
     sessionDuration: "",
   });
 
-  const [notifications, setNotifications] = useState<NotificationsSettings>({
-    emailNotifications: true,
-    sessionReminders: true,
-    promotionalEmails: false,
-    weeklyReports: true,
-  });
-
   const [subscriptionData, setSubscriptionData] = useState<SubscriptionData>({
     balance: 0,
     lastTopUp: new Date(),
     status: "Active",
-    currency: "USD",
+    currency: "EGP",
   });
 
   const [paymentHistory, setPaymentHistory] = useState<PaymentItem[]>([]);
@@ -239,8 +231,6 @@ export default function StudentProfilePage() {
               setIsEditingProfile={setIsEditingProfile}
               isChangingPassword={isChangingPassword}
               setIsChangingPassword={setIsChangingPassword}
-              notifications={notifications}
-              setNotifications={setNotifications}
               paymentHistory={paymentHistory}
               sessionStats={sessionStats}
               onSaveProfile={handleSaveProfile}

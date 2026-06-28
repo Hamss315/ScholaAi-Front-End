@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 export default function AllSessionsHeader() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const initials = getInitials(user?.userName) || "JS";
+  const initials = getInitials(user?.userName, user?.firstName, user?.lastName) || "JS";
 
   return (
     <header className="bg-white border-b sticky top-0 z-50">

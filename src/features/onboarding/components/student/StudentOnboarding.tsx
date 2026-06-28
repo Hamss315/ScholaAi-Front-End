@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Brain, Check, ChevronLeft, ChevronRight } from "lucide-react";
 
 import { Button } from "../../../../components/ui/button";
@@ -22,6 +23,7 @@ const TOTAL_STEPS = 4;
 
 export default function StudentOnboarding({ onComplete }: Props) {
   const { payload } = useRegister();
+  const navigate = useNavigate();
 
   const [currentStep, setCurrentStep] = useState(1);
 
@@ -90,7 +92,11 @@ export default function StudentOnboarding({ onComplete }: Props) {
   }, [currentStep, formData]);
 
   const handleBack = () => {
-    if (currentStep > 1) setCurrentStep((s) => s - 1);
+    if (currentStep > 1) {
+      setCurrentStep((s) => s - 1);
+    } else {
+      navigate("/register");
+    }
   };
 
   const handleNext = () => {
@@ -164,7 +170,6 @@ export default function StudentOnboarding({ onComplete }: Props) {
             <Button
               variant="outline"
               onClick={handleBack}
-              disabled={currentStep === 1}
             >
               <ChevronLeft className="w-4 h-4 mr-2" />
               Back

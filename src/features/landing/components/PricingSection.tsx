@@ -26,7 +26,7 @@ export default function PricingSection({ onGetStarted }: Props) {
             <p className="text-gray-600 mb-6">Add funds to your wallet and pay for individual sessions</p>
 
             <div className="text-5xl mb-6" style={{ color: "#8B5CF6" }}>
-              $30-$50<span className="text-xl text-gray-600">/session</span>
+              30-50 EGP<span className="text-xl text-gray-600">/session</span>
             </div>
 
             <ul className="space-y-3 mb-8 text-left">

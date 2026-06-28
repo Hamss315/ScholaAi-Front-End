@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 export default function TeacherRequestsHeader() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const initials = getInitials(user?.userName) || "DR";
+  const initials = getInitials(user?.userName, user?.firstName, user?.lastName) || "DR";
 
   return (
     <header className="bg-white border-b sticky top-0 z-50">

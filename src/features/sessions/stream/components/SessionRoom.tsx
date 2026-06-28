@@ -348,7 +348,13 @@ export function SessionRoom({ sessionId, sessionDbId, peerId, role, token }: Ses
 
         leaveSession();
         signalR.disconnect();
-        navigate(-1);
+
+        // Student gets redirected to the session rating page after leaving
+        if (role === 'viewer') {
+            navigate(`/session/${sessionDbId}/rating`);
+        } else {
+            navigate(-1);
+        }
     }, [role, sessionDbId, stopRecording, leaveSession, signalR, navigate]);
 
     // ── End Session — stop recording, upload it, and end the session in DB ────

@@ -5,8 +5,6 @@ import { Card } from "../../../components/ui/card";
 import { Badge } from "../../../components/ui/badge";
 import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
-import { Switch } from "../../../components/ui/switch";
-import { Separator } from "../../../components/ui/separator";
 import {
   Tabs,
   TabsContent,
@@ -18,10 +16,8 @@ import {
   Edit,
   Save,
   X,
-  Lock,
   Mail,
   Calendar,
-  FileText,
   Settings,
   Clock,
   Phone,
@@ -30,7 +26,6 @@ import {
 
 import type {
   ProfileData,
-  NotificationsSettings,
   PaymentItem,
   SessionStats,
 } from "../types/profile";
@@ -64,9 +59,6 @@ interface StudentProfileTabsProps {
   isChangingPassword: boolean;
   setIsChangingPassword: Dispatch<SetStateAction<boolean>>;
 
-  notifications: NotificationsSettings;
-  setNotifications: Dispatch<SetStateAction<NotificationsSettings>>;
-
   paymentHistory: PaymentItem[];
   sessionStats: SessionStats;
 
@@ -89,8 +81,6 @@ export default function StudentProfileTabs({
   setIsEditingProfile,
   isChangingPassword,
   setIsChangingPassword,
-  notifications,
-  setNotifications,
   paymentHistory,
   sessionStats,
   onSaveProfile,
@@ -105,9 +95,8 @@ export default function StudentProfileTabs({
   return (
     <div className="md:col-span-2">
       <Tabs defaultValue="profile" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="profile">Profile</TabsTrigger>
-          <TabsTrigger value="settings">Settings</TabsTrigger>
           <TabsTrigger value="sessions">Sessions</TabsTrigger>
           <TabsTrigger value="billing">Billing</TabsTrigger>
         </TabsList>
@@ -235,172 +224,95 @@ export default function StudentProfileTabs({
                   className="mt-1"
                 />
               </div>
-            </div>
-          </Card>
-        </TabsContent>
 
-        {/* Settings Tab */}
-        <TabsContent value="settings">
-          <div className="space-y-6">
-            <Card className="p-6">
-              <div className="flex justify-between items-center mb-6">
-                <div>
-                  <h3 className="text-2xl" style={{ color: "#1E3A8A" }}>
-                    Security
-                  </h3>
-                  <p className="text-sm text-gray-600">
-                    Manage your password and security settings
-                  </p>
-                </div>
-                {!isChangingPassword && (
+              {/* Password Section */}
+              <div className="mt-8 pt-6 border-t border-gray-100">
+                <h4 className="text-lg font-medium mb-4" style={{ color: "#1E3A8A" }}>
+                  Security & Password
+                </h4>
+
+                {passwordSuccess && (
+                  <div className="flex items-center gap-2 text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg px-4 py-3 mb-4">
+                    <span>✓</span> {passwordSuccess}
+                  </div>
+                )}
+                {passwordError && (
+                  <div className="flex items-center gap-2 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-4 py-3 mb-4">
+                    <span>✕</span> {passwordError}
+                  </div>
+                )}
+
+                {!isChangingPassword ? (
                   <Button
+                    variant="outline"
                     onClick={() => setIsChangingPassword(true)}
-                    style={{ backgroundColor: "#3B82F6" }}
+                    className="text-blue-600 border-blue-200 hover:bg-blue-50"
                   >
-                    <Lock className="w-4 h-4 mr-2" />
                     Change Password
                   </Button>
+                ) : (
+                  <div className="space-y-4 max-w-md">
+                    <div>
+                      <Label htmlFor="currentPassword">Current Password</Label>
+                      <Input
+                        id="currentPassword"
+                        type="password"
+                        value={passwordData.currentPassword}
+                        onChange={(e) =>
+                          setPasswordData((p) => ({ ...p, currentPassword: e.target.value }))
+                        }
+                        className="mt-1"
+                        placeholder="Enter current password"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="newPassword">New Password</Label>
+                      <Input
+                        id="newPassword"
+                        type="password"
+                        value={passwordData.newPassword}
+                        onChange={(e) =>
+                          setPasswordData((p) => ({ ...p, newPassword: e.target.value }))
+                        }
+                        className="mt-1"
+                        placeholder="Enter new password"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                      <Input
+                        id="confirmPassword"
+                        type="password"
+                        value={passwordData.confirmPassword}
+                        onChange={(e) =>
+                          setPasswordData((p) => ({ ...p, confirmPassword: e.target.value }))
+                        }
+                        className="mt-1"
+                        placeholder="Confirm new password"
+                      />
+                    </div>
+
+                    <div className="flex gap-2 pt-2">
+                      <Button onClick={onChangePassword} style={{ backgroundColor: "#3B82F6" }}>
+                        Update Password
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setIsChangingPassword(false);
+                          setPasswordData({ currentPassword: "", newPassword: "", confirmPassword: "" });
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
                 )}
               </div>
-
-              {isChangingPassword && (
-                <div className="space-y-4 mb-2 p-4 bg-gray-50 rounded-lg">
-
-                  {/* error/success messages */}
-                  {passwordError && (
-                    <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded p-2">
-                      {passwordError}
-                    </p>
-                  )}
-                  {passwordSuccess && (
-                    <p className="text-sm text-green-600 bg-green-50 border border-green-200 rounded p-2">
-                      {passwordSuccess}
-                    </p>
-                  )}
-
-                  <div>
-                    <Label htmlFor="current-password">Current Password</Label>
-                    <Input
-                      id="current-password"
-                      type="password"
-                      className="mt-1"
-                      value={passwordData.currentPassword}                         // ✅ controlled
-                      onChange={(e) => setPasswordData(p => ({ ...p, currentPassword: e.target.value }))}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="new-password">New Password</Label>
-                    <Input
-                      id="new-password"
-                      type="password"
-                      className="mt-1"
-                      value={passwordData.newPassword}                             // ✅ controlled
-                      onChange={(e) => setPasswordData(p => ({ ...p, newPassword: e.target.value }))}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="confirm-password">Confirm New Password</Label>
-                    <Input
-                      id="confirm-password"
-                      type="password"
-                      className="mt-1"
-                      value={passwordData.confirmPassword}                         // ✅ controlled
-                      onChange={(e) => setPasswordData(p => ({ ...p, confirmPassword: e.target.value }))}
-                    />
-                  </div>
-
-                  <div className="flex gap-2">
-                    <Button onClick={onChangePassword} style={{ backgroundColor: "#22C55E" }}>
-                      Update Password
-                    </Button>
-                    <Button variant="outline" onClick={() => setIsChangingPassword(false)}>
-                      Cancel
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </Card>
-
-            <Card className="p-6">
-              <div className="mb-6">
-                <h3 className="text-2xl mb-2" style={{ color: "#1E3A8A" }}>
-                  Notifications
-                </h3>
-                <p className="text-sm text-gray-600">
-                  Choose what updates you'd like to receive
-                </p>
-              </div>
-
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Mail className="w-5 h-5 text-gray-400" />
-                    <div>
-                      <p>Email Notifications</p>
-                      <p className="text-sm text-gray-600">
-                        Receive email updates about your account
-                      </p>
-                    </div>
-                  </div>
-                  <Switch
-                    checked={notifications.emailNotifications}
-                    onCheckedChange={(checked) =>
-                      setNotifications((n) => ({
-                        ...n,
-                        emailNotifications: checked,
-                      }))
-                    }
-                  />
-                </div>
-
-                <Separator />
-
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Calendar className="w-5 h-5 text-gray-400" />
-                    <div>
-                      <p>Session Reminders</p>
-                      <p className="text-sm text-gray-600">
-                        Get reminded before your sessions start
-                      </p>
-                    </div>
-                  </div>
-                  <Switch
-                    checked={notifications.sessionReminders}
-                    onCheckedChange={(checked) =>
-                      setNotifications((n) => ({
-                        ...n,
-                        sessionReminders: checked,
-                      }))
-                    }
-                  />
-                </div>
-
-                <Separator />
-
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <FileText className="w-5 h-5 text-gray-400" />
-                    <div>
-                      <p>Weekly Reports</p>
-                      <p className="text-sm text-gray-600">
-                        Get weekly learning progress reports
-                      </p>
-                    </div>
-                  </div>
-                  <Switch
-                    checked={notifications.weeklyReports}
-                    onCheckedChange={(checked) =>
-                      setNotifications((n) => ({
-                        ...n,
-                        weeklyReports: checked,
-                      }))
-                    }
-                  />
-                </div>
-              </div>
-            </Card>
-          </div>
+            </div>
+          </Card>
         </TabsContent>
 
         {/* Sessions Tab */}
