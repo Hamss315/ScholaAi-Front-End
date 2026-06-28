@@ -22,6 +22,7 @@ interface ChatPageProps {
   selectedChat?: ChatConversation;
   currentUserId?: string;
   currentUserName?: string;
+  onNavigate?: (page: string) => void;
 }
 
 export default function ChatPage({
@@ -29,6 +30,7 @@ export default function ChatPage({
   selectedChat: propSelectedChat,
   currentUserId: propUserId,
   currentUserName: propUserName,
+  onNavigate,
 }: ChatPageProps) {
   const { chatId } = useParams<{ chatId: string }>();
   const location = useLocation();
@@ -163,7 +165,16 @@ export default function ChatPage({
                 <span className="text-2xl text-[#1E3A8A]">ScholaAi</span>
               </div>
 
-              <Button variant="ghost" onClick={() => navigate("/chats")}>
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  if (onNavigate) {
+                    onNavigate("chats-list");
+                  } else {
+                    navigate("/chats");
+                  }
+                }}
+              >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to Messages
               </Button>
@@ -190,7 +201,13 @@ export default function ChatPage({
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => navigate("/")}
+                onClick={() => {
+                  if (onNavigate) {
+                    onNavigate("home");
+                  } else {
+                    navigate("/");
+                  }
+                }}
               >
                 <LogOut className="w-5 h-5" />
               </Button>
