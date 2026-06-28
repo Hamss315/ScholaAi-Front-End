@@ -9,7 +9,7 @@ import { Label } from "../../../components/ui/label";
 import { Textarea } from "../../../components/ui/textarea";
 
 import { createSessionRequest } from "../services/session.service";
-import { getSubjects, type SubjectDto } from "../../../services/api/admin";
+import { getPublicSubjects, type SubjectDto } from "../../../services/api/admin";
 
 export default function RequestSessionForm() {
   const navigate = useNavigate();
@@ -28,7 +28,7 @@ export default function RequestSessionForm() {
 
   // Fetch subjects from backend on mount
   useEffect(() => {
-    getSubjects()
+    getPublicSubjects()
       .then((res) => setSubjects(res.data ?? []))
       .catch(() => setSubjects([]))
       .finally(() => setSubjectsLoading(false));

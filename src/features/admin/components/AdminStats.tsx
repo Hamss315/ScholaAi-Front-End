@@ -79,7 +79,7 @@ export default function AdminStats({ stats, loading }: AdminStatsProps) {
       />
       <StatCard
         label="Revenue (Month)"
-        value={`$${(stats?.monthlyRevenue ?? 0).toLocaleString()}`}
+        value={`${(stats?.monthlyRevenue ?? 0).toLocaleString()} EGP`}
         sub={`${stats?.totalSessionsThisMonth ?? 0} sessions`}
         icon={DollarSign}
         color="#22C55E"

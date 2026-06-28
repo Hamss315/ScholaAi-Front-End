@@ -225,7 +225,16 @@ export default function TeacherProfilePage() {
       setProfileSuccess("Profile updated successfully!");
       setIsEditingProfile(false);
     } catch (e: any) {
-      setProfileError(e?.response?.data?.message || e.message || "Failed to update profile.");
+      const data = e?.response?.data;
+      if (typeof data === "string") {
+        setProfileError(data);
+      } else if (data?.errors) {
+        // ASP.NET ModelState errors: { errors: { fieldName: ["error msg"] } }
+        const messages = Object.values(data.errors).flat().join(" • ");
+        setProfileError(messages as string);
+      } else {
+        setProfileError(data?.message || e.message || "Failed to update profile.");
+      }
     }
   };
 
